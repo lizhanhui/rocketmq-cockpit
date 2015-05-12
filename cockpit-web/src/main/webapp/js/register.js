@@ -1,5 +1,6 @@
 $(document).ready(function() {
     $("#registerButton").click(function() {
+        addcloud();
         var password = $("#password").val();
         var confirmPassword = $("#confirmPassword").val();
 
@@ -52,6 +53,8 @@ $(document).ready(function() {
                 }
             });
         }
+
+        removecloud();
         return readyToRegister;
     });
 });

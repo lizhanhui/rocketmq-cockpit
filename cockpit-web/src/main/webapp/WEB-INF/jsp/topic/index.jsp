@@ -8,6 +8,7 @@
     <script type="application/javascript" src="js/jquery.dataTables.min.js"></script>
     <link type="text/css" href="css/jquery.dataTables.min.css" rel="stylesheet">
     <script src="js/topic.js" type="application/javascript"></script>
+    <script src="js/onloading.js" type="application/javascript"></script>
 </head>
 <body>
     <jsp:include page="../include/header.jsp"></jsp:include>

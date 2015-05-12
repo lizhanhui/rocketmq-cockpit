@@ -20,9 +20,11 @@ $(document).ready(function() {
     } ;
 
     $(".queryByID").click(function() {
+        addcloud();
         var msgId = $("input.msgId").val();
         if (msgId.length != 32){
             alert(" wrong message id ");
+            removecloud();
             return;
         }
         $.ajax({
@@ -71,18 +73,28 @@ $(document).ready(function() {
                                var backlog = $("<tr><td colspan='2'>订阅了，而且消费了SUBSCRIBED_AND_CONSUMED,<br /> 订阅了，但是被过滤掉了 SUBSCRIBED_BUT_FILTERD, <br /> 订阅了，但是是PULL，结果未知 SUBSCRIBED_BUT_PULL, <br /> 订阅了，但是没有消费 SUBSCRIBED_AND_NOT_CONSUME_YET, <br /> 未知异常 UNKNOW_EXCEPTION,</td></tr>");
                                $(".itable-content").append(backlog);
                             }
-                        }
+
+                            removecloud();
+                        },
+                         error: function() {
+                             removecloud();
+                             alert("Error");
+                         }
                     });
+
+                removecloud();
             }
         });
     });
 
     $(".queryByKEY").click(function() {
+        addcloud()
         var topic = $("input.msgTopic").val();
         var key = $("input.msgKey").val();
 
         if ("" === topic || "" === key){
             alert(" please input topic and key");
+            removecloud();
             return;
         }
 
@@ -105,12 +117,18 @@ $(document).ready(function() {
                         $(".ktable-content").append(item);
                    });
                 }
-            }
+                removecloud();
+            },
+             error: function() {
+                 removecloud();
+                 alert("Error");
+             }
         });
 
     });
 
     $(document).on("click", ".operationItem", function() {
+        addcloud();
         var msgId = $(this).attr("rel");
         $("input.msgId").val(msgId);
         $.ajax({
@@ -161,15 +179,17 @@ $(document).ready(function() {
                             }
                         }
                     });
-
+                removecloud();
             },
             error: function() {
+                removecloud();
                 alert("Error");
             }
         });
     });
 
     $(document).on("click", ".flowItem", function() {
+        addcloud();
         var msgId = $(this).attr("rel");
         $("input.msgId").val(msgId);
         $.ajax({
@@ -188,14 +208,17 @@ $(document).ready(function() {
                         $(".ftable-content").append(item);
                    });
                 }
+                removecloud();
             },
             error: function() {
+                removecloud();
                 alert("Error");
             }
         });
     });
 
     $(document).on("click", ".consumerItem", function() {
+        addcloud();
         var topic = $(this).attr("rel");
         $.ajax({
             async: false,
@@ -217,6 +240,7 @@ $(document).ready(function() {
                     selDiv.appendChild(selectC);
 
                     selectC.onchange = function (){
+                        addcloud();
                         var consumerGroup = "undefined" === typeof($("#selectC").children('option:selected').val()) ? "-1" : $("#selectC").children('option:selected').val();
 
                         if (-1 != consumerGroup){
@@ -284,11 +308,15 @@ $(document).ready(function() {
 
                         }else{
                         }
+
+                        removecloud();
                     } ;
                 }
+                removecloud();
             },
             error: function() {
                 alert("Error");
+                removecloud();
             }
         });
     });

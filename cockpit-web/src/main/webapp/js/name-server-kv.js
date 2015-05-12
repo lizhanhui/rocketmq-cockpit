@@ -24,6 +24,7 @@ $(document).ready(function() {
     });
 
     $(".addKV").click(function() {
+        addcloud();
         var nameSpace = $(".nameSpace").val();
         var key = $(".key").val();
         var value = $(".value").val();
@@ -50,11 +51,14 @@ $(document).ready(function() {
                     $(".key").val("");
                     $(".value").val("");
                 }
+
+                removecloud();
             }
         });
     });
 
-    $(".deleteKV").live("click", function() {
+    $(document).on("click", ".deleteKV", function() {
+        addcloud();
         var id = $(this).attr("rel");
         var row = $(this).parent().parent();
         $.ajax({
@@ -77,12 +81,15 @@ $(document).ready(function() {
                        }
                    });
                 }
+
+                removecloud();
             }
         });
 
     });
 
-    $(".applyKV").live("click", function() {
+    $(document).on("click", ".applyKV", function() {
+        addcloud();
         var id = $(this).attr("rel");
 
         var $status = $(this).parent().prev();
@@ -90,6 +97,8 @@ $(document).ready(function() {
             $status.text(data.status);
             id.remove();
         });
+
+        removecloud();
     });
 
 });

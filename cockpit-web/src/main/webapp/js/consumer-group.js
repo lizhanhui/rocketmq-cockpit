@@ -1,5 +1,5 @@
 $(document).ready(function() {
-
+    addcloud();
     $.get("cockpit/api/consumer-group", function(data) {
         $(".table-content").children().remove();
         data.forEach(function(consumerGroup) {
@@ -19,6 +19,7 @@ $(document).ready(function() {
     });
 
     $(".addConsumerGroup").click(function() {
+        addcloud();
         var clusterName = $("input.cluster_name").val();
         var whichBrokerWhenConsumeSlowly = $("input.which_broker_when_consume_slowly").val();
         var groupName = $("input.group_name").val();
@@ -35,6 +36,8 @@ $(document).ready(function() {
                                  "brokerAddress":brokerAddress, "brokerId":brokerId, "retryMaxTimes":retryMaxTimes,
                                  "retryQueueNum":retryQueueNum, "consumeFromMinEnable":consumeFromMinEnable,"status":allow});
         if ($.trim(groupName) === "") {
+            alert(" no group name ?");
+            removecloud();
             return false;
         } else {
             $.ajax({
@@ -48,16 +51,19 @@ $(document).ready(function() {
                             location.reload(true);
                         },
                         error: function() {
-
+                            removecloud();
+                            alert(" ERROR ");
                         }
                     });
         }
     });
 
     $(document).on("click", ".removeItem", function() {
+        addcloud();
         var row = $(this).parent().parent();
         var id = row.children().eq(0).html();
         if ($.trim(id) === "" ) {
+            removecloud();
             return false;
         }
         $.ajax({
@@ -68,6 +74,7 @@ $(document).ready(function() {
             contentType: "application/json",
             success: function() {
                 row.remove();
+                removecloud();
             },
             error: function() {
                 location.reload(true);
@@ -76,6 +83,7 @@ $(document).ready(function() {
     });
 
     $(document).on("click", ".approveItem", function() {
+        addcloud();
             var row = $(this).parent().parent();
             var id = row.children().eq(0).html();
             var clusterName = row.children().eq(1).html();
@@ -95,6 +103,7 @@ $(document).ready(function() {
                                      "retryQueueNum":retryQueueNum, "consumeFromMinEnable":consumeFromMinEnable,"order":order});
 
             if ($.trim(id) === "" ) {
+                removecloud();
                 return false;
             }
 
@@ -116,7 +125,11 @@ $(document).ready(function() {
                             location.reload(true);
                         }
                     });
+
+                    removecloud();
                 }
             });
     });
+
+    removecloud();
 });

@@ -7,6 +7,7 @@
         <jsp:param name="pageTitle" value="User Registration" />
     </jsp:include>
     <script type="text/javascript" src="js/register.js"></script>
+    <script src="js/onloading.js" type="application/javascript"></script>
 </head>
 <body>
     <div class="container-fluid">

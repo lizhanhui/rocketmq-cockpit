@@ -15,8 +15,10 @@ $(document).ready(function() {
 
 
     $(".addNameServer").click(function() {
+        addcloud();
         var nameServer = $("input.newNameServer").val();
         if ($.trim(nameServer) === "") {
+            removecloud();
             return false;
         } else {
             sections = nameServer.split(":");
@@ -41,12 +43,14 @@ $(document).ready(function() {
                         alert("Error!");
                     }
 
+                    removecloud();
                 }
             });
         }
     });
 
-    $(".removeItem").live("click", function() {
+    $(document).on("click", ".removeItem",  function() {
+        addcloud();
         var row = $(this).parent().parent();
         $.ajax({
             async: true,
@@ -55,7 +59,9 @@ $(document).ready(function() {
             dataType: "json",
             complete: function() {
                 row.remove();
+                removecloud();
             }
         });
     });
+
 });

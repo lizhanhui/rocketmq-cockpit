@@ -2,6 +2,7 @@ var selectDefault = "----请选择-----";
 var chart;
 
 $(document).ready(function() {
+    addcloud();
 /** * Grid theme for Highcharts JS * @author Torstein Honsi */
     Highcharts.theme = {
         colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
@@ -198,6 +199,7 @@ $(document).ready(function() {
     });
 
     $(".findConsumeProgress").click(function() {
+        addcloud();
         var x = [];
         var consumerGroup = "undefined" === typeof($("#selectC").children('option:selected').val()) ? "-1" : $("#selectC").children('option:selected').val();
         var topic = "undefined" === typeof($("#selectT").children('option:selected').val()) ? "-1" : $("#selectT").children('option:selected').val();
@@ -210,6 +212,7 @@ $(document).ready(function() {
         var queue = "undefined" === typeof($("#selectQ").children('option:selected').val()) ? "-1" : $("#selectQ").children('option:selected').val();
         if ($.trim(consumerGroup) === "" || "-1" === consumerGroup) {
             alert("consumer group should not be null");
+            removecloud();
             return false;
         } else {
             $.ajax({
@@ -246,11 +249,14 @@ $(document).ready(function() {
 
                     x.reverse();
                     showCharts(line, x);
+
+                    removecloud();
                 }
             });
         }
     });
 
+    removecloud();
 });
 
 function createOption(text){

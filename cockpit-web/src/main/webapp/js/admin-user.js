@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    addcloud();
     $.get("cockpit/manage/user/all", function(data) {
         data.forEach(function(item) {
             var $tr = $("<tr></tr>");
@@ -47,6 +48,7 @@ $(document).ready(function() {
     });
 
     $(document).on("click", ".operation", function() {
+        addcloud();
         var $a = $(this);
         var userId = $a.attr("rel");
         if ($a.hasClass("draft") || $a.hasClass("deleted")) {
@@ -65,6 +67,9 @@ $(document).ready(function() {
                 $a.text("Activate");
             });
         }
+
+        removecloud();
     });
 
+    removecloud();
 });

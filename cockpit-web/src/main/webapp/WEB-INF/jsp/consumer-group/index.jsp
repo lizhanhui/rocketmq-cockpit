@@ -5,6 +5,7 @@
         <jsp:param name="pageTitle" value="Consumer Group Management" />
     </jsp:include>
     <script src="js/consumer-group.js" type="application/javascript"></script>
+    <script src="js/onloading.js" type="application/javascript"></script>
 </head>
 <body>
     <jsp:include page="../include/header.jsp"></jsp:include>

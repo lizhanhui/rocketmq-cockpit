@@ -1,11 +1,13 @@
 var oTable;
 
 $(document).ready(function() {
+    addcloud();
     oTable = initTable();
     document.getElementById("addTopicDIV").style.display="none";
     document.getElementById("sendMessageTestDIV").style.display="none";
 
     $(".addTopic").click(function() {
+        addcloud();
         var topic = $("input.topic").val();
         var write_queue_num = $("input.writeQueueNum").val();
         var read_queue_num = $("input.readQueueNum").val();
@@ -19,8 +21,10 @@ $(document).ready(function() {
         var ob = JSON.stringify({"topic":topic,"writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
                                  "brokerAddress":broker_address, "clusterName":cluster_name, "permission":permission, "unit":unit, "hasUnitSubscription":has_unit_subscription, "order":order, "status":allow});
         if ($.trim(topic) === "") {
+            removecloud();
             return false;
         } else if ($.trim(cluster_name) === "" && $.trim(broker_address) == "") {
+            removecloud();
             return false;
         } else {
             $.ajax({
@@ -34,7 +38,7 @@ $(document).ready(function() {
                             location.reload(true);
                         },
                         error: function() {
-
+                            removecloud();
                         }
                     });
         }
@@ -57,6 +61,7 @@ $(document).ready(function() {
     });
 
     $(".send").click(function() {
+        addcloud();
             var topic = $("input.send_topic").val();
             var producerGroup = $("input.send_producerGroup").val();
             var tag = $("input.send_tag").val();
@@ -64,6 +69,7 @@ $(document).ready(function() {
             var body = $("input.send_body").val();
 
             if ($.trim(topic) === "") {
+                removecloud();
                 return false;
             } else {
                 $.ajax({
@@ -77,11 +83,13 @@ $(document).ready(function() {
                                 location.reload(true);
                             },
                             error: function() {
-
+                                removecloud();
                             }
                         });
             }
         });
+
+    removecloud();
 });
 
 function initTable(){
@@ -134,6 +142,7 @@ function initTable(){
 }
 
 function _deleteFun(id, topic, cluster_name, broker_address) {
+    addcloud();
     $.ajax({
         async: false,
         data: JSON.stringify({"id":id, "topic":topic, "clusterName":cluster_name}),
@@ -154,11 +163,14 @@ function _deleteFun(id, topic, cluster_name, broker_address) {
                         }
                     });
             }
+
+            removecloud();
         }
     });
 }
 
 function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read_queue_num, permission, unit, has_unit_subscription,  order) {
+        addcloud();
         var ob = JSON.stringify({"id":id, "topic":topic,"writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
                                  "brokerAddress":broker_address, "clusterName":cluster_name, "permission":permission,
                                  "unit":unit, "hasUnitSubscription":has_unit_subscription, "order":order});
@@ -182,6 +194,8 @@ function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read
                         }
                     });
                 }
+
+                removecloud();
             }
         });
 }

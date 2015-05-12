@@ -6,6 +6,7 @@
     </jsp:include>
     <title>Name Server Management</title>
     <script src="js/name-server.js" type="application/javascript"></script>
+    <script src="js/onloading.js" type="application/javascript"></script>
 </head>
 <body>
     <jsp:include page="../include/header.jsp"></jsp:include>

@@ -5,6 +5,7 @@
         <jsp:param name="pageTitle" value="Query Message" />
     </jsp:include>
   <script src="js/message.js" type="application/javascript"></script>
+  <script src="js/onloading.js" type="application/javascript"></script>
 </head>
 <body>
 

@@ -14,9 +14,11 @@ $(document).ready(function() {
 
 
     $(".addMapping").click(function() {
+        addcloud();
         var innerIP = $("input.innerIP").val();
         var publicIP = $("input.publicIP").val();
         if ($.trim(innerIP) === "" || $.trim(publicIP) == "") {
+            removecloud();
             return false;
         } else {
             $.ajax({
@@ -31,12 +33,15 @@ $(document).ready(function() {
                     $(".table-content").append(item);
                     $("input.innerIP").val("");
                     $("input.publicIP").val("");
+
+                    removecloud();
                 }
             });
         }
     });
 
-    $(".removeItem").live("click", function() {
+    $(document).on("click", ".removeItem", function() {
+        addcloud();
         var row = $(this).parent().parent();
         var id = $(this).attr("rel");
         $.ajax({
@@ -45,10 +50,13 @@ $(document).ready(function() {
             type: "DELETE",
             success: function() {
                 row.remove();
+                removecloud();
             },
             error: function() {
+                removecloud();
                 alert("Error");
             }
         });
     });
+
 });

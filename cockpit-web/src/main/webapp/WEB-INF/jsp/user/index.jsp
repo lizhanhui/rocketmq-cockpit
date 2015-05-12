@@ -6,6 +6,7 @@
         <jsp:param name="pageTitle" value="Manage User" />
     </jsp:include>
     <script src="js/admin-user.js" type="text/javascript"></script>
+    <script src="js/onloading.js" type="application/javascript"></script>
     <style type="text/css">
         table, td, th {
             border: solid lightgrey 1px;

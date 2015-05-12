@@ -10,6 +10,7 @@
     <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
     <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
     <script src="js/producer.js" type="application/javascript"></script>
+    <script src="js/onloading.js" type="application/javascript"></script>
 </head>
 <body>
     <div class="container-fluid">
