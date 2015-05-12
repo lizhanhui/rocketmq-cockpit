@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper">
+
+    <insert id="insert" parameterType="Topic" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO topic (id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time)
+        VALUES (NULL, #{topic}, #{clusterName}, #{permission}, #{writeQueueNum}, #{readQueueNum}, #{unit}, #{hasUnitSubscription}, #{brokerAddress}, #{order}, #{status.id}, #{createTime}, #{updateTime})
+    </insert>
+
+    <insert id="associateTeam">
+        INSERT INTO topic_team_xref(topic_id, team_id)
+        VALUES (#{topicId}, #{teamId})
+    </insert>
+
+    <delete id="removeTopicTeamAssociation">
+        DELETE
+        FROM topic_team_xref
+        WHERE 1 = 1
+
+        <if test="topicId > 0">
+            AND topic_id = #{topicId}
+        </if>
+
+        <if test="teamId > 0">
+            AND team_id = #{teamId}
+        </if>
+    </delete>
+
+    <update id="update" parameterType="Topic">
+        UPDATE topic SET topic = #{topic}, cluster_name = #{clusterName},
+            permission = #{permission}, write_queue_num = #{writeQueueNum},
+            read_queue_num = #{readQueueNum}, unit = #{unit},
+            has_unit_subscription = #{hasUnitSubscription}, broker_address = #{brokerAddress},
+            order_type = #{order}, status_id = #{status.id},
+            create_time = #{createTime}, update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE
+        FROM topic
+        WHERE id = #{id}
+    </delete>
+
+    <update id="register" parameterType="long">
+        UPDATE topic SET status_id = 2
+        WHERE id = #{id}
+    </update>
+
+    <resultMap id="topicMap" type="Topic">
+        <id column="id" property="id" />
+        <result column="topic" property="topic" />
+        <result column="cluster_name" property="clusterName" />
+        <result column="permission" property="permission" />
+        <result column="write_queue_num" property="writeQueueNum" />
+        <result column="read_queue_num" property="readQueueNum" />
+        <result column="unit" property="unit" />
+        <result column="has_unit_subscription" property="hasUnitSubscription" />
+        <result column="broker_address" property="brokerAddress" />
+        <result column="order_type" property="order" />
+        <result column="status_id" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <select id="get" resultMap="topicMap">
+        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
+        FROM topic
+        WHERE id = #{id}
+    </select>
+
+    <select id="list" resultMap="topicMap">
+        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
+        FROM topic
+        <if test="teamId > 0">
+            JOIN topic_team_xref AS xref ON id = xref.topic_id
+        </if>
+        WHERE 1 = 1
+        <if test="teamId > 0">
+            AND xref.team_id = #{teamId}
+        </if>
+
+        <if test="topic != null">
+            AND topic = #{topic}
+        </if>
+    </select>
+</mapper>

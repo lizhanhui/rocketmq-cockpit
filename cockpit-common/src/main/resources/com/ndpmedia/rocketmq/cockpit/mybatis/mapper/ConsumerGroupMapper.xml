@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper">
+
+    <insert id="insert" parameterType="ConsumerGroup" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO consumer_group (id, cluster_name, group_name, consume_enable, consume_broadcast_enable, update_time)
+        VALUES (NULL, #{clusterName}, #{groupName}, #{consumeEnable}, #{consumeBroadcastEnable}, #{updateTime})
+    </insert>
+
+    <insert id="associateTeam">
+        INSERT INTO consumer_group_team_xref(consumer_group_id, team_id)
+                VALUES (#{consumerGroupId}, #{teamId})
+    </insert>
+
+    <update id="update" parameterType="ConsumerGroup">
+        UPDATE consumer_group
+        SET cluster_name = #{clusterName},
+            which_broker_when_consume_slowly = #{whichBrokerWhenConsumeSlowly},
+            group_name = #{groupName}, consume_enable = #{consumeEnable},
+            consume_broadcast_enable = #{consumeBroadcastEnable},
+            broker_address = #{brokerAddress}, broker_id = #{brokerId},
+            retry_max_times = #{retryMaxTimes}, retry_queue_num = #{retryQueueNum},
+            consume_from_min_enable = #{consumeFromMinEnable}, status_id = #{status.id},
+            create_time = #{createTime}, update_time = #{updateTime}
+    </update>
+
+    <update id="register" parameterType="long">
+        UPDATE consumer_group
+        SET status_id = 2
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE
+        FROM consumer_group
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteConsumerGroupTeamAssociation">
+        DELETE
+        FROM consumer_group_team_xref
+        WHERE 1 = 1
+        <if test="consumerGroupId > 0">
+            AND consumer_group_id = #{consumerGroupId}
+        </if>
+
+        <if test="teamId > 0">
+            AND team_id = #{teamId}
+        </if>
+    </delete>
+
+    <resultMap id="consumerGroupMap" type="ConsumerGroup">
+        <id column="id" property="id" />
+        <result column="cluster_name" property="clusterName" />
+        <result column="which_broker_when_consume_slowly" property="whichBrokerWhenConsumeSlowly" />
+        <result column="group_name" property="groupName" />
+        <result column="consume_enable" property="consumeEnable" />
+        <result column="consume_broadcast_enable" property="consumeBroadcastEnable" />
+        <result column="broker_address" property="brokerAddress" />
+        <result column="broker_id" property="brokerId" />
+        <result column="retry_max_times" property="retryMaxTimes" />
+        <result column="retry_queue_num" property="retryQueueNum" />
+        <result column="consume_from_min_enable" property="consumeFromMinEnable" />
+        <result column="status_id" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <select id="list" resultMap="consumerGroupMap">
+        SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, broker_address, broker_id, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
+        FROM consumer_group
+        <if test="teamId > 0">
+            JOIN consumer_group_team_xref AS xref ON xref.consumer_group_id = id
+        </if>
+        WHERE 1 = 1
+
+        <if test="teamId > 0">
+            AND xref.team_id = #{teamId}
+        </if>
+
+        <if test="clusterName != null">
+            AND cluster_name = #{clusterName}
+        </if>
+
+        <if test="consumerGroupName != null">
+            AND group_name = #{consumerGroupName}
+        </if>
+    </select>
+
+    <select id="get" resultMap="consumerGroupMap" parameterType="long">
+        SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, broker_address, broker_id, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
+        FROM consumer_group
+        WHERE id = #{id}
+    </select>
+</mapper>

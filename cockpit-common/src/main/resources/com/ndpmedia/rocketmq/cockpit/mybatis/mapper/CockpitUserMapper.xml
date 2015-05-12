@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitUserMapper">
+
+    <resultMap id="cockpitUserMap" type="CockpitUser">
+        <id column="uid" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="email" property="email" />
+        <result column="status_id" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+        <association property="team" resultMap="teamMap" />
+        <collection property="cockpitRoles" column="uid" ofType="CockpitRole" select="queryRoles" />
+    </resultMap>
+
+    <resultMap id="teamMap" type="Team">
+        <id column="tid" property="id" />
+        <result column="name" property="name" />
+    </resultMap>
+
+    <insert id="insert" parameterType="CockpitUser" useGeneratedKeys="true" keyProperty="id">
+      INSERT INTO cockpit_user(id, username, password, email, status_id)
+      VALUES (NULL, #{username}, #{password}, #{email}, #{status.id})
+    </insert>
+
+    <insert id="grant">
+        INSERT INTO cockpit_user_role_xref(user_id, role_id)
+                SELECT #{userId}, #{roleId}
+                FROM dual
+                WHERE NOT EXISTS(SELECT * FROM cockpit_user_role_xref WHERE user_id = #{userId} AND role_id = #{roleId})
+    </insert>
+
+    <update id="activate" parameterType="long">
+        UPDATE cockpit_user
+        SET status_id = 2
+        WHERE id = #{id}
+    </update>
+
+    <update id="suspend" parameterType="long">
+        UPDATE cockpit_user
+        SET status_id = 3
+        WHERE id = #{id}
+    </update>
+
+    <delete id="revoke">
+        DELETE FROM cockpit_user_role_xref
+        WHERE user_id = #{userId} AND role_id = #{roleId}
+    </delete>
+
+    <select id="get" resultMap="cockpitUserMap">
+        SELECT u.id AS uid, u.username, u.password, u.email, u.status_id, t.id AS tid, t.name
+        FROM cockpit_user AS u
+            JOIN team_user_xref AS xref ON u.id = xref.user_id
+            JOIN team AS t on xref.team_id = t.id
+        WHERE 1 = 1
+
+        <if test="id > 0">
+            AND u.id = #{id}
+        </if>
+
+        <if test="userName != null">
+            AND u.username = #{userName}
+        </if>
+    </select>
+
+
+    <select id="list" resultMap="cockpitUserMap">
+        SELECT u.id AS uid, u.username, u.password, u.email, u.status_id, t.id AS tid, t.name
+        FROM cockpit_user AS u
+            JOIN team_user_xref AS xref ON u.id = xref.user_id
+            JOIN team AS t on xref.team_id = t.id
+        <if test="status != null">
+            WHERE u.status_id = #{status.id}
+        </if>
+    </select>
+
+    <select id="queryRoles" resultType="CockpitRole">
+        SELECT r.id, r.name
+        FROM cockpit_role AS r
+             JOIN cockpit_user_role_xref AS xref ON xref.role_id = r.id
+        WHERE xref.user_id = #{userId}
+    </select>
+
+</mapper>

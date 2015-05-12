@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/security
+                           http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+    <security:http pattern="/js/**" security="none" />
+    <security:http pattern="/css/**" security="none" />
+    <security:http pattern="/img/**" security="none" />
+    <security:http pattern="/fonts/**" security="none" />
+
+    <security:http pattern="/rocketmq/**" security="none" />
+    <security:http pattern="/console/**" security="none" />
+    <security:http pattern="/**/captcha-image" security="none" />
+    <security:http pattern="/cockpit/register" security="none" />
+    <security:http pattern="/cockpit/login" security="none" />
+    <security:http pattern="/error" security="none" />
+
+    <security:http auto-config="true">
+
+        <security:intercept-url pattern="/*" requires-channel="https" />
+
+        <security:custom-filter ref="rocketMQLoginFilter" before="FORM_LOGIN_FILTER" />
+        <security:intercept-url pattern="/favicon.ico" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <security:intercept-url pattern="/cockpit/login.jsp" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/cockpit/captcha-image.jsp" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/j_spring_security_check"  access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+
+        <security:intercept-url pattern="/cockpit/manage/**"  access="ROLE_ADMIN"/>
+        <security:intercept-url pattern="/cockpit/admin/**"  access="ROLE_ADMIN"/>
+        <security:intercept-url pattern="/cockpit/ip/**" requires-channel="http" access="ROLE_ADMIN"/>
+        <security:intercept-url pattern="/cockpit/name-server/**" requires-channel="http" access="ROLE_ADMIN"/>
+
+        <security:intercept-url pattern="/**"  access="ROLE_USER, ROLE_ADMIN"/>
+
+        <security:form-login authentication-failure-handler-ref="rocketMQUserLoginFailedHandler"
+                             authentication-success-handler-ref="rocketMQUserLoginSuccessHandler"
+                             default-target-url="/cockpit/home"
+                             always-use-default-target="true"
+                             login-page="/cockpit/login.jsp"
+                             login-processing-url="/j_spring_security_check"
+                             authentication-failure-url="/cockpit/login.jsp?error=true"/>
+        <security:session-management session-fixation-protection="none">
+            <security:concurrency-control max-sessions="1" error-if-maximum-exceeded="false"  />
+        </security:session-management>
+
+        <security:access-denied-handler ref="accessDeniedHandler" />
+
+        <security:remember-me remember-me-parameter="remember-me" token-validity-seconds="604800" />
+
+        <security:logout logout-url="/logout" logout-success-url="/cockpit/login.jsp" delete-cookies="JSESSIONID" />
+    </security:http>
+
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider  user-service-ref="userDetailService">
+            <security:password-encoder hash="bcrypt">
+            </security:password-encoder>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <bean id="userDetailService" class="com.ndpmedia.rocketmq.authentication.RocketMQUserDetailsService" />
+
+    <bean id="rocketMQLoginFilter" class="com.ndpmedia.rocketmq.authentication.RocketMQLoginFilter" />
+    <bean id="rocketMQUserLoginSuccessHandler" class="com.ndpmedia.rocketmq.authentication.RocketMQUserLoginSuccessHandler" />
+
+    <bean id="accessDeniedHandler" class="com.ndpmedia.rocketmq.authentication.RocketMQUserAccessDeniedHandler" >
+        <property name="accessDeniedURL" value="error/403.jsp" />
+    </bean>
+
+    <bean id="rocketMQUserLoginFailedHandler"
+          class="com.ndpmedia.rocketmq.authentication.RocketMQUserLoginFailedHandler" />
+
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+
+</beans>

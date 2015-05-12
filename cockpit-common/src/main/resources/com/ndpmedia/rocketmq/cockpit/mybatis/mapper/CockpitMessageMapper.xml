@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitMessageMapper">
+
+    <resultMap id="cockpitMessageMapper" type="CockpitMessageFlow">
+        <id column="id" property="id" />
+        <result column="topic" property="topic" />
+        <result column="tags" property="tags" />
+        <result column="msg_id" property="msgId" />
+        <result column="tracer_id" property="tracerId" />
+        <result column="born_host" property="bornHost" />
+        <result column="status" property="status" />
+        <result column="source" property="source" />
+        <result column="producer_group" property="producerGroup" />
+        <result column="consumer_group" property="consumerGroup" />
+        <result column="broker" property="broker" />
+        <result column="client" property="client" />
+        <result column="message_queue" property="messageQueue" />
+        <result column="offset" property="offSet" />
+        <result column="ip_from" property="ipFrom" />
+        <result column="ip_to" property="ipTo" />
+        <result column="create_time" property="createTime" />
+        <result column="time_stamp" property="timeStamp" />
+    </resultMap>
+
+    <select id="tracerId" resultType="string">
+        SELECT tracer_id
+        FROM message_flow
+        WHERE 1 = 1
+            AND tracer_id IS NOT NULL
+        <if test="id != null">
+            AND msg_id = #{id}
+        </if>
+        limit 1
+    </select>
+
+    <select id="list" resultMap="cockpitMessageMapper">
+        SELECT *
+        FROM message_flow
+        WHERE 1 = 1
+        <if test="msgId != null">
+            AND ( msg_id = #{msgId}
+            <if test="tracerId != null">
+                OR tracer_id = #{tracerId}
+            </if>
+            )
+        </if>
+
+    </select>
+
+    <delete id="bulkDelete" parameterType="date">
+        DELETE
+        FROM message_flow
+        WHERE #{date} > create_time
+    </delete>
+
+</mapper>
