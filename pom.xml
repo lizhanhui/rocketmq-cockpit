@@ -28,6 +28,14 @@
         <rocketmq.version>3.2.2</rocketmq.version>
     </properties>
 
+    <repositories>
+        <!-- Internal Nexus Repository. GitHub user, please comment the following repository out. -->
+        <repository>
+            <id>Local Nexus Repository</id>
+            <url>http://172.30.10.200:8081/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
