@@ -14,8 +14,9 @@
     <packaging>war</packaging>
 
     <dependencies>
+
         <dependency>
-            <groupId>com.alibaba.rocketmq</groupId>
+            <groupId>com.ndpmedia.rocketmq.cockpit</groupId>
             <artifactId>cockpit-common</artifactId>
             <version>3.2.2</version>
         </dependency>
