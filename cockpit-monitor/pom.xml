@@ -12,6 +12,7 @@
     <name>${artifactId} ${project.version}</name>
 
     <dependencies>
+
         <dependency>
             <groupId>com.ndpmedia.rocketmq.cockpit</groupId>
             <artifactId>cockpit-common</artifactId>
