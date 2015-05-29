@@ -12,6 +12,7 @@ import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import java.util.HashSet;
@@ -38,7 +39,20 @@ public class SyncTopicCommand implements SubCommand {
 
     @Override
     public Options buildCommandlineOptions(Options options) {
-        return null;
+
+        Option opt = new Option("b", "brokerAddr", true, "delete subscription group from which broker");
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option("c", "clusterName", true, "delete subscription group from which cluster");
+        opt.setRequired(false);
+        options.addOption(opt);
+
+        opt = new Option("g", "groupName", true, "subscription group name");
+        opt.setRequired(true);
+        options.addOption(opt);
+
+        return options;
     }
 
     @Override
