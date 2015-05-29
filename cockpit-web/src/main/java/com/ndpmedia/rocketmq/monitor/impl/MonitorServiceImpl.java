@@ -41,7 +41,8 @@ public class MonitorServiceImpl implements MonitorService {
             List<Object> temp = new ArrayList<Object>();
             temp.add(consumeProgress.get("consumerGroup"));
             temp.add(consumeProgress.get("diff"));
-            temp.add(null == consumeProgress.get("threshold") ? 1000 : consumeProgress.get("threshold"));
+            temp.add(null == consumeProgress.get("threshold1") ? 1000 : consumeProgress.get("threshold1"));
+            temp.add(null == consumeProgress.get("threshold2") ? 50000 : consumeProgress.get("threshold2"));
             result.add(temp);
         }
 

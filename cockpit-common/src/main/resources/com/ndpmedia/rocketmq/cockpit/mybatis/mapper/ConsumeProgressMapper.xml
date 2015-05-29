@@ -238,7 +238,7 @@
         SELECT sum(cp.diff) as diff, cp.create_time
 
         <if test="consumerGroup != null">
-            , cp.consumer_group as consumerGroup, cg.threshold as threshold
+            , cp.consumer_group as consumerGroup, cg.warn_threshold as threshold1, cg.fatal_threshold as threshold2
         </if>
 
         <if test="topic != null">
