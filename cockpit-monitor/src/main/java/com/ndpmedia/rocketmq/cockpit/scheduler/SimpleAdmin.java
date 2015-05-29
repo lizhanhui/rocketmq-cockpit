@@ -3,6 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.scheduler;
 import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.srvutil.ServerUtil;
 import com.alibaba.rocketmq.tools.command.SubCommand;
+import com.ndpmedia.rocketmq.cockpit.scheduler.command.SyncConsumerGroupCommand;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.SyncTopicCommand;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -19,6 +20,7 @@ public class SimpleAdmin {
 
     static{
         cmdList.add(new SyncTopicCommand());
+        cmdList.add(new SyncConsumerGroupCommand());
     }
 
     public static void main(String[] args){
