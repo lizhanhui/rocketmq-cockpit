@@ -25,6 +25,7 @@ public interface TopicMapper {
      */
     List<Topic> list(@Param("teamId") long teamId, @Param("topic") String topic);
 
+    List<Topic> detailList(@Param("teamId") long teamId, @Param("topic") String topic);
 
     void associateTeam(@Param("topicId") long topicId, @Param("teamId") long teamId);
 

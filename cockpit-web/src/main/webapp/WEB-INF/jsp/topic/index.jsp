@@ -20,9 +20,9 @@
             placeholder="Write Queue Number, Default 16"></td></tr>
             <tr class="hide"><td>Read Queue Number:</td><td>  <input type="text" class="form-control readQueueNum"
             placeholder="Read Queue Number, Default 16"></td></tr>
-            <tr class="hide"><td>Broker Address:</td><td>  <input type="text" class="form-control brokerAddress"
+            <tr><td>Broker Address:</td><td>  <input type="text" class="form-control brokerAddress"
             placeholder="IP:10911"></td></tr>
-            <tr class="hide"><td>Cluster Name:</td><td>  <input type="text" class="form-control clusterName"
+            <tr><td>Cluster Name:</td><td>  <input type="text" class="form-control clusterName"
             placeholder="Cluster Name" value="DefaultCluster"></td></tr>
             <tr class="hide"><td>Permission:</td><td>  <input type="text" class="form-control permission"
                     placeholder="Read: 2/Write: 4/Read&Write: 6"></td></tr>
@@ -71,15 +71,12 @@
         <thead>
            <tr>
                   <th>Topic</th>
-                  <th>Cluster Name</th>
-                  <th>Broker Address</th>
                   <th>Write Queue Number</th>
                   <th>Read Queue Number</th>
                   <th>Permission</th>
                   <th>Unit</th>
                   <th>Has Unit Subscription</th>
                   <th>Order</th>
-                  <th>Status</th>
                   <th>Create Time</th>
                   <th>Update Time</th>
                   <th>Operation</th>
@@ -89,6 +86,23 @@
         </tbody>
       </table>
 
+<div id="topicDetailDIV" class="col-xs-8 col-xs-offset-2 text-left table-responsive">
+      <table cellspacing="0" class="display" id="topicDetail" width="100%">
+        <thead>
+           <tr>
+                  <th>Topic</th>
+                  <th>Cluster Name</th>
+                  <th>Broker Address</th>
+                  <th>Status</th>
+                  <th>Create Time</th>
+                  <th>Update Time</th>
+                  <th>Operation</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+</div>
 
 </div>
 </body>

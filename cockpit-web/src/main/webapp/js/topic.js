@@ -1,10 +1,12 @@
 var oTable;
+var dTable;
 
 $(document).ready(function() {
     addcloud();
     oTable = initTable();
     document.getElementById("addTopicDIV").style.display="none";
     document.getElementById("sendMessageTestDIV").style.display="none";
+    document.getElementById("topicDetailDIV").style.display="none";
 
     $(".addTopic").click(function() {
         addcloud();
@@ -103,14 +105,49 @@ function initTable(){
             "scrollX": true,
             "columns": [
                         { "data": "topic" },
-                        { "data": "clusterName" },
-                        { "data": "brokerAddress" },
                         { "data": "writeQueueNum" },
                         { "data": "readQueueNum" },
                         { "data": "permission" },
                         { "data": "unit" },
                         { "data": "hasUnitSubscription" },
                         { "data": "order" },
+                        { "data": "createTime" },
+                        { "data": "updateTime" },
+                        { "data": "topic",
+                          "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                                $(nTd).html("<a href='javascript:void(0);' " + "onclick='detailTable(\"" + oData.topic + "\")'>Detail</a>&nbsp;&nbsp;");
+                          }
+                        }
+            ],
+            "fnCreatedRow": function (nRow, aData, iDataIndex) {
+                        //add selected class
+                        $(nRow).click(function () {
+                            if ($(this).hasClass('row_selected')) {
+                                $(this).removeClass('row_selected');
+                            } else {
+                                oTable.$('tr.row_selected').removeClass('row_selected');
+                                $(this).addClass('row_selected');
+                            }
+                        });
+            }
+        });
+        return table;
+}
+
+
+function detailTable(topic){
+    tTable = $('#topicDetail').dataTable({
+            "processing": true,
+            "sAjaxSource": "cockpit/api/topic/detail/" + topic,
+            "sAjaxDataProp": "data",
+            "bPaginate": true,  //是否分页。
+            "bFilter": true,  //是否可过滤。
+            "bLengthChange": true, //是否允许自定义每页显示条数.
+            "scrollX": true,
+            "columns": [
+                        { "data": "topic" },
+                        { "data": "clusterName" },
+                        { "data": "brokerAddress" },
                         { "data": "status" },
                         { "data": "createTime" },
                         { "data": "updateTime" },
@@ -138,7 +175,7 @@ function initTable(){
                         });
             }
         });
-        return table;
+        document.getElementById("topicDetailDIV").style.display = "block";
 }
 
 function _deleteFun(id, topic, cluster_name, broker_address) {
