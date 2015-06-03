@@ -87,7 +87,8 @@
       </table>
 
 <div id="topicDetailDIV" class="col-xs-8 col-xs-offset-2 text-left table-responsive">
-      <table cellspacing="0" class="display" id="topicDetail" width="100%">
+<button id="closeDetail" onclick="closeDetail();">close</button>
+      <table cellspacing="0" class="display" id="topicDetail" width="100%" style="margin-left: 0px;">
         <thead>
            <tr>
                   <th>Topic</th>

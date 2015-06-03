@@ -9,6 +9,7 @@ $(document).ready(function() {
     document.getElementById("topicDetailDIV").style.display="none";
 
     $(".addTopic").click(function() {
+        document.getElementById("topicDetailDIV").style.display="none";
         addcloud();
         var topic = $("input.topic").val();
         var write_queue_num = $("input.writeQueueNum").val();
@@ -136,46 +137,61 @@ function initTable(){
 
 
 function detailTable(topic){
-    tTable = $('#topicDetail').dataTable({
-            "processing": true,
-            "sAjaxSource": "cockpit/api/topic/detail/" + topic,
-            "sAjaxDataProp": "data",
-            "bPaginate": true,  //是否分页。
-            "bFilter": true,  //是否可过滤。
-            "bLengthChange": true, //是否允许自定义每页显示条数.
-            "scrollX": true,
-            "columns": [
-                        { "data": "topic" },
-                        { "data": "clusterName" },
-                        { "data": "brokerAddress" },
-                        { "data": "status" },
-                        { "data": "createTime" },
-                        { "data": "updateTime" },
-                        { "data": "id",
-                          "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                            if (oData.status != "ACTIVE"){
-                                $(nTd).html("<a href='javascript:void(0);' " + "onclick='_editFun(\"" + oData.id + "\",\"" + oData.topic + "\",\"" + oData.clusterName + "\",\"" + oData.brokerAddress + "\",\"" + oData.writeQueueNum + "\",\"" + oData.readQueueNum + "\",\"" + oData.permission + "\",\"" + oData.unit + "\",\"" + oData.hasUnitSubscription + "\",\"" + oData.order + "\")'>Approve</a>&nbsp;&nbsp;")
-                                .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.id + "\",\"" + oData.topic + "\",\"" + oData.clusterName + "\",\"" + oData.brokerAddress + "\")'>Delete</a>");
-                             }else {
-                                $(nTd).html("<a href='javascript:void(0);' " + "onclick='_sendFun(\"" + oData.topic + "\")'>test</a>&nbsp;&nbsp;")
-                                .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.id + "\",\"" + oData.topic + "\",\"" + oData.clusterName + "\",\"" + oData.brokerAddress + "\")'>Delete</a>");
-                             }
-                          }
+    var details = document.getElementById("topicDetailDIV");
+    details.style.display = "none";
+    if(undefined == dTable){
+
+    }else{
+        $('#topicDetail').dataTable().fnDestroy();
+    }
+    dTable = $('#topicDetail').dataTable({
+        "processing": true,
+        "sAjaxSource": "cockpit/api/topic/detail/" + topic,
+        "sAjaxDataProp": "data",
+        "bPaginate": true,  //是否分页。
+        "bFilter": true,  //是否可过滤。
+        "bLengthChange": true, //是否允许自定义每页显示条数.
+        "scrollX": true,
+        "columns": [
+                    { "data": "topic" },
+                    { "data": "clusterName" },
+                    { "data": "brokerAddress" },
+                    { "data": "status" },
+                    { "data": "createTime" },
+                    { "data": "updateTime" },
+                    { "data": "id",
+                      "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (oData.status != "ACTIVE"){
+                            $(nTd).html("<a href='javascript:void(0);' " + "onclick='_editFun(\"" + oData.id + "\",\"" + oData.topic + "\",\"" + oData.clusterName + "\",\"" + oData.brokerAddress + "\",\"" + oData.writeQueueNum + "\",\"" + oData.readQueueNum + "\",\"" + oData.permission + "\",\"" + oData.unit + "\",\"" + oData.hasUnitSubscription + "\",\"" + oData.order + "\")'>Approve</a>&nbsp;&nbsp;")
+                            .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.id + "\",\"" + oData.topic + "\",\"" + oData.clusterName + "\",\"" + oData.brokerAddress + "\")'>Delete</a>");
+                         }else {
+                            $(nTd).html("<a href='javascript:void(0);' " + "onclick='_sendFun(\"" + oData.topic + "\")'>test</a>&nbsp;&nbsp;")
+                            .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.id + "\",\"" + oData.topic + "\",\"" + oData.clusterName + "\",\"" + oData.brokerAddress + "\")'>Delete</a>");
+                         }
+                      }
+                    }
+        ],
+        "fnCreatedRow": function (nRow, aData, iDataIndex) {
+                    //add selected class
+                    $(nRow).click(function () {
+                        if ($(this).hasClass('row_selected')) {
+                            $(this).removeClass('row_selected');
+                        } else {
+                            oTable.$('tr.row_selected').removeClass('row_selected');
+                            $(this).addClass('row_selected');
                         }
-            ],
-            "fnCreatedRow": function (nRow, aData, iDataIndex) {
-                        //add selected class
-                        $(nRow).click(function () {
-                            if ($(this).hasClass('row_selected')) {
-                                $(this).removeClass('row_selected');
-                            } else {
-                                oTable.$('tr.row_selected').removeClass('row_selected');
-                                $(this).addClass('row_selected');
-                            }
-                        });
-            }
-        });
-        document.getElementById("topicDetailDIV").style.display = "block";
+                    });
+        }
+    });
+    details.style.display = "block";
+    details.style.position = "absolute";
+    details.style.borderWidth = "thick";
+    details.style.top = "150";
+    details.style.background = "#FFCC80";
+    details.style.opacity = "1";
+    details.style.marginleft = "0";
+    document.body.appendChild(details); //添加遮罩
+
 }
 
 function _deleteFun(id, topic, cluster_name, broker_address) {
@@ -239,6 +255,7 @@ function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read
 
 function _sendFun(topic) {
     document.getElementById("sendMessageTestDIV").style.display = "block";
+    document.getElementById("topicDetailDIV").style.display="none";
     $("input.send_topic").val(topic);
 }
 
@@ -246,4 +263,8 @@ function addButton(){
     document.getElementById("addButton").style.display="none";
 
     document.getElementById("addTopicDIV").style.display="block";
+}
+
+function closeDetail(){
+    document.getElementById("topicDetailDIV").style.display="none";
 }
