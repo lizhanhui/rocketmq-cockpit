@@ -47,12 +47,13 @@ public class SimpleAdmin {
                     final CommandLine commandLine =
                             ServerUtil.parseCmdLine("mqadmin " + cmd.commandName(), subargs,
                                     cmd.buildCommandlineOptions(options), new PosixParser());
-                    if (null == commandLine) {
-                        System.exit(-1);
-                        return;
-                    }
+//                    if (null == commandLine) {
+//                        System.out.println("nothing input ?l");
+//                        System.exit(-1);
+//                        return;
+//                    }
 
-                    if (commandLine.hasOption('n')) {
+                    if (null != commandLine && commandLine.hasOption('n')) {
                         String namesrvAddr = commandLine.getOptionValue('n');
                         System.setProperty(MixAll.NAMESRV_ADDR_PROPERTY, namesrvAddr);
                     }
