@@ -3,11 +3,14 @@ package com.ndpmedia.rocketmq.cockpit.scheduler;
 import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.srvutil.ServerUtil;
 import com.alibaba.rocketmq.tools.command.SubCommand;
+import com.ndpmedia.rocketmq.cockpit.scheduler.command.DownTopicCommand;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.SyncConsumerGroupCommand;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.SyncTopicCommand;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +24,11 @@ public class SimpleAdmin {
     static{
         cmdList.add(new SyncTopicCommand());
         cmdList.add(new SyncConsumerGroupCommand());
+        cmdList.add(new DownTopicCommand());
     }
 
     public static void main(String[] args){
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath*:applicationContextCommon.xml");
         main0(args);
     }
 
