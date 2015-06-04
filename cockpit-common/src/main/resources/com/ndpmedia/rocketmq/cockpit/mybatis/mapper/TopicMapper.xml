@@ -68,7 +68,20 @@
     <select id="get" resultMap="topicMap">
         SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
         FROM topic
-        WHERE id = #{id}
+        WHERE 1 = 1
+        <if test="id > 0">
+            AND id = #{id}
+        </if>
+        <if test="topic != null">
+            AND topic = #{topic}
+        </if>
+        <if test="broker != null">
+            AND broker_address = #{broker}
+        </if>
+        <if test="cluster != null">
+            AND cluster_name = #{cluster}
+        </if>
+        limit 1
     </select>
 
     <select id="list" resultMap="topicMap">

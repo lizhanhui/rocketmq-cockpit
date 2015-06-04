@@ -5,6 +5,7 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitMessageMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.LoginMapper;
+import com.ndpmedia.rocketmq.cockpit.scheduler.command.DownTopicCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import org.slf4j.Logger;
@@ -22,6 +23,9 @@ import java.util.Set;
 public class TaskScheduler {
 
     private Logger logger = LoggerFactory.getLogger(TaskScheduler.class);
+
+    @Autowired
+    private DownTopicCommand downTopicCommand;
 
     @Autowired
     private ConsumeProgressMapper consumeProgressMapper;
@@ -79,6 +83,11 @@ public class TaskScheduler {
 
         numberOfRecordsDeleted = cockpitMessageMapper.bulkDelete(calendar.getTime());
         logger.info("Deleted " + numberOfRecordsDeleted + " message flow records.");
+    }
+
+    @Scheduled(cron = "0 0 12 * * *")
+    public void downloadTopic(){
+        downTopicCommand.execute(null, null, null);
     }
 
 

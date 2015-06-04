@@ -15,7 +15,7 @@ public interface TopicMapper {
 
     void update(Topic topic);
 
-    Topic get(long id);
+    Topic get(@Param("id") long id,@Param("topic")  String topic,@Param("broker")  String broker,@Param("cluster")  String cluster);
 
     /**
      * List by team ID and topic.

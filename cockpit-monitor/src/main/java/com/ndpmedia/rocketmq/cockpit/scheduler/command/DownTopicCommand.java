@@ -17,12 +17,14 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 /**
  * Created by robert on 2015/5/29.
  */
+@Component
 public class DownTopicCommand implements SubCommand {
 
     @Autowired
@@ -181,7 +183,9 @@ public class DownTopicCommand implements SubCommand {
             while (flag) {
                 try {
                     Topic topic = getTopic(topicConfig, broker);
-                    topicMapper.insert(topic);
+                    Topic oldT = topicMapper.get(0L, topic.getTopic(), topic.getBrokerAddress(), null);
+                    if (null == oldT)
+                        topicMapper.insert(topic);
                     flag = false;
                 } catch (Exception e) {
                     e.printStackTrace();
