@@ -38,6 +38,16 @@
         <if test="brokerId > 0">
             AND broker_id = #{brokerId}
         </if>
+
+        <if test="dc > 0">
+            AND dc = #{dc}
+        </if>
+
+        <if test="lastUpdateTime != null">
+         <![CDATA[
+            AND last_update_time >= #{lastUpdateTime}
+         ]]>
+        </if>
     </select>
 
 </mapper>
