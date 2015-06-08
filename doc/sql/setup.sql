@@ -11,3 +11,8 @@ INSERT INTO cockpit_role(id, name) VALUES(4, 'ROLE_WATCHER');
 
 INSERT INTO cockpit_user_role_xref(user_id, role_id) VALUES (1, 1);
 INSERT INTO cockpit_user_role_xref(user_id, role_id) VALUES (2, 3);
+
+INSERT INTO data_center(id, name) VALUES (1, 'US East');
+INSERT INTO data_center(id, name) VALUES (2, 'Singapore');
+INSERT INTO data_center(id, name) VALUES (3, 'US West');
+INSERT INTO data_center(id, name) VALUES (5, 'South America');
