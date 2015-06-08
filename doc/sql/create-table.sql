@@ -27,7 +27,7 @@ CREATE TABLE data_center (
 
 CREATE TABLE broker (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  cluster_name VARCHAR(255) NOT NULL,
+  cluster_name VARCHAR(255) NOT NULL DEFAULT 'DefaultCluster',
   broker_name VARCHAR(255) NOT NULL,
   broker_id SMALLINT NOT NULL,
   address VARCHAR(255) NOT NULL,

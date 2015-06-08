@@ -105,6 +105,5 @@ public class TaskScheduler {
     @Scheduled(fixedRate = 30000)
     public void checkBrokerStatus() {
 
-
     }
 }
