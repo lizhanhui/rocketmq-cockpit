@@ -121,8 +121,11 @@ $(document).ready(function() {
                         if (-1 === firstB){
 
                         }else{
-                            temp.push(Math.round(100*(consumeProgress.brokerOffset - firstB)/(5*60))/100);
-
+                            if (consumeProgress.brokerOffset >= firstB){
+                               temp.push(Math.round(100*(consumeProgress.brokerOffset - firstB)/(5*60))/100);
+                            }else{
+                                temp.push(Math.round(0));
+                            }
                             x.push(temp);
                         }
 
