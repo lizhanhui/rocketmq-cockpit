@@ -53,6 +53,12 @@ CREATE TABLE IF NOT EXISTS topic (
   update_time TIMESTAMP NOT NULL DEFAULT 0
 ) ENGINE = INNODB;
 
+CREATE TABLE broker_topic_xref (
+  broker_id INT NOT NULL REFERENCES broker(id),
+  topic_id INT NOT NULL REFERENCES topic(id),
+  status INT NOT NULL REFERENCES status_lu(id),
+  CONSTRAINT uniq_broker_topic UNIQUE (broker_id, topic_id)
+) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS consumer_group (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -72,6 +78,13 @@ CREATE TABLE IF NOT EXISTS consumer_group (
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time TIMESTAMP NOT NULL DEFAULT 0
 ) ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS broker_consumer_group_xref (
+  broker_id INT NOT NULL REFERENCES broker(id),
+  consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
+  status SMALLINT NOT NULL REFERENCES status_lu(id),
+  CONSTRAINT uniq_broker_consumer_group UNIQUE (broker_id, consumer_group_id)
+);
 
 CREATE TABLE IF NOT EXISTS status_lu (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
