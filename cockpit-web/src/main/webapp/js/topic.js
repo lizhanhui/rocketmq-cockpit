@@ -212,12 +212,11 @@ function _deleteFun(id, topic, cluster_name, broker_address) {
                         dataType: "json",
                         contentType: "application/json; charset=UTF-8",
                         complete: function() {
+                            removecloud();
                             window.location.reload(true);
                         }
                     });
             }
-
-            removecloud();
         }
     });
 }
