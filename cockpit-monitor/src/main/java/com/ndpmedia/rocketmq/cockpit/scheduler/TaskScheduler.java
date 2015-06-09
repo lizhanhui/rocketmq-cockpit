@@ -98,4 +98,12 @@ public class TaskScheduler {
         loginMapper.delete(calendar.getTime());
     }
 
+
+    /**
+     * Check broker status every 5 minutes.
+     */
+    @Scheduled(fixedRate = 30000)
+    public void checkBrokerStatus() {
+
+    }
 }
