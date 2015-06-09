@@ -13,6 +13,8 @@ import com.alibaba.rocketmq.tools.command.SubCommand;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -29,6 +31,12 @@ public class DownTopicCommand implements SubCommand {
 
     @Autowired
     private TopicMapper topicMapper;
+
+    @Autowired
+    private CockpitBrokerService cockpitBrokerService;
+
+    @Autowired
+    private CockpitTopicService cockpitTopicService;
 
     private Map<String, String> brokerToCluster = new HashMap<>();
 
@@ -84,108 +92,28 @@ public class DownTopicCommand implements SubCommand {
     }
 
     private void doMap(DefaultMQAdminExt defaultMQAdminExt) {
-        System.out.println("[sync topic] try to get broker list");
-        boolean flag = true;
-        ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
-        while(flag) {
-            try {
-                clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
-                flag = false;
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-        Set<Map.Entry<String, Set<String>>> clusterSet =
-                clusterInfoSerializeWrapper.getClusterAddrTable().entrySet();
-
-        for (Map.Entry<String, Set<String>> next : clusterSet) {
-            Set<String> brokerNameSet = new HashSet<String>();
-            brokerNameSet.addAll(next.getValue());
-            String cluster = next.getKey();
-
-
-            for (String brokerName : brokerNameSet) {
-                BrokerData brokerData = clusterInfoSerializeWrapper.getBrokerAddrTable().get(brokerName);
-                if (brokerData != null) {
-                    Set<Map.Entry<Long, String>> brokerAddrSet = brokerData.getBrokerAddrs().entrySet();
-                    Iterator<Map.Entry<Long, String>> itAddr = brokerAddrSet.iterator();
-
-                    while (itAddr.hasNext()) {
-                        Map.Entry<Long, String> next1 = itAddr.next();
-                        brokerToCluster.put(next1.getValue(), cluster);
-                    }
-                }
-            }
-        }
-
-        System.out.println("[sync topic] now we get broker list , size : " + brokerToCluster.size() + " [] " + brokerToCluster);
+        brokerToCluster.putAll(cockpitBrokerService.getBrokerCluster(defaultMQAdminExt));
     }
 
     private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) {
-        TopicConfig topicConfig = new TopicConfig();
-        topicConfig.setTopicName(topic);
-
-        TopicRouteData topicRouteData = new TopicRouteData();
-        boolean flag = true;
-        while (flag){
-            try {
-                topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
-                flag = false;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        List<QueueData> lists = topicRouteData.getQueueDatas();
-
-        int readQ = 0;
-        int writeQ = 0;
-        int perm = 0;
-        for (QueueData queueData:lists){
-            readQ = Math.max(readQ, queueData.getReadQueueNums());
-            writeQ = Math.max(writeQ, queueData.getWriteQueueNums());
-            perm = Math.max(perm, queueData.getPerm());
-            topicConfig.setTopicSysFlag(queueData.getTopicSynFlag());
-        }
-        topicConfig.setWriteQueueNums(writeQ);
-        topicConfig.setReadQueueNums(readQ);
-        topicConfig.setPerm(perm);
-
-        if (null != topicConfig && null != topicConfig.getTopicName() && !topicConfig.getTopicName().isEmpty())
-            return topicConfig;
-
-        System.err.println("[sync topic] big error! find topic but no topic config !");
-        return null;
+        return cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
     }
 
     private void downloadTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig) {
-        TopicRouteData topicRouteData = null;
-        boolean flag = true;
-        while (flag) {
-            try {
-                topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topicConfig.getTopicName());
-                flag = false;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        List<BrokerData> brokerDatas = topicRouteData.getBrokerDatas();
-        Set<String> brokers = new HashSet<>();
-
-        for (BrokerData brokerData:brokerDatas){
-            for (Map.Entry<Long, String> entry:brokerData.getBrokerAddrs().entrySet()){
-                brokers.add(entry.getValue());
-            }
-        }
+        Set<String> brokers = cockpitTopicService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
 
         for (String broker : brokers) {
-            flag =true;
+            boolean flag =true;
             while (flag) {
                 try {
                     Topic topic = getTopic(topicConfig, broker);
                     Topic oldT = topicMapper.get(0L, topic.getTopic(), topic.getBrokerAddress(), null);
+                    //若未获取到相同Topic Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
                     if (null == oldT)
                         topicMapper.insert(topic);
+                    //若获取到相同Topic Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
+                    if (null != oldT && oldT.getStatus() != Status.ACTIVE)
+                        topicMapper.register(oldT.getId());
                     flag = false;
                 } catch (Exception e) {
                     e.printStackTrace();

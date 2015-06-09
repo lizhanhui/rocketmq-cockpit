@@ -1,7 +1,13 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
+import com.alibaba.rocketmq.client.exception.MQClientException;
+import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.common.protocol.body.TopicList;
+import com.alibaba.rocketmq.common.protocol.route.BrokerData;
+import com.alibaba.rocketmq.common.protocol.route.QueueData;
+import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
+import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.CommandUtil;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
@@ -14,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service("cockpitTopicService")
 public class CockpitTopicServiceImpl implements CockpitTopicService {
@@ -46,6 +49,87 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
             defaultMQAdminExt.shutdown();
         }
         return null;
+    }
+
+    @Override
+    public Set<String> getTopics(DefaultMQAdminExt defaultMQAdminExt) {
+        Set<String> resultT = new HashSet<>();
+        TopicList topics = null;
+        try {
+            topics = defaultMQAdminExt.fetchAllTopicList();
+            for (String topicName : topics.getTopicList()) {
+                if (topicName.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX) || topicName.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX))
+                    continue;
+
+                resultT.add(topicName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return resultT;
+    }
+
+    @Override
+    public TopicConfig getTopicConfigByTopicName(DefaultMQAdminExt defaultMQAdminExt, String topic) {
+        TopicConfig topicConfig = new TopicConfig();
+        topicConfig.setTopicName(topic);
+
+        TopicRouteData topicRouteData = new TopicRouteData();
+        boolean flag = true;
+        while (flag){
+            try {
+                topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
+                flag = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        List<QueueData> lists = topicRouteData.getQueueDatas();
+
+        int readQ = 0;
+        int writeQ = 0;
+        int perm = 0;
+        for (QueueData queueData:lists){
+            readQ = Math.max(readQ, queueData.getReadQueueNums());
+            writeQ = Math.max(writeQ, queueData.getWriteQueueNums());
+            perm = Math.max(perm, queueData.getPerm());
+            topicConfig.setTopicSysFlag(queueData.getTopicSynFlag());
+        }
+        topicConfig.setWriteQueueNums(writeQ);
+        topicConfig.setReadQueueNums(readQ);
+        topicConfig.setPerm(perm);
+
+        if (null != topicConfig && null != topicConfig.getTopicName() && !topicConfig.getTopicName().isEmpty())
+            return topicConfig;
+
+        System.err.println("[sync topic] big error! find topic but no topic config !");
+        return null;
+    }
+
+    @Override
+    public Set<String> getTopicBrokers(DefaultMQAdminExt defaultMQAdminExt, String topic) {
+        TopicRouteData topicRouteData = null;
+        boolean flag = true;
+        while (flag) {
+            try {
+                topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
+                flag = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        List<BrokerData> brokerDatas = topicRouteData.getBrokerDatas();
+        Set<String> topicBroker = new HashSet<>();
+
+        for (BrokerData brokerData:brokerDatas){
+            for (Map.Entry<Long, String> entry:brokerData.getBrokerAddrs().entrySet()){
+                topicBroker.add(entry.getValue());
+            }
+        }
+
+        return topicBroker;
     }
 
 
