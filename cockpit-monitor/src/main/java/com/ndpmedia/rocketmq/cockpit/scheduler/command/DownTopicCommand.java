@@ -75,10 +75,8 @@ public class DownTopicCommand implements SubCommand {
             adminExt.start();
             doMap(adminExt);
 
-            TopicList topics = adminExt.fetchAllTopicList();
-            for (String topicName : topics.getTopicList()) {
-                if (topicName.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX) || topicName.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX))
-                    continue;
+            Set<String> topics = cockpitTopicService.getTopics(adminExt);
+            for (String topicName : topics) {
                 System.out.println("now we check :" + topicName);
                 TopicConfig topicConfig = getTopicConfig(adminExt, topicName);
                 if (null != topicConfig)
