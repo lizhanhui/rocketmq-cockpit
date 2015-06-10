@@ -273,7 +273,9 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
 
     @Override
     public Set<Long> getTeamId(Topic topic){
-        return topicMapper.getTeamId(topic.getId());
+        Set<Long> sets = new HashSet<>();
+        sets.addAll(topicMapper.getTeamId(topic.getId()));
+        return sets;
     }
 
     @Transactional
