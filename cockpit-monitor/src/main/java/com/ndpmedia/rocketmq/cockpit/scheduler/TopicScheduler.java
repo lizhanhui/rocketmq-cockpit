@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -49,8 +50,8 @@ public class TopicScheduler {
             Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
             List<Topic> topics = cockpitTopicService.getActiveTopics();
             for (Topic topic : topics) {
-                Set<Long> teamIds = cockpitTopicService.getTeamId(topic);
-                logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + teamIds);
+                List<Long> teamIds = cockpitTopicService.getTeamId(topic);
+                logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + Arrays.toString(teamIds.toArray()));
                 //现阶段可对应的Broker与Topic信息不做处理
                 if (brokers.contains(topic.getBrokerAddress()))
                     continue;

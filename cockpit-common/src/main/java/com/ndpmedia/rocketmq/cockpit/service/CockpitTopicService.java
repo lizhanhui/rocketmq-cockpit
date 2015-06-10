@@ -53,7 +53,7 @@ public interface CockpitTopicService {
 
     boolean unregister(long id);
 
-    Set<Long> getTeamId(Topic topic);
+    List<Long> getTeamId(Topic topic);
 
     void insert(Topic topic, long teamId);
 

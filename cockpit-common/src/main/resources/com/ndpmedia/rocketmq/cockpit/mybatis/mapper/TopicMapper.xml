@@ -12,7 +12,7 @@
         VALUES (#{topicId}, #{teamId})
     </insert>
 
-    <select id="getTeamId" resultMap="long">
+    <select id="getTeamId" resultType="long">
         SELECT team_id
         FROM topic_team_xref
         WHERE topic_id = #{topicId}
