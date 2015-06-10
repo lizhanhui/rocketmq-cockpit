@@ -35,7 +35,7 @@ public class BrokerScheduler {
     /**
      * Check broker status every 5 minutes.
      */
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 600000)
     public void checkBrokerStatus() {
         try {
             ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
