@@ -21,7 +21,13 @@
 
     <security:http auto-config="true">
 
-        <security:intercept-url pattern="/*" requires-channel="https" />
+        <!-- Use https in projection -->
+        <!--
+            <security:intercept-url pattern="/*" requires-channel="https" />
+        -->
+
+        <!-- For debug only -->
+        <security:intercept-url pattern="/*" requires-channel="http" />
 
         <security:custom-filter ref="rocketMQLoginFilter" before="FORM_LOGIN_FILTER" />
         <security:intercept-url pattern="/favicon.ico" access="IS_AUTHENTICATED_ANONYMOUSLY" />

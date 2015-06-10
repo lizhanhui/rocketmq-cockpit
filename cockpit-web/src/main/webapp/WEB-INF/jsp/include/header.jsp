@@ -24,6 +24,7 @@
                         <li><a href="cockpit/topic-progress/">Topic Progress</a> </li>
                     </ul>
                 </li>
+
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Consumer Group<span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
@@ -33,6 +34,14 @@
                 </li>
 
                 <li><a href="cockpit/message/">Query Message</a></li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Project<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="cockpit/project/manage">Manage</a></li>
+                        <li><a href="cockpit/project/create">Launch New Project</a> </li>
+                    </ul>
+                </li>
 
                 <c:if test="${not empty sessionScope.is_admin_in_session and sessionScope.is_admin_in_session}">
                     <li class="dropdown">
