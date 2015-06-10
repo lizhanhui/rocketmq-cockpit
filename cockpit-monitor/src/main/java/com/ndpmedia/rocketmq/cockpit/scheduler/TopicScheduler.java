@@ -40,7 +40,7 @@ public class TopicScheduler {
     /**
      * check topic status every 5 minutes
      */
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 600000)
     public void checkTopicStatus() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
@@ -51,7 +51,7 @@ public class TopicScheduler {
             List<Topic> topics = cockpitTopicService.getActiveTopics();
             for (Topic topic : topics) {
                 //现阶段可对应的Broker与Topic信息不做处理
-                if (brokers.contains(topic.getBrokerAddress()))
+                if (brokers.isEmpty() || brokers.contains(topic.getBrokerAddress()))
                     continue;
 
                 //注销已有激活信息
@@ -66,6 +66,8 @@ public class TopicScheduler {
                         topic.setBrokerAddress(broker);
                         cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
 
+                        if (teamIds.isEmpty())
+                            continue;
                         for (long teamId:teamIds)
                             cockpitTopicService.insert(topic, teamId);
                     }
