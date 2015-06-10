@@ -13,7 +13,7 @@ public interface TopicMapper {
 
     void register(long id);
 
-    void unregister(String broker);
+    void unregister(@Param("broker") String broker);
 
     void update(Topic topic);
 

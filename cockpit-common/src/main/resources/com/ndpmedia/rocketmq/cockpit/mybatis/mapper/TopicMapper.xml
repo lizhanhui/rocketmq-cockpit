@@ -47,7 +47,7 @@
         WHERE id = #{id}
     </update>
 
-    <update id="unregister" parameterMap="string">
+    <update id="unregister" >
         UPDATE topic SET status_id = 3
         WHERE broker_address = #{broker}
     </update>
