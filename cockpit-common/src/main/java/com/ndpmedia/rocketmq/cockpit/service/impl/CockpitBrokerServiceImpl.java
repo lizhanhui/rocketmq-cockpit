@@ -104,7 +104,7 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
     @Override
     public boolean removeAllTopic(String broker) {
         try {
-            topicMapper.unregister(broker);
+
         }catch (Exception e){
             return false;
         }

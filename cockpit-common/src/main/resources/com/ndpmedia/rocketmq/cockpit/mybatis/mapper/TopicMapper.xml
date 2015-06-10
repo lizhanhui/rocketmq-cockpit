@@ -53,9 +53,9 @@
         WHERE id = #{id}
     </update>
 
-    <update id="unregister" >
+    <update id="unregister" parameterType="long" >
         UPDATE topic SET status_id = 3
-        WHERE broker_address = #{broker}
+        WHERE id = #{id}
     </update>
 
     <resultMap id="topicMap" type="Topic">
@@ -109,6 +109,11 @@
         <if test="topic != null">
             AND topic = #{topic}
         </if>
+
+        <if test="statusId > 0">
+            AND status_id = #{statusId}
+        </if>
+
         GROUP BY topic, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, order_type
     </select>
 

@@ -79,6 +79,11 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
     }
 
     @Override
+    public List<Topic> getTopic(String topic) {
+        return topicMapper.list(-1, topic, 2);
+    }
+
+    @Override
     public TopicConfig getTopicConfigByTopicName(DefaultMQAdminExt defaultMQAdminExt, String topic) {
         TopicConfig topicConfig = new TopicConfig();
         topicConfig.setTopicName(topic);
@@ -111,7 +116,7 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         if (null != topicConfig && null != topicConfig.getTopicName() && !topicConfig.getTopicName().isEmpty())
             return topicConfig;
 
-        System.err.println("[sync topic] big error! find topic but no topic config !");
+        logger.info("[sync topic] big error! find topic but no topic config !");
         return null;
     }
 
@@ -243,6 +248,18 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
             e.printStackTrace();
             return false;
         }
+        return true;
+    }
+
+    @Override
+    public boolean unregister(long id){
+        try{
+            topicMapper.unregister(id);
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+
         return true;
     }
 

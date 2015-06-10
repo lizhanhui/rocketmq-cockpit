@@ -14,7 +14,7 @@ public interface TopicMapper {
 
     void register(long id);
 
-    void unregister(@Param("broker") String broker);
+    void unregister(long id);
 
     void update(Topic topic);
 
@@ -26,7 +26,7 @@ public interface TopicMapper {
      * @param topic Topic name.
      * @return List of topics.
      */
-    List<Topic> list(@Param("teamId") long teamId, @Param("topic") String topic);
+    List<Topic> list(@Param("teamId") long teamId, @Param("topic") String topic, @Param("statusId") long statusId);
 
     List<Topic> detailList(@Param("teamId") long teamId, @Param("topic") String topic);
 

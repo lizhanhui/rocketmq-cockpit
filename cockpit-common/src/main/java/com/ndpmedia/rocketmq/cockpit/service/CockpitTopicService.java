@@ -26,6 +26,7 @@ public interface CockpitTopicService {
 
     List<Topic> getActiveTopics();
 
+    List<Topic> getTopic(String topic);
     /**
      * get topic config by topic name
      * @param defaultMQAdminExt
@@ -49,6 +50,8 @@ public interface CockpitTopicService {
     boolean deleteTopic(Topic topic);
 
     boolean register(long id);
+
+    boolean unregister(long id);
 
     Set<Long> getTeamId(Topic topic);
 
