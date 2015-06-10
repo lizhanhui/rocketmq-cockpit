@@ -34,7 +34,7 @@ public interface TopicMapper {
 
     List<Topic> activeList();
 
-    Set<Long> getTeamId(@Param("topicId") long topicId);
+    List<Long> getTeamId(@Param("topicId") long topicId);
 
     void associateTeam(@Param("topicId") long topicId, @Param("teamId") long teamId);
 

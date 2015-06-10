@@ -16,6 +16,7 @@
         SELECT team_id
         FROM topic_team_xref
         WHERE topic_id = #{topicId}
+        GROUP BY team_id
     </select>
 
     <delete id="removeTopicTeamAssociation">
