@@ -50,16 +50,17 @@ public class TopicScheduler {
             Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
             List<Topic> topics = cockpitTopicService.getActiveTopics();
             for (Topic topic : topics) {
-                List<Long> teamIds = cockpitTopicService.getTeamId(topic);
-                logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + Arrays.toString(teamIds.toArray()));
                 //现阶段可对应的Broker与Topic信息不做处理
                 if (brokers.contains(topic.getBrokerAddress()))
                     continue;
 
                 //注销已有激活信息
                 cockpitTopicService.unregister(topic.getId());
-                //确认该Topic是否具有其他消费Broker
+                //确认该Topic是否具有其他Broker
                 if (cockpitTopicService.getTopic(topic.getTopic()).isEmpty()){
+                    List<Long> teamIds = cockpitTopicService.getTeamId(topic);
+                    logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + Arrays.toString(teamIds.toArray()));
+
                     TopicConfig topicConfig = cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic.getTopic());
                     for (String broker : brokers){
                         topic.setBrokerAddress(broker);
