@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ProjectMapper">
+
+    <insert id="create" parameterType="com.ndpmedia.rocketmq.cockpit.model.Project" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO project(id, name, description, team_id)
+        VALUES (NULL, #{name}, #{description}, #{teamId})
+    </insert>
+
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.Project">
+        UPDATE project
+        SET name = #{name}, description = #{description}, team_id = #{teamId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE
+        FROM project
+        WHERE id = #{id}
+    </delete>
+
+    <select id="list" resultType="com.ndpmedia.rocketmq.cockpit.model.Project" parameterType="long">
+        SELECT id, name, description, team_id AS teamId
+        FROM project
+        WHERE 1 = 1
+        <if test="teamId > 0">
+            team_id = #{teamId}
+        </if>
+    </select>
+
+</mapper>
