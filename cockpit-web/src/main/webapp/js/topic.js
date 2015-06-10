@@ -3,6 +3,7 @@ var dTable;
 
 $(document).ready(function() {
     addcloud();
+    showCloud();
     oTable = initTable();
     document.getElementById("addTopicDIV").style.display="none";
     document.getElementById("sendMessageTestDIV").style.display="none";
@@ -10,7 +11,7 @@ $(document).ready(function() {
 
     $(".addTopic").click(function() {
         document.getElementById("topicDetailDIV").style.display="none";
-        addcloud();
+        showCloud();
         var topic = $("input.topic").val();
         var write_queue_num = $("input.writeQueueNum").val();
         var read_queue_num = $("input.readQueueNum").val();
@@ -24,11 +25,13 @@ $(document).ready(function() {
         var ob = JSON.stringify({"topic":topic,"writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
                                  "brokerAddress":broker_address, "clusterName":cluster_name, "permission":permission, "unit":unit, "hasUnitSubscription":has_unit_subscription, "order":order, "status":allow});
         if ($.trim(topic) === "") {
-            removecloud();
+            alert(" no topic ?");
+            hideCloud();
             return false;
         } else if ($.trim(cluster_name) === "" && $.trim(broker_address) == "") {
-            removecloud();
-            return false;
+            alert("");
+            hideCloud();
+8            return false;
         } else {
             $.ajax({
                         async: false,
@@ -41,7 +44,7 @@ $(document).ready(function() {
                             location.reload(true);
                         },
                         error: function() {
-                            removecloud();
+                            hideCloud();
                         }
                     });
         }
@@ -64,7 +67,7 @@ $(document).ready(function() {
     });
 
     $(".send").click(function() {
-        addcloud();
+        showCloud();
             var topic = $("input.send_topic").val();
             var producerGroup = $("input.send_producerGroup").val();
             var tag = $("input.send_tag").val();
@@ -72,7 +75,7 @@ $(document).ready(function() {
             var body = $("input.send_body").val();
 
             if ($.trim(topic) === "") {
-                removecloud();
+                hideCloud();
                 return false;
             } else {
                 $.ajax({
@@ -86,13 +89,13 @@ $(document).ready(function() {
                                 location.reload(true);
                             },
                             error: function() {
-                                removecloud();
+                                hideCloud();
                             }
                         });
             }
         });
 
-    removecloud();
+    hideCloud();
 });
 
 function initTable(){
@@ -195,7 +198,7 @@ function detailTable(topic){
 }
 
 function _deleteFun(id, topic, cluster_name, broker_address) {
-    addcloud();
+    showCloud();
     $.ajax({
         async: false,
         data: JSON.stringify({"id":id, "topic":topic, "clusterName":cluster_name}),
@@ -212,7 +215,7 @@ function _deleteFun(id, topic, cluster_name, broker_address) {
                         dataType: "json",
                         contentType: "application/json; charset=UTF-8",
                         complete: function() {
-                            removecloud();
+                            hideCloud();
                             window.location.reload(true);
                         }
                     });
@@ -222,7 +225,7 @@ function _deleteFun(id, topic, cluster_name, broker_address) {
 }
 
 function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read_queue_num, permission, unit, has_unit_subscription,  order) {
-        addcloud();
+        showCloud();
         var ob = JSON.stringify({"id":id, "topic":topic,"writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
                                  "brokerAddress":broker_address, "clusterName":cluster_name, "permission":permission,
                                  "unit":unit, "hasUnitSubscription":has_unit_subscription, "order":order});
@@ -247,7 +250,7 @@ function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read
                     });
                 }
 
-                removecloud();
+                hideCloud();
             }
         });
 }

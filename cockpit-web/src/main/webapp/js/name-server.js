@@ -1,5 +1,5 @@
 $(document).ready(function() {
-
+    addcloud();
     $.get("cockpit/api/name-server", function(data) {
         $(".table-content").children().remove();
         data.forEach(function(nameServerItem) {
@@ -15,10 +15,10 @@ $(document).ready(function() {
 
 
     $(".addNameServer").click(function() {
-        addcloud();
+        showCloud();
         var nameServer = $("input.newNameServer").val();
         if ($.trim(nameServer) === "") {
-            removecloud();
+            hideCloud();
             return false;
         } else {
             sections = nameServer.split(":");
@@ -43,14 +43,14 @@ $(document).ready(function() {
                         alert("Error!");
                     }
 
-                    removecloud();
+                    hideCloud();
                 }
             });
         }
     });
 
     $(document).on("click", ".removeItem",  function() {
-        addcloud();
+        showCloud();
         var row = $(this).parent().parent();
         $.ajax({
             async: true,
@@ -59,9 +59,9 @@ $(document).ready(function() {
             dataType: "json",
             complete: function() {
                 row.remove();
-                removecloud();
+                hideCloud();
             }
         });
     });
-
+    hideCloud();
 });

@@ -73,6 +73,7 @@ $(document).ready(function() {
 
 
     $.get("cockpit/api/topic-progress", function(data) {
+        showCloud();
         var otext1 = document.createTextNode("Topic：");
 
         var selectT = document.createElement("select");
@@ -87,11 +88,11 @@ $(document).ready(function() {
         var selDiv = document.getElementById("selTopic");
             selDiv.appendChild(otext1);
             selDiv.appendChild(selectT);
-
+        hideCloud();
     });
 
     $(".findTopicProgress").click(function() {
-        addcloud();
+        showCloud();
         var x = [];
         var topic = "undefined" === typeof($("#selectT").children('option:selected').val()) ? "-1" : $("#selectT").children('option:selected').val();
 
@@ -101,7 +102,7 @@ $(document).ready(function() {
 
         if ($.trim(topic) === "" || "-1" === topic) {
             alert("consumer group should not be null");
-            removecloud();
+            hideCloud();
             return false;
         } else {
             $.ajax({
@@ -134,12 +135,12 @@ $(document).ready(function() {
 
                     showCharts(line, x);
 
-                    removecloud();
+                    hideCloud();
                 }
             });
         }
     });
-    removecloud();
+    hideCloud();
 });
 
 function createOption(text){

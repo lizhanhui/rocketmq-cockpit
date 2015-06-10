@@ -1,6 +1,7 @@
 $(document).ready(function() {
+    addcloud();
     $(".queryTopic").click(function() {
-        addcloud();
+        showCloud();
         var groupName = $("input.groupName").val();
         var topic = $("input.topic").val();
         var broker = $("input.broker").val();
@@ -17,17 +18,17 @@ $(document).ready(function() {
             });
         }
 
-        removecloud();
+        hideCloud();
     });
 
         $(".queryItem").live("click", function() {
-            addcloud();
+            showCloud();
             var row = $(this).parent().parent();
             var topic = row.children().eq(0).html();
             var brokerName = row.children().eq(1).html();
             var queueId = row.children().eq(2).html();
             if ($.trim(topic) === "" ) {
-                removecloud();
+                hideCloud();
                 return false;
             }
             $.ajax({
@@ -83,8 +84,9 @@ $(document).ready(function() {
                                 data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
                             }]
                         });
-                    removecloud();
+                    hideCloud();
                 }
             });
         });
+    hideCloud();
 });

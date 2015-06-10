@@ -1,5 +1,5 @@
 $(document).ready(function() {
-
+    addcloud();
     $.get("cockpit/api/ip", function(data) {
         $(".table-content").children().remove();
         data.forEach(function(ip) {
@@ -14,11 +14,11 @@ $(document).ready(function() {
 
 
     $(".addMapping").click(function() {
-        addcloud();
+        showCloud();
         var innerIP = $("input.innerIP").val();
         var publicIP = $("input.publicIP").val();
         if ($.trim(innerIP) === "" || $.trim(publicIP) == "") {
-            removecloud();
+            hideCloud();
             return false;
         } else {
             $.ajax({
@@ -34,14 +34,14 @@ $(document).ready(function() {
                     $("input.innerIP").val("");
                     $("input.publicIP").val("");
 
-                    removecloud();
+                    hideCloud();
                 }
             });
         }
     });
 
     $(document).on("click", ".removeItem", function() {
-        addcloud();
+        showCloud();
         var row = $(this).parent().parent();
         var id = $(this).attr("rel");
         $.ajax({
@@ -50,13 +50,14 @@ $(document).ready(function() {
             type: "DELETE",
             success: function() {
                 row.remove();
-                removecloud();
+                hideCloud();
             },
             error: function() {
-                removecloud();
                 alert("Error");
+                hideCloud();
             }
         });
     });
 
+    hideCloud();
 });

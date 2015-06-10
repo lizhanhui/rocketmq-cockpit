@@ -1,4 +1,9 @@
 function addcloud() {
+    document.body.appendChild(buildBase());
+    document.body.appendChild(buildImgs()); //添加loading动画-
+}
+
+function buildBase(){
     var bodyWidth = document.documentElement.clientWidth;
     var bodyHeight = Math.max(document.documentElement.clientHeight, document.body.scrollHeight);
     var bgObj = document.createElement("div" );
@@ -12,7 +17,22 @@ function addcloud() {
     bgObj.style.width = bodyWidth + "px";
     bgObj.style.height = bodyHeight + "px";
     bgObj.style.zIndex = "10000"; //设置它的zindex属性，让这个div在z轴最大，用户点击页面任何东西都不会有反应|
-    document.body.appendChild(bgObj); //添加遮罩
+    return bgObj;
+}
+
+function hideBase(){
+    document.getElementById("bgDiv").style.display = "none";
+    document.getElementById("bgDiv").style.zIndex = "-1";
+}
+
+function showBase(){
+    document.getElementById("bgDiv").style.display = "block";
+    document.getElementById("bgDiv").style.zIndex = "10000";
+}
+
+function buildImgs(){
+    var bodyWidth = document.documentElement.clientWidth;
+    var bodyHeight = Math.max(document.documentElement.clientHeight, document.body.scrollHeight);
     var loadingObj = document.createElement("div");
     loadingObj.setAttribute( 'id', 'loadingDiv' );
     loadingObj.style.position = "absolute";
@@ -26,7 +46,25 @@ function addcloud() {
     loadingObj.style.width = lw + "px";
     loadingObj.style.height = lh + "px";
     loadingObj.style.zIndex = "10000";
-    document.body.appendChild(loadingObj); //添加loading动画-
+    return loadingObj;
+}
+
+function hideImgs(){
+    document.getElementById("loadingDiv").style.display = "none";
+}
+
+function showImgs(){
+    document.getElementById("loadingDiv").style.display = "block";
+}
+
+function hideCloud(){
+    hideBase();
+    hideImgs();
+}
+
+function showCloud(){
+    showBase();
+    showImgs();
 }
 
 function removecloud() {

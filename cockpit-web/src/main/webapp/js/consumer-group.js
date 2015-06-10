@@ -19,7 +19,7 @@ $(document).ready(function() {
     });
 
     $(".addConsumerGroup").click(function() {
-        addcloud();
+        showCloud();
         var clusterName = $("input.cluster_name").val();
         var whichBrokerWhenConsumeSlowly = $("input.which_broker_when_consume_slowly").val();
         var groupName = $("input.group_name").val();
@@ -37,7 +37,7 @@ $(document).ready(function() {
                                  "retryQueueNum":retryQueueNum, "consumeFromMinEnable":consumeFromMinEnable,"status":allow});
         if ($.trim(groupName) === "") {
             alert(" no group name ?");
-            removecloud();
+            hideCloud();
             return false;
         } else {
             $.ajax({
@@ -51,7 +51,7 @@ $(document).ready(function() {
                             location.reload(true);
                         },
                         error: function() {
-                            removecloud();
+                            hideCloud();
                             alert(" ERROR ");
                         }
                     });
@@ -59,7 +59,7 @@ $(document).ready(function() {
     });
 
     $(document).on("click", ".removeItem", function() {
-        addcloud();
+        showCloud();
         var row = $(this).parent().parent();
         var id = row.children().eq(0).html();
         if ($.trim(id) === "" ) {
@@ -74,7 +74,7 @@ $(document).ready(function() {
             contentType: "application/json",
             success: function() {
                 row.remove();
-                removecloud();
+                hideCloud();
             },
             error: function() {
                 location.reload(true);
@@ -83,7 +83,7 @@ $(document).ready(function() {
     });
 
     $(document).on("click", ".approveItem", function() {
-        addcloud();
+        showCloud();
             var row = $(this).parent().parent();
             var id = row.children().eq(0).html();
             var clusterName = row.children().eq(1).html();
@@ -103,7 +103,7 @@ $(document).ready(function() {
                                      "retryQueueNum":retryQueueNum, "consumeFromMinEnable":consumeFromMinEnable,"order":order});
 
             if ($.trim(id) === "" ) {
-                removecloud();
+                hideCloud();
                 return false;
             }
 
@@ -126,10 +126,10 @@ $(document).ready(function() {
                         }
                     });
 
-                    removecloud();
+                    hideCloud();
                 }
             });
     });
 
-    removecloud();
+    hideCloud();
 });

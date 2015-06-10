@@ -48,7 +48,7 @@ $(document).ready(function() {
     });
 
     $(document).on("click", ".operation", function() {
-        addcloud();
+        showCloud();
         var $a = $(this);
         var userId = $a.attr("rel");
         if ($a.hasClass("draft") || $a.hasClass("deleted")) {
@@ -68,8 +68,8 @@ $(document).ready(function() {
             });
         }
 
-        removecloud();
+        hideCloud();
     });
 
-    removecloud();
+    hideCloud();
 });

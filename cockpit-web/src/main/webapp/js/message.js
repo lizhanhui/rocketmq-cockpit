@@ -1,6 +1,6 @@
 var selectDefault = "----请选择-----";
 $(document).ready(function() {
-
+    addcloud();
     var select = document.getElementById("queryType");
 
     select.onchange = function (){
@@ -20,11 +20,11 @@ $(document).ready(function() {
     } ;
 
     $(".queryByID").click(function() {
-        addcloud();
+        showCloud();
         var msgId = $("input.msgId").val();
         if (msgId.length != 32){
             alert(" wrong message id ");
-            removecloud();
+            hideCloud();
             return;
         }
         $.ajax({
@@ -88,13 +88,13 @@ $(document).ready(function() {
     });
 
     $(".queryByKEY").click(function() {
-        addcloud()
+        showCloud()
         var topic = $("input.msgTopic").val();
         var key = $("input.msgKey").val();
 
         if ("" === topic || "" === key){
             alert(" please input topic and key");
-            removecloud();
+            hideCloud();
             return;
         }
 
@@ -117,18 +117,18 @@ $(document).ready(function() {
                         $(".ktable-content").append(item);
                    });
                 }
-                removecloud();
+                hideCloud();
             },
              error: function() {
-                 removecloud();
                  alert("Error");
+                 hideCloud();
              }
         });
 
     });
 
     $(document).on("click", ".operationItem", function() {
-        addcloud();
+        showCloud();
         var msgId = $(this).attr("rel");
         $("input.msgId").val(msgId);
         $.ajax({
@@ -179,17 +179,17 @@ $(document).ready(function() {
                             }
                         }
                     });
-                removecloud();
+                hideCloud();
             },
             error: function() {
-                removecloud();
                 alert("Error");
+                hideCloud();
             }
         });
     });
 
     $(document).on("click", ".flowItem", function() {
-        addcloud();
+        showCloud();
         var msgId = $(this).attr("rel");
         $("input.msgId").val(msgId);
         $.ajax({
@@ -208,17 +208,17 @@ $(document).ready(function() {
                         $(".ftable-content").append(item);
                    });
                 }
-                removecloud();
+                hideCloud();
             },
             error: function() {
-                removecloud();
                 alert("Error");
+                hideCloud();
             }
         });
     });
 
     $(document).on("click", ".consumerItem", function() {
-        addcloud();
+        showCloud();
         var topic = $(this).attr("rel");
         $.ajax({
             async: false,
@@ -240,7 +240,7 @@ $(document).ready(function() {
                     selDiv.appendChild(selectC);
 
                     selectC.onchange = function (){
-                        addcloud();
+                        showCloud();
                         var consumerGroup = "undefined" === typeof($("#selectC").children('option:selected').val()) ? "-1" : $("#selectC").children('option:selected').val();
 
                         if (-1 != consumerGroup){
@@ -309,17 +309,18 @@ $(document).ready(function() {
                         }else{
                         }
 
-                        removecloud();
+                        hideCloud();
                     } ;
                 }
-                removecloud();
+                hideCloud();
             },
             error: function() {
                 alert("Error");
-                removecloud();
+                hideCloud();
             }
         });
     });
+    hideCloud();
 });
 
 function getMapValue(sourceMap){

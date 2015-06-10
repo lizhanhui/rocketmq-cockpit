@@ -73,6 +73,7 @@ $(document).ready(function() {
 
 
     $.get("cockpit/api/consume-progress", function(data) {
+        showCloud();
         var otext1 = document.createTextNode("Consumer Group：");
         var otext2 = document.createTextNode("Topic：");
         var otext3 = document.createTextNode("Broker：");
@@ -107,6 +108,7 @@ $(document).ready(function() {
             selDiv.appendChild(selectQ);
 
         selectC.onchange = function (){
+            showCloud();
             var consumerGroup = $(this).children('option:selected').val();
             hideTopic();
             if (-1 != consumerGroup){
@@ -129,13 +131,16 @@ $(document).ready(function() {
                             selOption2.innerHTML = topic;
                             select.appendChild(selOption2);
                        });
+                       hideCloud();
                    }
                });
             }else{
+                hideCloud();
             }
         } ;
 
         selectT.onchange = function (){
+            showCloud();
             var consumerGroup = $("#selectC").children('option:selected').val();
             var topic = $(this).children('option:selected').val();
             if (topic.indexOf("%") != -1){
@@ -162,13 +167,16 @@ $(document).ready(function() {
                             selOption2.innerHTML = broker;
                             select.appendChild(selOption2);
                        });
+                       hideCloud();
                    }
                });
             }else{
+                hideCloud();
             }
         } ;
 
         selectB.onchange = function (){
+            showCloud();
             var consumerGroup = $("#selectC").children('option:selected').val();
             var topic = $("#selectT").children('option:selected').val();
             if (topic.indexOf("%") != -1){
@@ -190,16 +198,19 @@ $(document).ready(function() {
                        backdata.forEach(function(queue){
                             select.appendChild(createOption(queue));
                        });
-
+                       hideCloud();
                    }
                });
             }else{
+                hideCloud();
             }
         } ;
+
+        hideCloud();
     });
 
     $(".findConsumeProgress").click(function() {
-        addcloud();
+        showCloud();
         var x = [];
         var consumerGroup = "undefined" === typeof($("#selectC").children('option:selected').val()) ? "-1" : $("#selectC").children('option:selected').val();
         var topic = "undefined" === typeof($("#selectT").children('option:selected').val()) ? "-1" : $("#selectT").children('option:selected').val();
@@ -212,7 +223,7 @@ $(document).ready(function() {
         var queue = "undefined" === typeof($("#selectQ").children('option:selected').val()) ? "-1" : $("#selectQ").children('option:selected').val();
         if ($.trim(consumerGroup) === "" || "-1" === consumerGroup) {
             alert("consumer group should not be null");
-            removecloud();
+            hideCloud();
             return false;
         } else {
             $.ajax({
@@ -250,13 +261,13 @@ $(document).ready(function() {
                     x.reverse();
                     showCharts(line, x);
 
-                    removecloud();
+                    hideCloud();
                 }
             });
         }
     });
 
-    removecloud();
+    hideCloud();
 });
 
 function createOption(text){

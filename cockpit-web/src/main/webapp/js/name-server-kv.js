@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    addcloud();
     $.get("cockpit/api/name-server-kv", function(data) {
         $(".table-content").children().remove();
 
@@ -24,7 +25,7 @@ $(document).ready(function() {
     });
 
     $(".addKV").click(function() {
-        addcloud();
+        showCloud();
         var nameSpace = $(".nameSpace").val();
         var key = $(".key").val();
         var value = $(".value").val();
@@ -52,13 +53,13 @@ $(document).ready(function() {
                     $(".value").val("");
                 }
 
-                removecloud();
+                hideCloud();
             }
         });
     });
 
     $(document).on("click", ".deleteKV", function() {
-        addcloud();
+        showCloud();
         var id = $(this).attr("rel");
         var row = $(this).parent().parent();
         $.ajax({
@@ -82,14 +83,14 @@ $(document).ready(function() {
                    });
                 }
 
-                removecloud();
+                hideCloud();
             }
         });
 
     });
 
     $(document).on("click", ".applyKV", function() {
-        addcloud();
+        showCloud();
         var id = $(this).attr("rel");
 
         var $status = $(this).parent().prev();
@@ -98,7 +99,7 @@ $(document).ready(function() {
             id.remove();
         });
 
-        removecloud();
+        hideCloud();
     });
-
+    hideCloud();
 });
