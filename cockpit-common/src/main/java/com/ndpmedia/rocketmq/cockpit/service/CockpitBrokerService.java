@@ -22,4 +22,6 @@ public interface CockpitBrokerService {
      * @return
      */
     Map<String, String> getBrokerCluster(DefaultMQAdminExt defaultMQAdminExt);
+
+    boolean removeAllTopic(String broker);
 }

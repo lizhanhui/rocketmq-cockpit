@@ -47,6 +47,11 @@
         WHERE id = #{id}
     </update>
 
+    <update id="unregister" parameterMap="string">
+        UPDATE topic SET status_id = 3
+        WHERE broker_address = #{broker}
+    </update>
+
     <resultMap id="topicMap" type="Topic">
         <id column="id" property="id" />
         <result column="topic" property="topic" />

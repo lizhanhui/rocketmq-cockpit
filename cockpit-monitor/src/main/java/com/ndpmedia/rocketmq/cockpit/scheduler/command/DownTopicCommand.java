@@ -1,12 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler.command;
 
-import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.TopicConfig;
-import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
-import com.alibaba.rocketmq.common.protocol.body.TopicList;
-import com.alibaba.rocketmq.common.protocol.route.BrokerData;
-import com.alibaba.rocketmq.common.protocol.route.QueueData;
-import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
@@ -18,6 +12,8 @@ import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +24,8 @@ import java.util.*;
  */
 @Component
 public class DownTopicCommand implements SubCommand {
+
+    private Logger logger = LoggerFactory.getLogger(DownTopicCommand.class);
 
     @Autowired
     private TopicMapper topicMapper;
@@ -77,7 +75,7 @@ public class DownTopicCommand implements SubCommand {
 
             Set<String> topics = cockpitTopicService.getTopics(adminExt);
             for (String topicName : topics) {
-                System.out.println("now we check :" + topicName);
+                logger.info("now we check :" + topicName);
                 TopicConfig topicConfig = getTopicConfig(adminExt, topicName);
                 if (null != topicConfig)
                     downloadTopicConfig(adminExt, topicConfig);
@@ -110,7 +108,7 @@ public class DownTopicCommand implements SubCommand {
                     if (null == oldT)
                         topicMapper.insert(topic);
                     //若获取到相同Topic Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
-                    if (null != oldT && oldT.getStatus() != Status.ACTIVE)
+                    else if (oldT.getStatus() != Status.ACTIVE)
                         topicMapper.register(oldT.getId());
                     flag = false;
                 } catch (Exception e) {
@@ -118,7 +116,7 @@ public class DownTopicCommand implements SubCommand {
                 }
             }
 
-            System.out.println("[sync topic]add topic config:" + topicConfig + " to broker :" + broker);
+            logger.info("[sync topic]add topic config:" + topicConfig + " to broker :" + broker);
         }
     }
 

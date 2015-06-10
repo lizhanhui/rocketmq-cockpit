@@ -13,6 +13,8 @@ public interface TopicMapper {
 
     void register(long id);
 
+    void unregister(String broker);
+
     void update(Topic topic);
 
     Topic get(@Param("id") long id,@Param("topic")  String topic,@Param("broker")  String broker,@Param("cluster")  String cluster);

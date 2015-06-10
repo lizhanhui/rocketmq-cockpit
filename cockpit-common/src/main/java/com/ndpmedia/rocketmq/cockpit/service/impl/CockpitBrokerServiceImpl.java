@@ -3,7 +3,9 @@ package com.ndpmedia.rocketmq.cockpit.service.impl;
 import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,6 +15,9 @@ import java.util.*;
  */
 @Service("cockpitBrokerService")
 public class CockpitBrokerServiceImpl implements CockpitBrokerService {
+
+    @Autowired
+    private TopicMapper topicMapper;
 
     @Override
     public Set<String> getALLBrokers(DefaultMQAdminExt defaultMQAdminExt) {
@@ -94,5 +99,15 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
 
         System.out.println("[sync topic] now we get broker list , size : " + brokerToCluster.size() + " [] " + brokerToCluster);
         return brokerToCluster;
+    }
+
+    @Override
+    public boolean removeAllTopic(String broker) {
+        try {
+            topicMapper.unregister(broker);
+        }catch (Exception e){
+            return false;
+        }
+        return true;
     }
 }
