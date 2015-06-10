@@ -12,6 +12,12 @@
         VALUES (#{topicId}, #{teamId})
     </insert>
 
+    <select id="getTeamId" resultType="set">
+        SELECT team_id
+        FROM topic_team_xref
+        WHERE topic_id = #{topicId}
+    </select>
+
     <delete id="removeTopicTeamAssociation">
         DELETE
         FROM topic_team_xref
@@ -104,6 +110,18 @@
             AND topic = #{topic}
         </if>
         GROUP BY topic, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, order_type
+    </select>
+
+    <select id="delList" resultMap="topicMap">
+        SELECT *
+        FROM topic
+        WHERE status_id = 3
+    </select>
+
+    <select id="activeList" resultMap="topicMap">
+        SELECT *
+        FROM topic
+        WHERE status_id = 2
     </select>
 
     <select id="detailList" resultMap="topicMap">

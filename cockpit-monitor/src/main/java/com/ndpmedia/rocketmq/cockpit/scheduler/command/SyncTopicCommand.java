@@ -1,12 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler.command;
 
-import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.TopicConfig;
-import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
-import com.alibaba.rocketmq.common.protocol.body.TopicList;
-import com.alibaba.rocketmq.common.protocol.route.BrokerData;
-import com.alibaba.rocketmq.common.protocol.route.QueueData;
-import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
@@ -90,23 +84,8 @@ public class SyncTopicCommand implements SubCommand {
     }
 
     private void rebuildTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig) {
-        Set<String> localBroker = cockpitTopicService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
-
         for (String broker : brokerList) {
-            if (localBroker.contains(broker))
-                continue;
-
-            boolean flag =true;
-            while (flag) {
-                try {
-                    defaultMQAdminExt.createAndUpdateTopicConfig(broker, topicConfig);
-                    flag = false;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            System.out.println("[sync topic]add topic config:" + topicConfig + " to broker :" + broker);
+            cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
         }
     }
 }

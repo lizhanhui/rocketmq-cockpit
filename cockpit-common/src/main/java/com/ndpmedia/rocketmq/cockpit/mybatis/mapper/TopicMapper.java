@@ -4,6 +4,7 @@ import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TopicMapper {
 
@@ -28,6 +29,12 @@ public interface TopicMapper {
     List<Topic> list(@Param("teamId") long teamId, @Param("topic") String topic);
 
     List<Topic> detailList(@Param("teamId") long teamId, @Param("topic") String topic);
+
+    List<Topic> delList();
+
+    List<Topic> activeList();
+
+    Set<Long> getTeamId(@Param("topicId") long topicId);
 
     void associateTeam(@Param("topicId") long topicId, @Param("teamId") long teamId);
 

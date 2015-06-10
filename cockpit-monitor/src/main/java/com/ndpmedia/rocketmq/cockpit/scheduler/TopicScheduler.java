@@ -62,10 +62,28 @@ public class TopicScheduler {
                 for (String broker:baseBrokers){
                     if (!brokers.contains(broker)){
                         logger.info("[check broker status] " + broker + " is already DEL.");
-                        cockpitBrokerService.removeAllTopic(broker);
+//                        cockpitBrokerService.removeAllTopic(broker);
+                        baseBrokers.remove(broker);
                     }
                 }
             }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            defaultMQAdminExt.shutdown();
+        }
+    }
+
+    /**
+     * check topic status every 5 minutes
+     */
+    @Scheduled(fixedRate = 30000)
+    public void checkTopicStatus(){
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+        try {
+            defaultMQAdminExt.start();
+
         }catch (Exception e){
             e.printStackTrace();
         }finally {

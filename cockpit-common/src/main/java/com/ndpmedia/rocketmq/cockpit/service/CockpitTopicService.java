@@ -4,6 +4,7 @@ import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 
+import java.util.List;
 import java.util.Set;
 
 public interface CockpitTopicService {
@@ -21,6 +22,10 @@ public interface CockpitTopicService {
      */
     Set<String> getTopics(DefaultMQAdminExt defaultMQAdminExt);
 
+    List<Topic> getDelTopics();
+
+    List<Topic> getActiveTopics();
+
     /**
      * get topic config by topic name
      * @param defaultMQAdminExt
@@ -37,11 +42,19 @@ public interface CockpitTopicService {
      */
     Set<String> getTopicBrokers(DefaultMQAdminExt defaultMQAdminExt, String topic);
 
+    boolean rebuildTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig, String broker);
+
     boolean createOrUpdateTopic(Topic topic);
 
     boolean deleteTopic(Topic topic);
 
+    boolean register(long id);
+
+    Set<Long> getTeamId(Topic topic);
+
     void insert(Topic topic, long teamId);
 
     void remove(long topicId, long teamId);
+
+
 }

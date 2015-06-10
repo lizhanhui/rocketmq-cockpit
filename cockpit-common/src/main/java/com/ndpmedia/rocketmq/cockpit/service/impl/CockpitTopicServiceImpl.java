@@ -1,13 +1,11 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
-import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.common.protocol.body.TopicList;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.common.protocol.route.QueueData;
 import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
-import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.CommandUtil;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
@@ -71,13 +69,23 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
     }
 
     @Override
+    public List<Topic> getDelTopics() {
+        return topicMapper.delList();
+    }
+
+    @Override
+    public List<Topic> getActiveTopics() {
+        return topicMapper.activeList();
+    }
+
+    @Override
     public TopicConfig getTopicConfigByTopicName(DefaultMQAdminExt defaultMQAdminExt, String topic) {
         TopicConfig topicConfig = new TopicConfig();
         topicConfig.setTopicName(topic);
 
         TopicRouteData topicRouteData = new TopicRouteData();
         boolean flag = true;
-        while (flag){
+        while (flag) {
             try {
                 topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
                 flag = false;
@@ -90,7 +98,7 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         int readQ = 0;
         int writeQ = 0;
         int perm = 0;
-        for (QueueData queueData:lists){
+        for (QueueData queueData : lists) {
             readQ = Math.max(readQ, queueData.getReadQueueNums());
             writeQ = Math.max(writeQ, queueData.getWriteQueueNums());
             perm = Math.max(perm, queueData.getPerm());
@@ -123,8 +131,8 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         List<BrokerData> brokerDatas = topicRouteData.getBrokerDatas();
         Set<String> topicBroker = new HashSet<>();
 
-        for (BrokerData brokerData:brokerDatas){
-            for (Map.Entry<Long, String> entry:brokerData.getBrokerAddrs().entrySet()){
+        for (BrokerData brokerData : brokerDatas) {
+            for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
                 topicBroker.add(entry.getValue());
             }
         }
@@ -132,6 +140,29 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         return topicBroker;
     }
 
+    @Override
+    public boolean rebuildTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig, String broker) {
+
+        Set<String> localBroker = getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
+
+        if (!localBroker.contains(broker)) {
+            boolean flag = true;
+            while (flag) {
+                try {
+                    defaultMQAdminExt.createAndUpdateTopicConfig(broker, topicConfig);
+                    flag = false;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            logger.info("[cockpit topic service]add topic config:" + topicConfig + " to broker :" + broker);
+
+            return true;
+        }
+
+        return false;
+    }
 
     @Override
     public boolean createOrUpdateTopic(Topic topic) {
@@ -204,12 +235,28 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         return true;
     }
 
+    @Override
+    public boolean register(long id) {
+        try{
+            topicMapper.register(id);
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     private static TopicConfig wrapTopicToTopicConfig(Topic topic) {
         TopicConfig topicConfig = new TopicConfig();
         topicConfig.setWriteQueueNums(topic.getWriteQueueNum());
         topicConfig.setReadQueueNums(topic.getReadQueueNum());
         topicConfig.setTopicName(topic.getTopic());
         return topicConfig;
+    }
+
+    @Override
+    public Set<Long> getTeamId(Topic topic){
+        return topicMapper.getTeamId(topic.getId());
     }
 
     @Transactional
