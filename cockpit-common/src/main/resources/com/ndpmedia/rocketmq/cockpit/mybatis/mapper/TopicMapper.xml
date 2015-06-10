@@ -118,13 +118,13 @@
     </select>
 
     <select id="delList" resultMap="topicMap">
-        SELECT *
+        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
         FROM topic
         WHERE status_id = 3
     </select>
 
     <select id="activeList" resultMap="topicMap">
-        SELECT *
+        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
         FROM topic
         WHERE status_id = 2
     </select>
