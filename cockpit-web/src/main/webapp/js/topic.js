@@ -218,14 +218,14 @@ function _deleteFun(id, topic, cluster_name, broker_address) {
                             window.location.reload(true);
                         },
                         error: function() {
-                            alert(" delete topic on broker error !");
+                            alert(" delete topic on database error !");
                             hideCloud();
                         }
                     });
             }
         },
         error: function(){
-            alert("delete topic on database error");
+            alert("delete topic on broker error");
             hideCloud();
         }
     });
