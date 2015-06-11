@@ -29,9 +29,9 @@ $(document).ready(function() {
             hideCloud();
             return false;
         } else if ($.trim(cluster_name) === "" && $.trim(broker_address) == "") {
-            alert("");
+            alert("error");
             hideCloud();
-8            return false;
+            return false;
         } else {
             $.ajax({
                         async: false,
@@ -214,12 +214,19 @@ function _deleteFun(id, topic, cluster_name, broker_address) {
                         type: "DELETE",
                         dataType: "json",
                         contentType: "application/json; charset=UTF-8",
-                        complete: function() {
-                            hideCloud();
+                        success: function() {
                             window.location.reload(true);
+                        },
+                        error: function() {
+                            alert(" delete topic on broker error !");
+                            hideCloud();
                         }
                     });
             }
+        },
+        error: function(){
+            alert("delete topic on database error");
+            hideCloud();
         }
     });
 }
