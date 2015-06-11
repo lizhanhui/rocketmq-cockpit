@@ -25,6 +25,7 @@ public class TopicManageController {
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseBody
     public boolean delete(@RequestBody Topic topic) {
+        cockpitTopicService.unregister(topic.getId());
         boolean result = cockpitTopicService.deleteTopic(topic);
         if (cockpitTopicService.getTopic(topic.getTopic()).isEmpty())
             return result&&cockpitTopicService.deleteTopicOnNS(topic);

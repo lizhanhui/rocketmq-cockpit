@@ -28,7 +28,7 @@ public interface TopicMapper {
      */
     List<Topic> list(@Param("teamId") long teamId, @Param("topic") String topic, @Param("statusId") long statusId);
 
-    List<Topic> detailList(@Param("teamId") long teamId, @Param("topic") String topic);
+    List<Topic> detailList(@Param("teamId") long teamId, @Param("topic") String topic, @Param("statusId") long statusId);
 
     List<Topic> delList();
 

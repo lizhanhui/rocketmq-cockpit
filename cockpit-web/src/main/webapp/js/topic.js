@@ -201,7 +201,7 @@ function _deleteFun(id, topic, cluster_name, broker_address) {
     showCloud();
     $.ajax({
         async: false,
-        data: JSON.stringify({"id":id, "topic":topic, "clusterName":cluster_name， "brokerAddress": broker_address}),
+        data: JSON.stringify({"id":id, "topic":topic, "clusterName":cluster_name, "brokerAddress": broker_address}),
         url: "cockpit/manage/topic/",
         type: "DELETE",
         dataType: "json",
@@ -214,12 +214,8 @@ function _deleteFun(id, topic, cluster_name, broker_address) {
                         type: "DELETE",
                         dataType: "json",
                         contentType: "application/json; charset=UTF-8",
-                        success: function() {
+                        complete: function() {
                             window.location.reload(true);
-                        },
-                        error: function() {
-                            alert(" delete topic on database error !");
-                            hideCloud();
                         }
                     });
             }

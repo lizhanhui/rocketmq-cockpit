@@ -144,5 +144,9 @@
         <if test="topic != null">
             AND topic = #{topic}
         </if>
+
+        <if test="statusId > 0">
+            AND status_id = #{statusId}
+        </if>
     </select>
 </mapper>

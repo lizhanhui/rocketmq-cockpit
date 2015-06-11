@@ -80,7 +80,7 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
 
     @Override
     public List<Topic> getTopic(String topic) {
-        return topicMapper.list(-1, topic, 2);
+        return topicMapper.detailList(-1, topic, 2);
     }
 
     @Override
@@ -231,7 +231,6 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
             // Delete from brokers.
                 masterBrokerAddressSet.addAll(
                     CommandUtil.fetchMasterAddrByClusterName(defaultMQAdminExt, topic.getClusterName()));
-
             defaultMQAdminExt.deleteTopicInBroker(masterBrokerAddressSet, topic.getTopic());
         } catch (Exception e) {
             logger.warn("[DELETE][TOPIC][MQADMIN] try to delete topic failed." + e);
