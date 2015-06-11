@@ -5,6 +5,8 @@ import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +18,14 @@ import java.util.*;
 @Service("cockpitBrokerService")
 public class CockpitBrokerServiceImpl implements CockpitBrokerService {
 
+    private Logger logger = LoggerFactory.getLogger(CockpitBrokerServiceImpl.class);
+
     @Autowired
     private TopicMapper topicMapper;
 
     @Override
     public Set<String> getALLBrokers(DefaultMQAdminExt defaultMQAdminExt) {
-        System.out.println("[cockpit broker] try to get broker list");
+        logger.info("[cockpit broker] try to get broker list");
         Set<String> brokerList = new HashSet<>();
         boolean flag = true;
         ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
@@ -55,7 +59,7 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
             }
         }
 
-        System.out.println("[cockpit broker] now we get broker list , size : " + brokerList.size() + brokerList);
+        logger.info("[cockpit broker] now we get broker list , size : " + brokerList.size() + brokerList);
         return brokerList;
     }
 
@@ -63,7 +67,7 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
     public Map<String, String> getBrokerCluster(DefaultMQAdminExt defaultMQAdminExt) {
         Map<String, String> brokerToCluster = new HashMap<>();
 
-        System.out.println("[sync topic] try to get broker list");
+        logger.info("[sync topic] try to get broker list");
         boolean flag = true;
         ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
         while(flag) {
@@ -97,7 +101,7 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
             }
         }
 
-        System.out.println("[sync topic] now we get broker list , size : " + brokerToCluster.size() + " [] " + brokerToCluster);
+        logger.info("[sync topic] now we get broker list , size : " + brokerToCluster.size() + " [] " + brokerToCluster);
         return brokerToCluster;
     }
 
