@@ -88,7 +88,7 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         TopicConfig topicConfig = new TopicConfig();
         topicConfig.setTopicName(topic);
 
-        TopicRouteData topicRouteData = new TopicRouteData();
+        TopicRouteData topicRouteData = null;
         boolean flag = true;
         while (flag) {
             try {
@@ -96,25 +96,28 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
                 flag = false;
             } catch (Exception e) {
                 e.printStackTrace();
+                if (e.getMessage().contains("No topic route info"))
+                    flag = false;
             }
         }
-        List<QueueData> lists = topicRouteData.getQueueDatas();
+        if (null != topicRouteData) {
+            List<QueueData> lists = topicRouteData.getQueueDatas();
 
-        int readQ = 0;
-        int writeQ = 0;
-        int perm = 0;
-        for (QueueData queueData : lists) {
-            readQ = Math.max(readQ, queueData.getReadQueueNums());
-            writeQ = Math.max(writeQ, queueData.getWriteQueueNums());
-            perm = Math.max(perm, queueData.getPerm());
-            topicConfig.setTopicSysFlag(queueData.getTopicSynFlag());
-        }
-        topicConfig.setWriteQueueNums(writeQ);
-        topicConfig.setReadQueueNums(readQ);
-        topicConfig.setPerm(perm);
+            int readQ = 0;
+            int writeQ = 0;
+            int perm = 0;
+            for (QueueData queueData : lists) {
+                readQ = Math.max(readQ, queueData.getReadQueueNums());
+                writeQ = Math.max(writeQ, queueData.getWriteQueueNums());
+                perm = Math.max(perm, queueData.getPerm());
+                topicConfig.setTopicSysFlag(queueData.getTopicSynFlag());
+            }
+            topicConfig.setWriteQueueNums(writeQ);
+            topicConfig.setReadQueueNums(readQ);
+            topicConfig.setPerm(perm);
 
-        if (null != topicConfig && null != topicConfig.getTopicName() && !topicConfig.getTopicName().isEmpty())
             return topicConfig;
+        }
 
         logger.info("[sync topic] big error! find topic but no topic config !");
         return null;
