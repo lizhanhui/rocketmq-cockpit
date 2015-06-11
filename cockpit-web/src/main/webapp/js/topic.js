@@ -201,7 +201,7 @@ function _deleteFun(id, topic, cluster_name, broker_address) {
     showCloud();
     $.ajax({
         async: false,
-        data: JSON.stringify({"id":id, "topic":topic, "clusterName":cluster_name}),
+        data: JSON.stringify({"id":id, "topic":topic, "clusterName":cluster_name， "brokerAddress": broker_address}),
         url: "cockpit/manage/topic/",
         type: "DELETE",
         dataType: "json",

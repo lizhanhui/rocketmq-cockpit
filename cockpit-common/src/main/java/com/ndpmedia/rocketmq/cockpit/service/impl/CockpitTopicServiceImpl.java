@@ -224,13 +224,31 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
-            Set<String> nameServerAddress = new HashSet<String>(defaultMQAdminExt.getNameServerAddressList());
-
+            Set<String> masterBrokerAddressSet = new HashSet<>();
+            if (null != topic.getBrokerAddress())
+                masterBrokerAddressSet.add(topic.getBrokerAddress());
+            else
             // Delete from brokers.
-            Set<String> masterBrokerAddressSet =
-                    CommandUtil.fetchMasterAddrByClusterName(defaultMQAdminExt, topic.getClusterName());
+                masterBrokerAddressSet.addAll(
+                    CommandUtil.fetchMasterAddrByClusterName(defaultMQAdminExt, topic.getClusterName()));
 
             defaultMQAdminExt.deleteTopicInBroker(masterBrokerAddressSet, topic.getTopic());
+        } catch (Exception e) {
+            logger.warn("[DELETE][TOPIC][MQADMIN] try to delete topic failed." + e);
+            return false;
+        } finally {
+            defaultMQAdminExt.shutdown();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean deleteTopicOnNS(Topic topic) {
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+        defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
+        try {
+            defaultMQAdminExt.start();
+            Set<String> nameServerAddress = new HashSet<String>(defaultMQAdminExt.getNameServerAddressList());
 
             // Delete from name server.
             defaultMQAdminExt.deleteTopicInNameServer(nameServerAddress, topic.getTopic());
