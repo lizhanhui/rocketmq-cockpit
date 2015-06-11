@@ -50,7 +50,7 @@ public class TopicServiceController {
     public Map<String, Object> detailList(HttpServletRequest request, @PathVariable("topic") String topic) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        List<Topic> topics = topicMapper.detailList(teamId, topic);
+        List<Topic> topics = topicMapper.detailList(teamId, topic, 0);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", topics.size());
