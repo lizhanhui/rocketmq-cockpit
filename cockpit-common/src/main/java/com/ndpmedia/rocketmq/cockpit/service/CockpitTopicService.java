@@ -49,8 +49,6 @@ public interface CockpitTopicService {
 
     boolean deleteTopic(Topic topic);
 
-    boolean deleteTopicOnNS(Topic topic);
-
     boolean register(long id);
 
     boolean unregister(long id);
