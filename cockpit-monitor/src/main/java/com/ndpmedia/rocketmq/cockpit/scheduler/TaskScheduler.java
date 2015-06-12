@@ -15,6 +15,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * consumer group base offset scheduler
+ */
 @Component
 public class TaskScheduler {
 
@@ -29,6 +32,10 @@ public class TaskScheduler {
     @Autowired
     private CockpitTopicService cockpitTopicService;
 
+    /**
+     * schedule:get consumer group and the topic offset.
+     * period:300 second
+     */
     @Scheduled(fixedRate = 300000)
     public void queryAccumulation() {
         Date date = new Date();
