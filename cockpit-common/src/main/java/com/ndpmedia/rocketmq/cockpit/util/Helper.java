@@ -2,6 +2,7 @@ package com.ndpmedia.rocketmq.cockpit.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class Helper {
@@ -19,5 +20,15 @@ public final class Helper {
         return localHostAddress + "@" + Thread.currentThread().getId() + "_" + COUNTER.incrementAndGet();
     }
 
+    public static String getStringBuild(Collection<?> collection, String space){
+        StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (Object o:collection){
+            if (index++ > 0)
+                sb.append(space);
+            sb.append(o.toString());
+        }
 
+        return sb.toString();
+    }
 }
