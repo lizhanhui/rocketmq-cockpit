@@ -9,6 +9,7 @@ import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
+import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -102,7 +103,7 @@ public class DownTopicCommand implements SubCommand {
             boolean flag =true;
             while (flag) {
                 try {
-                    Topic topic = getTopic(topicConfig, broker);
+                    Topic topic = TopicTranslate.translateFrom(topicConfig, brokerToCluster.get(broker), broker);
                     Topic oldT = topicMapper.get(0L, topic.getTopic(), topic.getBrokerAddress(), null);
                     //若未获取到相同Topic Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
                     if (null == oldT)
@@ -118,20 +119,5 @@ public class DownTopicCommand implements SubCommand {
 
             logger.info("[sync topic]add topic config:" + topicConfig + " to broker :" + broker);
         }
-    }
-
-    private Topic getTopic(TopicConfig topicConfig, String broker) {
-        Topic topic = new Topic();
-        topic.setBrokerAddress(broker);
-        topic.setClusterName(brokerToCluster.get(broker));
-        topic.setCreateTime(new Date());
-        topic.setOrder(topicConfig.isOrder());
-        topic.setPermission(topicConfig.getPerm());
-        topic.setReadQueueNum(topicConfig.getReadQueueNums());
-        topic.setWriteQueueNum(topicConfig.getWriteQueueNums());
-        topic.setStatus(Status.ACTIVE);
-        topic.setTopic(topicConfig.getTopicName());
-        topic.setUpdateTime(new Date());
-        return topic;
     }
 }

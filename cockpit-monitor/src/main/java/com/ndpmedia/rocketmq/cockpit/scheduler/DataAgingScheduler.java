@@ -13,6 +13,9 @@ import java.util.Calendar;
 
 /**
  * Created by robert on 2015/6/9.
+ * data aging scheduler.
+ * 1.consume progress 、message flow
+ * 2.login message
  */
 @Component
 public class DataAgingScheduler {
@@ -27,6 +30,11 @@ public class DataAgingScheduler {
     @Autowired
     private ConsumeProgressMapper consumeProgressMapper;
 
+    /**
+     * schedule:delete old comsume progress 、message flow records.
+     * period:one hour(the first second of an hour)
+     * span: records old than one day
+     */
     @Scheduled(cron = "0 0 * * * *")
     public void deleteDeprecatedData() {
         logger.info("Start to clean deprecated data");
@@ -39,6 +47,11 @@ public class DataAgingScheduler {
         logger.info("Deleted " + numberOfRecordsDeleted + " message flow records.");
     }
 
+    /**
+     * schedule: delete login message
+     * period:30 second
+     * span:old than 30 minutes
+     */
     @Scheduled(fixedRate = 30000)
     public void deleteDeprecatedLoginData() {
         Calendar calendar = Calendar.getInstance();

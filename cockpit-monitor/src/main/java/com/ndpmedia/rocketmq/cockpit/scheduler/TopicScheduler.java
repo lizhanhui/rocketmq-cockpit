@@ -19,6 +19,9 @@ import java.util.Set;
 
 /**
  * Created by robert on 2015/6/9.
+ * check topic and topic status
+ * 1.auto download topic from cluster or broker to data base
+ * 2.if broker break, auto check topic , create or update topic config on cluster or broker.
  */
 @Component
 public class TopicScheduler {
@@ -33,6 +36,10 @@ public class TopicScheduler {
     @Autowired
     private CockpitBrokerService cockpitBrokerService;
 
+    /**
+     * schedule:check topic and topic route from cluster and broker.
+     * period:one hour(12:24 of an hour)
+     */
     @Scheduled(cron = "24 12 * * * *")
     public void downloadTopic() {
         downTopicCommand.execute(null, null, null);

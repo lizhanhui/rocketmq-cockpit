@@ -78,7 +78,8 @@ public class TopicServiceController {
     public void delete(@PathVariable("id") long id, HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         topicMapper.delete(id);
-        cockpitTopicService.remove(id, cockpitUser.getTeam().getId());
+        //when delete topic , just clear it.
+        cockpitTopicService.remove(id, 0);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.POST)
