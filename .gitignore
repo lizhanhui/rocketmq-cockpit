@@ -50,3 +50,5 @@ crashlytics-build.properties
 
 target
 
+log.home_IS_UNDEFINED/logs/rocketmqlogs/tracer.log
+log.home_IS_UNDEFINED/logs/rocketmqlogs/rocketmq_client.log
