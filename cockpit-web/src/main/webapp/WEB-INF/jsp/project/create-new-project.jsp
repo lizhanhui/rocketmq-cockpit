@@ -56,7 +56,7 @@
                 </tr>
                 <tr>
                     <td>consume_enable:</td>
-                    <td><input type="text" class="form-control CGconsume_enable" placeholder="consume_enable"></td>
+                    <td><input type="text" class="form-control consume_enable" placeholder="consume_enable"></td>
                 </tr>
                 <tr>
                     <td>consume_broadcast_enable:</td>
