@@ -81,8 +81,7 @@ $(document).ready(function() {
             dataType: "json",
             contentType: "application/json",
             data: project,
-            success: function(backProject) {
-                alert(backProject);
+            success: function() {
                 $.ajax({
                     async: false,
                     url: "cockpit/api/consumer-group",
@@ -99,6 +98,7 @@ $(document).ready(function() {
                             contentType: 'application/json',
                             data: ob,
                             success: function() {
+                                alert(" SUCCESS ");
                                 location.reload(true);
                             },
                             error: function() {
