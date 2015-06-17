@@ -2,7 +2,11 @@ package com.ndpmedia.rocketmq.cockpit.service;
 
 import com.ndpmedia.rocketmq.cockpit.model.Project;
 
+import java.util.List;
+
 public interface CockpitProjectService {
+
+    List<Project> list(long teamId);
 
     /**
      * add project to database by team

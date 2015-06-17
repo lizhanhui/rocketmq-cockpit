@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/api/project")
@@ -19,6 +20,14 @@ public class CockpitProjectController {
 
     @Autowired
     private CockpitProjectService cockpitProjectService;
+
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public List<Project> list(HttpServletRequest request){
+        CockpitUser cockpitUser = (CockpitUser) request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
+        long teamId = cockpitUser.getTeam().getId();
+        return cockpitProjectService.list(teamId);
+    }
 
     @RequestMapping(method = RequestMethod.PUT)
     @ResponseBody

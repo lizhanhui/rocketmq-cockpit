@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service("cockpitProjectService")
 public class CockpitProjectServiceImpl implements CockpitProjectService {
 
@@ -16,6 +18,11 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Override
+    public List<Project> list(long teamId) {
+        return projectMapper.list(teamId);
+    }
 
     @Override
     public void insert(Project project) {
