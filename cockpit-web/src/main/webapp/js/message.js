@@ -88,7 +88,7 @@ $(document).ready(function() {
     });
 
     $(".queryByKEY").click(function() {
-        showCloud()
+        showCloud();
         var topic = $("input.msgTopic").val();
         var key = $("input.msgKey").val();
 
