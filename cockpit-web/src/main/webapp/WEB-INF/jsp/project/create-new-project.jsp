@@ -13,9 +13,9 @@
     <div class="container-fluid">
         <div class="row">
             <ol class="breadcrumb">
-                <li class="active"><span class="badge" style="background-color: blue;">1</span> Launch New Project</li>
-                <li><span class="badge" style="background-color: blue;">2</span> Create Consumer Groups</li>
-                <li><span class="badge" style="background-color: blue;">3</span> Create Topics</li>
+                <li class="active"><span id="step1" class="badge" style="background-color: red;">1</span> Launch New Project</li>
+                <li><span id="step2" class="badge" style="background-color: red;">2</span> Create Consumer Groups</li>
+                <li><span id="step3" class="badge" style="background-color: red;">3</span> Create Topics</li>
             </ol>
         </div>
     </div>

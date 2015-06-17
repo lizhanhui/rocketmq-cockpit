@@ -7,6 +7,7 @@ $(document).ready(function() {
         }
         document.getElementById("addProjectDIV").style.display="none";
         document.getElementById("addConsumerGroupDIV").style.display="block";
+        document.getElementById("step1").style.backgroundColor="blue";
     });
 
     $(".addConsumerGroup").click(function() {
@@ -24,6 +25,7 @@ $(document).ready(function() {
 
         document.getElementById("addConsumerGroupDIV").style.display="none";
         document.getElementById("addTopicDIV").style.display="block";
+        document.getElementById("step2").style.backgroundColor="blue";
     });
 
     $(".backProject").click(function() {
