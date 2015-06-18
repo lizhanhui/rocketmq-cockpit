@@ -14,4 +14,6 @@ public interface ProjectMapper {
     void update(Project project);
 
     void delete(long id);
+
+    Project get(@Param("projectId") long projectId, @Param("projectName") String projectName);
 }

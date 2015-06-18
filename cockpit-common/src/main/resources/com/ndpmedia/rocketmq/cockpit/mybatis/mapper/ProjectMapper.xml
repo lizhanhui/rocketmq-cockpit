@@ -28,4 +28,17 @@
         </if>
     </select>
 
+    <select id="get" resultType="com.ndpmedia.rocketmq.cockpit.model.Project">
+        SELECT id, name description, team_id AS teamId
+        FROM project
+        WHERE 1 = 1
+        <if test="projectId > 0">
+            AND id = #{projectId}
+        </if>
+        <if test="projectName == null">
+            AND name = #{projectName}
+        </if>
+        LIMIT 1
+    </select>
+
 </mapper>

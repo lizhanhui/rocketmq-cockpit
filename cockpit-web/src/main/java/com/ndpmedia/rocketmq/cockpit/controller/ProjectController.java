@@ -17,4 +17,9 @@ public class ProjectController {
         return "project/manage-projects";
     }
 
+    @RequestMapping(value = "/manage2")
+    public String showManage2() {
+        return "project/manage-projects2";
+    }
+
 }

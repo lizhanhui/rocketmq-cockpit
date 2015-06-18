@@ -20,4 +20,12 @@ public interface CockpitProjectService {
      */
     void remove(long projectId);
 
+    /**
+     * get project by id or name
+     * @param projectId id
+     * @param projectName   name
+     * @return  project
+     */
+    Project get(long projectId, String projectName);
+
 }

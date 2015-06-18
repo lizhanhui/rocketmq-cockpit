@@ -34,4 +34,9 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
     public void remove(long topicId) {
         projectMapper.delete(topicId);
     }
+
+    @Override
+    public Project get(long projectId, String projectName) {
+        return projectMapper.get(projectId, projectName);
+    }
 }
