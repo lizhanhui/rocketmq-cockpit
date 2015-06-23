@@ -11,9 +11,17 @@ public interface ProjectMapper {
 
     void create(Project project);
 
+    void createRefC(@Param("project") String project, @Param("consumerGroup") String consumerGroup);
+
+    void createRefT(@Param("project") String project, @Param("topic") String topic);
+
     void update(Project project);
 
     void delete(long id);
+
+    void deleteC(String name);
+
+    void deleteT(String name);
 
     Project get(@Param("projectId") long projectId, @Param("projectName") String projectName);
 }

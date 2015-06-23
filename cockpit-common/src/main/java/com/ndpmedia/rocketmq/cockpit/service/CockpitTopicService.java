@@ -115,5 +115,5 @@ public interface CockpitTopicService {
      */
     void remove(long topicId, long teamId);
 
-
+    Topic getBaseBean(String topicName);
 }

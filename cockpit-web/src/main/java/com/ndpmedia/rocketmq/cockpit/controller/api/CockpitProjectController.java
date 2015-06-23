@@ -1,18 +1,22 @@
 package com.ndpmedia.rocketmq.cockpit.controller.api;
 
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
+import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
+import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitProjectService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping(value = "/api/project")
@@ -20,6 +24,12 @@ public class CockpitProjectController {
 
     @Autowired
     private CockpitProjectService cockpitProjectService;
+
+    @Autowired
+    private CockpitConsumerGroupService cockpitConsumerGroupService;
+
+    @Autowired
+    private CockpitTopicService cockpitTopicService;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
@@ -44,10 +54,38 @@ public class CockpitProjectController {
         return true;
     }
 
+    @RequestMapping(value = "/{project}/{consumerGroup}/{topic}", method = RequestMethod.PUT)
+    @ResponseBody
+    public void addRef(@PathVariable("project") String project, @PathVariable("consumerGroup") String consumerGroup, @PathVariable("topic") String topic){
+        cockpitProjectService.addRef(project, consumerGroup, topic);
+    }
+
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseBody
     public boolean delete(@RequestBody int id){
         cockpitProjectService.remove(id);
         return true;
+    }
+
+    @RequestMapping(value = "/{project}", method = RequestMethod.GET)
+    @ResponseBody
+    public List<ConsumerGroup> getConsumerGroups(@PathVariable("project") String project){
+        List<ConsumerGroup> results = new ArrayList<>();
+        Set<String> groupNames = cockpitProjectService.getConsumerGroups(project);
+        for (String groupName:groupNames){
+            results.add(cockpitConsumerGroupService.getBaseBean(groupName));
+        }
+        return results;
+    }
+
+    @RequestMapping(value = "/{project}", method = RequestMethod.POST)
+    @ResponseBody
+    public List<Topic> getTopics(@PathVariable("project") String project){
+        List<Topic> results = new ArrayList<>();
+        Set<String> topicNames = cockpitProjectService.getTopics(project);
+        for (String topicName:topicNames){
+            results.add(cockpitTopicService.getBaseBean(topicName));
+        }
+        return results;
     }
 }

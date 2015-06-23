@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service("cockpitProjectService")
 public class CockpitProjectServiceImpl implements CockpitProjectService {
@@ -29,14 +30,33 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
         projectMapper.create(project);
     }
 
+    @Override
+    public void addRef(String project, String consumerGroup, String topic) {
+        projectMapper.createRefC(project, consumerGroup);
+        projectMapper.createRefT(project, topic);
+    }
+
     @Transactional
     @Override
-    public void remove(long topicId) {
-        projectMapper.delete(topicId);
+    public void remove(long projectId) {
+        Project project = projectMapper.get(projectId, null);
+        projectMapper.delete(projectId);
+        projectMapper.deleteC(project.getName());
+        projectMapper.deleteT(project.getName());
     }
 
     @Override
     public Project get(long projectId, String projectName) {
         return projectMapper.get(projectId, projectName);
+    }
+
+    @Override
+    public Set<String> getConsumerGroups(String projectName) {
+        return null;
+    }
+
+    @Override
+    public Set<String> getTopics(String projectName) {
+        return null;
     }
 }

@@ -309,4 +309,9 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         topicMapper.delete(topicId);
         topicMapper.removeTopicTeamAssociation(topicId, teamId);
     }
+
+    @Override
+    public Topic getBaseBean(String topicName) {
+        return null;
+    }
 }

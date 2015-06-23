@@ -7,6 +7,16 @@
         VALUES (NULL, #{name}, #{description}, #{teamId})
     </insert>
 
+    <insert id="createRefC">
+        INSERT INTO project_consumer_group_xref(project_name, consumer_group_name)
+        VALUES (#{project}, #{consumerGroup})
+    </insert>
+
+    <insert id="createRefT">
+        INSERT INTO project_topic_xref(project_name, topic_name)
+        VALUES (#{project}, #{topic})
+    </insert>
+
     <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.Project">
         UPDATE project
         SET name = #{name}, description = #{description}, team_id = #{teamId}
