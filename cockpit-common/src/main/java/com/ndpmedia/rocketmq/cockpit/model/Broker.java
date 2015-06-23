@@ -13,7 +13,7 @@ public class Broker {
 
     private String address;
 
-    private String version;
+    private String version = "3.2.2";
 
     private int dc;
 
