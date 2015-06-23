@@ -19,6 +19,18 @@
         WHERE id = #{id}
     </delete>
 
+    <delete id="deleteC" parameterType="java.lang.String">
+        DELETE
+        FROM project_consumer_group_xref
+        WHERE project_name = #{name}
+    </delete>
+
+    <delete id="deleteT" parameterType="java.lang.String">
+        DELETE
+        FROM project_topic_xref
+        WHERE project_name = #{name}
+    </delete>
+
     <select id="list" resultType="com.ndpmedia.rocketmq.cockpit.model.Project" parameterType="long">
         SELECT id, name, description, team_id AS teamId
         FROM project
@@ -29,13 +41,13 @@
     </select>
 
     <select id="get" resultType="com.ndpmedia.rocketmq.cockpit.model.Project">
-        SELECT id, name description, team_id AS teamId
+        SELECT id, name, description, team_id AS teamId
         FROM project
         WHERE 1 = 1
         <if test="projectId > 0">
             AND id = #{projectId}
         </if>
-        <if test="projectName == null">
+        <if test="projectName != null">
             AND name = #{projectName}
         </if>
         LIMIT 1
