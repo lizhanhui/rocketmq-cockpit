@@ -1,6 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler.command;
 
 import com.alibaba.rocketmq.common.MixAll;
+import com.alibaba.rocketmq.common.protocol.body.Connection;
 import com.alibaba.rocketmq.common.protocol.body.ConsumerRunningInfo;
 import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
@@ -55,8 +56,6 @@ public class SyncConsumerGroupCommand implements SubCommand {
             getBaseGroups(adminExt);
 
             for (String comGroup:consumerGroups) {
-                ConsumerRunningInfo crif = adminExt.getConsumerRunningInfo("CG_YMREDIRECTOR_QUEUE_TRACE_EVENT", "172.30.50.3@3", true);
-                crif.getProperties();
             }
         }catch (Exception e){
             e.printStackTrace();

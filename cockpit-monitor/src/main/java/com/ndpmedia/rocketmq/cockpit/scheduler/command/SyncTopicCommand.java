@@ -56,6 +56,7 @@ public class SyncTopicCommand implements SubCommand {
     public void execute(CommandLine commandLine, Options options, RPCHook rpcHook) {
         DefaultMQAdminExt adminExt = new DefaultMQAdminExt();
         adminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+
         try {
             adminExt.start();
             doList(adminExt);
