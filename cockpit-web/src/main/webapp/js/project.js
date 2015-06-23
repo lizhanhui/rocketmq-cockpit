@@ -100,8 +100,17 @@ $(document).ready(function() {
                             contentType: 'application/json',
                             data: ob,
                             success: function() {
-                                alert(" SUCCESS ");
-                                location.reload(true);
+                                $.ajax({
+                                    async: false,
+                                    url: "cockpit/api/project/" + projectName + "/" + groupName + "/" + topic,
+                                    type: "PUT",
+                                    dataType: "json",
+                                    contentType: "application/json",
+                                    complete: function() {
+                                        alert(" SUCCESS ");
+                                        location.reload(true);
+                                    }
+                                });
                             },
                             error: function() {
                                 alert(" ERROR ");
