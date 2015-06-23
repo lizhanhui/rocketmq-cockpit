@@ -31,7 +31,7 @@ CREATE TABLE broker (
   broker_name VARCHAR(255) NOT NULL,
   broker_id SMALLINT NOT NULL,
   address VARCHAR(255) NOT NULL,
-  version VARCHAR(100) NOT NULL,
+  version VARCHAR(100) DEFAULT '3.2.2',
   dc INT NOT NULL REFERENCES data_center(id),
   last_update_time TIMESTAMP NOT NULL,
   CONSTRAINT uniq_cluster_name_id UNIQUE (cluster_name, broker_name, broker_id)
