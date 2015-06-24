@@ -55,7 +55,7 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
 
     @Override
     public ConsumerGroup getBaseBean(String consumerGroupName) {
-        return null;
+        return consumerGroupMapper.getBase(consumerGroupName);
     }
 
     @Override
