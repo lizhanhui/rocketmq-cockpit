@@ -312,6 +312,6 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
 
     @Override
     public Topic getBaseBean(String topicName) {
-        return null;
+        return topicMapper.get(0, topicName, null, null);
     }
 }
