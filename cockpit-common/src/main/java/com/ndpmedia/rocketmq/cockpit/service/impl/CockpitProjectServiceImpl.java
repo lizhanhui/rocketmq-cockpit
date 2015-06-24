@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 @Service("cockpitProjectService")
 public class CockpitProjectServiceImpl implements CockpitProjectService {
@@ -51,12 +50,12 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
     }
 
     @Override
-    public Set<String> getConsumerGroups(String projectName) {
-        return null;
+    public List<String> getConsumerGroups(String projectName) {
+        return projectMapper.listC(projectName);
     }
 
     @Override
-    public Set<String> getTopics(String projectName) {
-        return null;
+    public List<String> getTopics(String projectName) {
+        return projectMapper.listT(projectName);
     }
 }

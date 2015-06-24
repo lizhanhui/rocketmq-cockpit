@@ -13,10 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Controller
 @RequestMapping(value = "/api/project")
@@ -71,7 +69,7 @@ public class CockpitProjectController {
     @ResponseBody
     public List<ConsumerGroup> getConsumerGroups(@PathVariable("project") String project){
         List<ConsumerGroup> results = new ArrayList<>();
-        Set<String> groupNames = cockpitProjectService.getConsumerGroups(project);
+        List<String> groupNames = cockpitProjectService.getConsumerGroups(project);
         for (String groupName:groupNames){
             results.add(cockpitConsumerGroupService.getBaseBean(groupName));
         }
@@ -82,7 +80,7 @@ public class CockpitProjectController {
     @ResponseBody
     public List<Topic> getTopics(@PathVariable("project") String project){
         List<Topic> results = new ArrayList<>();
-        Set<String> topicNames = cockpitProjectService.getTopics(project);
+        List<String> topicNames = cockpitProjectService.getTopics(project);
         for (String topicName:topicNames){
             results.add(cockpitTopicService.getBaseBean(topicName));
         }

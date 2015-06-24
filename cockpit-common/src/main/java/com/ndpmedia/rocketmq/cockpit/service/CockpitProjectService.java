@@ -38,8 +38,8 @@ public interface CockpitProjectService {
      */
     Project get(long projectId, String projectName);
 
-    Set<String> getConsumerGroups(String projectName);
+    List<String> getConsumerGroups(String projectName);
 
-    Set<String> getTopics(String projectName);
+    List<String> getTopics(String projectName);
 
 }

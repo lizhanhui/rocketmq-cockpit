@@ -24,4 +24,8 @@ public interface ProjectMapper {
     void deleteT(String name);
 
     Project get(@Param("projectId") long projectId, @Param("projectName") String projectName);
+
+    List<String> listT(String name);
+
+    List<String> listC(String name);
 }

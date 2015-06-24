@@ -1,14 +1,14 @@
 var selectDefault = "----请选择-----";
 
-$(document).ready(function() {
+$(document).ready(function () {
     addcloud();
-
+    hideCloud();
     Highcharts.theme = {
         colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
         chart: {
             backgroundColor: {
-                linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
-                stops: [ [0, 'rgb(255, 255, 255)'], [1, 'rgb(240, 240, 255)'] ]
+                linearGradient: {x1: 0, y1: 0, x2: 1, y2: 1},
+                stops: [[0, 'rgb(255, 255, 255)'], [1, 'rgb(240, 240, 255)']]
             },
             borderWidth: 2,
             plotBackgroundColor: 'rgba(255, 255, 255, .9)',
@@ -38,7 +38,12 @@ $(document).ready(function() {
                 }
             },
             title: {
-                style: { color: '#333', fontWeight: 'bold', fontSize: '12px', fontFamily: 'Trebuchet MS, Verdana, sans-serif' }
+                style: {
+                    color: '#333',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+                }
             }
         },
         yAxis: {
@@ -48,60 +53,93 @@ $(document).ready(function() {
             tickWidth: 1,
             tickColor: '#000',
             labels: {
-                style: { color: '#000', font: '11px Trebuchet MS, Verdana, sans-serif' }
+                style: {color: '#000', font: '11px Trebuchet MS, Verdana, sans-serif'}
             },
             title: {
-                style: { color: '#333', fontWeight: 'bold', fontSize: '12px', fontFamily: 'Trebuchet MS, Verdana, sans-serif' }
+                style: {
+                    color: '#333',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+                }
             }
         },
         legend: {
-            itemStyle: { font: '9pt Trebuchet MS, Verdana, sans-serif', color: 'black' },
-            itemHoverStyle: { color: '#039' },
-            itemHiddenStyle: { color: 'gray' }
+            itemStyle: {font: '9pt Trebuchet MS, Verdana, sans-serif', color: 'black'},
+            itemHoverStyle: {color: '#039'},
+            itemHiddenStyle: {color: 'gray'}
         },
         labels: {
-            style: { color: '#99b' }
+            style: {color: '#99b'}
         },
         navigation: {
-            buttonOptions: { theme: { stroke: '#CCCCCC' } }
+            buttonOptions: {theme: {stroke: '#CCCCCC'}}
         }
     };
     // Apply the theme
-    Highcharts.setOptions({ global: { useUTC: false } });
+    Highcharts.setOptions({global: {useUTC: false}});
     var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
 
-    $.get("cockpit/api/project", function(data) {
+    $.get("cockpit/api/project", function (data) {
         var text = document.createTextNode("Project: ");
         var divP = document.getElementById("divPro");
         var selectP = document.createElement("select");
         selectP.id = "selectP";
 
         selectP.appendChild(createOption(null));
-        data.forEach(function(project) {
+        data.forEach(function (project) {
             selectP.appendChild(createOption(project.name));
         });
 
         divP.appendChild(text);
         divP.appendChild(selectP);
 
-        selectP.onchange = function() {
+        selectP.onchange = function () {
             showCloud();
             var project = $("#selectP").children('option:selected').val();
-            if (-1 != project){
+            if (-1 != project) {
                 $.ajax({
-                    async:false,
+                    async: false,
                     url: "cockpit/api/project/" + project,//查询该project对应的Consumer Group
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json",
-                    success: function(datas) {
+                    success: function (datas) {
+                        var consumerGroup = "";
                         //获取结果集 插入表格
                         $(".cTable-content").children().remove();
-                        datas.forEach(function(ConsumerGroup) {
-
+                        datas.forEach(function (ConsumerGroup) {
+                            if (consumerGroup === "") {
+                                consumerGroup = ConsumerGroup.groupName;
+                            }
+                            var operationLink = $("<a class='showConsumerGroup' href='javascript:;'>show</a>");
+                            var operation = $("<td></td>");
+                            operation.append(operationLink);
+                            var item = $("<tr><td>" + ConsumerGroup.groupName + "</td></tr>");
+                            item.append(operation);
+                            $(".cTable-content").append(item);
                         });
                         //获取第一个结果，并展示其积压曲线
+                        $.ajax({
+                            async: false,
+                            url: "cockpit/api/consume-progress" + "/" + consumerGroup + "/" + "-1" + "/" + "-1" + "/" + "-1",
+                            type: "GET",
+                            contentType: "application/json; charset=UTF-8",
+                            dataType: "json",
+                            success: function (backdata) {
+                                var line = consumerGroup;
 
+                                backdata.forEach(function (consumeProgress) {
+                                    var temp = [];
+                                    var time = consumeProgress.createTime.replace(new RegExp("-", "gm"), "/");
+                                    temp.push((new Date(time)).getTime());
+                                    temp.push(consumeProgress.diff);
+                                    x.push(temp);
+                                });
+                                x.reverse();
+                                showCharts(line, x);
+                            }
+                        });
                     }
                 });
 
@@ -112,17 +150,17 @@ $(document).ready(function() {
                     data: project,
                     dataType: "json",
                     contentType: "application/json",
-                    success: function(datas) {
+                    success: function (datas) {
                         //获取结果集  插入表格
                         $(".tTable-content").children().remove();
-                        datas.forEach(function(topic) {
+                        datas.forEach(function (topic) {
 
                         });
                         //获取第一个结果，并展示其积压曲线
 
                     }
                 });
-            }else {
+            } else {
                 hideCloud();
             }
         };
@@ -150,10 +188,10 @@ function showCharts(xsets, ysets) {
         xAxis: {
             type: 'datetime',
             dateTimeLabelFormats: { // don't display the dummy year
-                second:'%H:%M:%S',
-                day:'%e. %b',
-                month:'%b \'%y',
-                year:'%Y'
+                second: '%H:%M:%S',
+                day: '%e. %b',
+                month: '%b \'%y',
+                year: '%Y'
             }
         },
         yAxis: {
@@ -164,21 +202,21 @@ function showCharts(xsets, ysets) {
             startOnTick: false
         },
         tooltip: {
-            formatter: function() {
-                return '<b>'+ this.series.name +'</b><br/>'+
-                    new Date(this.x) +': '+ this.y +' times';
+            formatter: function () {
+                return '<b>' + this.series.name + '</b><br/>' +
+                    new Date(this.x) + ': ' + this.y + ' times';
             }
         },
 
         series: [{
             name: xsets,
-            data:ysets
+            data: ysets
         }]
     });
 }
 
 function showTCharts(xsets, ysets) {
-    $('#cTontainer').highcharts({
+    $('#tContainer').highcharts({
         chart: {
             type: 'spline'
         },
@@ -191,10 +229,10 @@ function showTCharts(xsets, ysets) {
         xAxis: {
             type: 'datetime',
             dateTimeLabelFormats: { // don't display the dummy year
-                second:'%H:%M:%S',
-                day:'%e. %b',
-                month:'%b \'%y',
-                year:'%Y'
+                second: '%H:%M:%S',
+                day: '%e. %b',
+                month: '%b \'%y',
+                year: '%Y'
             }
         },
         yAxis: {
@@ -205,15 +243,15 @@ function showTCharts(xsets, ysets) {
             startOnTick: false
         },
         tooltip: {
-            formatter: function() {
-                return '<b>'+ this.series.name +'</b><br/>'+
-                    new Date(this.x) +': '+ this.y +' times';
+            formatter: function () {
+                return '<b>' + this.series.name + '</b><br/>' +
+                    new Date(this.x) + ': ' + this.y + ' times';
             }
         },
 
         series: [{
             name: xsets,
-            data:ysets
+            data: ysets
         }]
     });
 }

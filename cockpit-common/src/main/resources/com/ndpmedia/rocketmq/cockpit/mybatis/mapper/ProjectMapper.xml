@@ -41,6 +41,20 @@
         WHERE project_name = #{name}
     </delete>
 
+    <select id="listC"  parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT consumer_group_name
+        FROM project_consumer_group_xref
+        WHERE project_name = #{name}
+        GROUP BY consumer_group_name
+    </select>
+
+    <select id="listT" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT topic_name
+        FROM project_topic_xref
+        WHERE project_name = #{name}
+        GROUP BY topic_name
+    </select>
+
     <select id="list" resultType="com.ndpmedia.rocketmq.cockpit.model.Project" parameterType="long">
         SELECT id, name, description, team_id AS teamId
         FROM project
