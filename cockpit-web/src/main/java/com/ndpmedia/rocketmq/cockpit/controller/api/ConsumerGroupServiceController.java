@@ -55,7 +55,10 @@ public class ConsumerGroupServiceController {
     @ResponseBody
     public ConsumerGroup getByConsumerGroupName(@PathVariable("consumerGroupName") String consumerGroupName,
                                                 HttpServletRequest request) {
-        return consumerGroupMapper.list(getTeamId(request), null, consumerGroupName).get(0);
+        List<ConsumerGroup> groups = consumerGroupMapper.list(getTeamId(request), null, consumerGroupName);
+        if (groups.isEmpty())
+            return new ConsumerGroup();
+        return groups.get(0);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
