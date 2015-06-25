@@ -67,7 +67,7 @@ public class SyncTopicCommand implements SubCommand {
                 System.out.println("now we check :" + topicName);
                 TopicConfig topicConfig = getTopicConfig(adminExt, topicName);
                 if (null != topicConfig)
-                    rebuildTopicConfig(adminExt, topicConfig);
+                    rebuildTopicConfig(adminExt, topicConfig, commandLine);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,9 +84,12 @@ public class SyncTopicCommand implements SubCommand {
         return cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
     }
 
-    private void rebuildTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig) {
-        for (String broker : brokerList) {
-            cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
-        }
+    private void rebuildTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig, CommandLine commandLine) {
+        if (null != commandLine.getOptionValue('b') && commandLine.getOptionValue('b').trim().length() > 0)
+            cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, commandLine.getOptionValue('b').trim());
+        else
+            for (String broker : brokerList) {
+                cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
+            }
     }
 }
