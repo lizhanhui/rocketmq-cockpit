@@ -1,8 +1,8 @@
 var selectDefault = "----请选择-----";
 
 $(document).ready(function () {
-    addcloud();
-    hideCloud();
+
+
     Highcharts.theme = {
         colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
         chart: {
@@ -95,6 +95,7 @@ $(document).ready(function () {
         divP.appendChild(selectP);
 
         selectP.onchange = function () {
+
             var project = $("#selectP").children('option:selected').val();
             if (-1 != project) {
                 $.ajax({
@@ -150,17 +151,57 @@ $(document).ready(function () {
                     dataType: "json",
                     contentType: "application/json",
                     success: function (datas) {
+                        var showTopic = "";
                         //获取结果集  插入表格
                         $(".tTable-content").children().remove();
                         datas.forEach(function (topic) {
-
+                            if (showTopic === "") {
+                                showTopic = topic.topic;
+                            }
+                            var operationLink = $("<a class='showTopic' href='javascript:;'>show</a>");
+                            var operation = $("<td></td>");
+                            operation.append(operationLink);
+                            var item = $("<tr><td>" + topic.topic + "</td></tr>");
+                            item.append(operation);
+                            $(".tTable-content").append(item);
                         });
                         //获取第一个结果，并展示其积压曲线
+                        $.ajax({
+                            async: false,
+                            url: "cockpit/api/topic-progress" + "/" + showTopic,
+                            type: "GET",
+                            contentType: "application/json; charset=UTF-8",
+                            dataType: "json",
+                            success: function(backdata) {
+                                var line = showTopic;
+                                var firstB = -1;
+                                var x = [];
+                                backdata.reverse();
+                                backdata.forEach(function(consumeProgress){
+                                    var temp = [];
+                                    var time = consumeProgress.createTime.replace(new RegExp("-","gm"),"/");
+                                    temp.push((new Date(time)).getTime());
+                                    if (-1 === firstB){
 
+                                    }else{
+                                        if (consumeProgress.brokerOffset >= firstB){
+                                            temp.push(Math.round(100*(consumeProgress.brokerOffset - firstB)/(5*60))/100);
+                                        }else{
+                                            temp.push(Math.round(0));
+                                        }
+                                        x.push(temp);
+                                    }
+
+                                    firstB = consumeProgress.brokerOffset;
+                                });
+
+                                showTCharts(line, x);
+                            }
+                        });
                     }
                 });
             } else {
-                hideCloud();
+
             }
         };
     });

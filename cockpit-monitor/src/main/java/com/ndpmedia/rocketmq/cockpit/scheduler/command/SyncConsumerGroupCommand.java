@@ -6,6 +6,8 @@ import com.alibaba.rocketmq.common.protocol.body.ConsumerRunningInfo;
 import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitBrokerServiceImpl;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -19,6 +21,10 @@ import java.util.Set;
 public class SyncConsumerGroupCommand implements SubCommand {
 
     private Set<String> consumerGroups = new HashSet<>();
+
+    private Set<String> brokerList = new HashSet<>();
+
+    private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
 
     @Override
     public String commandName() {
@@ -54,8 +60,11 @@ public class SyncConsumerGroupCommand implements SubCommand {
             adminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
             adminExt.start();
             getBaseGroups(adminExt);
+            doList(adminExt);
 
             for (String comGroup:consumerGroups) {
+                System.out.println("now we check consumer group : " + comGroup);
+
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -80,5 +89,9 @@ public class SyncConsumerGroupCommand implements SubCommand {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void doList(DefaultMQAdminExt defaultMQAdminExt) {
+        brokerList.addAll(cockpitBrokerService.getALLBrokers(defaultMQAdminExt));
     }
 }
