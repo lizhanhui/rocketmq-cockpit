@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service("cockpitProjectService")
 public class CockpitProjectServiceImpl implements CockpitProjectService {
 
@@ -18,13 +20,42 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
     private ProjectMapper projectMapper;
 
     @Override
+    public List<Project> list(long teamId) {
+        return projectMapper.list(teamId);
+    }
+
+    @Override
     public void insert(Project project) {
         projectMapper.create(project);
     }
 
+    @Override
+    public void addRef(String project, String consumerGroup, String topic) {
+        projectMapper.createRefC(project, consumerGroup);
+        projectMapper.createRefT(project, topic);
+    }
+
     @Transactional
     @Override
-    public void remove(long topicId) {
-        projectMapper.delete(topicId);
+    public void remove(long projectId) {
+        Project project = projectMapper.get(projectId, null);
+        projectMapper.delete(projectId);
+        projectMapper.deleteC(project.getName());
+        projectMapper.deleteT(project.getName());
+    }
+
+    @Override
+    public Project get(long projectId, String projectName) {
+        return projectMapper.get(projectId, projectName);
+    }
+
+    @Override
+    public List<String> getConsumerGroups(String projectName) {
+        return projectMapper.listC(projectName);
+    }
+
+    @Override
+    public List<String> getTopics(String projectName) {
+        return projectMapper.listT(projectName);
     }
 }

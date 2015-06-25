@@ -53,6 +53,10 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
 
                     while (itAddr.hasNext()) {
                         Map.Entry<Long, String> next1 = itAddr.next();
+                        if (next1.getKey() != 0){
+                            logger.info("this broker maybe not master ." + next1.getValue());
+                            continue;
+                        }
                         brokerList.add(next1.getValue());
                     }
                 }

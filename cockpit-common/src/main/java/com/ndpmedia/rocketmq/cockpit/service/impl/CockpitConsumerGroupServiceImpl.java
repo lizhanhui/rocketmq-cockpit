@@ -54,6 +54,11 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
     }
 
     @Override
+    public ConsumerGroup getBaseBean(String consumerGroupName) {
+        return consumerGroupMapper.getBase(consumerGroupName);
+    }
+
+    @Override
     @Transactional
     public void insert(ConsumerGroup consumerGroup, long teamId) {
         consumerGroupMapper.insert(consumerGroup);

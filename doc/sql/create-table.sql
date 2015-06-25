@@ -31,7 +31,7 @@ CREATE TABLE broker (
   broker_name VARCHAR(255) NOT NULL,
   broker_id SMALLINT NOT NULL,
   address VARCHAR(255) NOT NULL,
-  version VARCHAR(100) NOT NULL,
+  version VARCHAR(100) DEFAULT '3.2.2',
   dc INT NOT NULL REFERENCES data_center(id),
   last_update_time TIMESTAMP NOT NULL,
   CONSTRAINT uniq_cluster_name_id UNIQUE (cluster_name, broker_name, broker_id)
@@ -129,9 +129,15 @@ CREATE TABLE IF NOT EXISTS project (
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS project_topic_xref (
-  project_id INT NOT NULL REFERENCES project(id),
-  topic_id INT NOT NULL REFERENCES topic(id),
-  CONSTRAINT uniq_project_topic UNIQUE (project_id, topic_id)
+  project_name VARCHAR(255) NOT NULL REFERENCES project(name),
+  topic_name VARCHAR(255) NOT NULL REFERENCES topic(topic),
+  CONSTRAINT uniq_project_topic UNIQUE (project_name, topic_name)
+) ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS project_consumer_group_xref (
+  project_name VARCHAR(255) NOT NULL REFERENCES project(name),
+  consumer_group_name VARCHAR(255) NOT NULL REFERENCES consumer_group(group_name),
+  CONSTRAINT uniq_project_consumer_group UNIQUE (project_name, consumer_group_name)
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS cockpit_user (

@@ -225,13 +225,14 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         try {
             defaultMQAdminExt.start();
             Set<String> masterBrokerAddressSet = new HashSet<>();
-            if (null != topic.getBrokerAddress())
+            if (null != topic.getBrokerAddress() && !topic.getBrokerAddress().isEmpty())
                 masterBrokerAddressSet.add(topic.getBrokerAddress());
             else
                 masterBrokerAddressSet.addAll(
                     CommandUtil.fetchMasterAddrByClusterName(defaultMQAdminExt, topic.getClusterName()));
 
-            defaultMQAdminExt.deleteTopicInBroker(masterBrokerAddressSet, topic.getTopic());
+            defaultMQAdminExt.
+                    deleteTopicInBroker(masterBrokerAddressSet, topic.getTopic());
 
             Set<String> nameServerAddress = new HashSet<String>(defaultMQAdminExt.getNameServerAddressList());
 
@@ -307,5 +308,10 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
     public void remove(long topicId, long teamId) {
         topicMapper.delete(topicId);
         topicMapper.removeTopicTeamAssociation(topicId, teamId);
+    }
+
+    @Override
+    public Topic getBaseBean(String topicName) {
+        return topicMapper.get(0, topicName, null, null);
     }
 }

@@ -13,6 +13,8 @@ public interface ConsumerGroupMapper {
 
     ConsumerGroup get(long id);
 
+    ConsumerGroup getBase(String name);
+
     long insert(ConsumerGroup consumerGroup);
 
     void update(ConsumerGroup consumerGroup);

@@ -1,9 +1,11 @@
 package com.ndpmedia.rocketmq.cockpit.controller.api;
 
+import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
@@ -16,10 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/api/topic")
@@ -30,6 +29,9 @@ public class TopicServiceController {
 
     @Autowired
     private CockpitTopicService cockpitTopicService;
+
+    @Autowired
+    private CockpitBrokerService cockpitBrokerService;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
@@ -69,7 +71,26 @@ public class TopicServiceController {
     @ResponseBody
     public Topic add(@RequestBody Topic topic, HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-        cockpitTopicService.insert(topic, cockpitUser.getTeam().getId());
+        if (null == topic.getBrokerAddress() || topic.getBrokerAddress().isEmpty())
+        {
+            DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+            defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+            try {
+                defaultMQAdminExt.start();
+                Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
+                for (String broker:brokers){
+                    topic.setBrokerAddress(broker);
+                    cockpitTopicService.insert(topic, cockpitUser.getTeam().getId());
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                defaultMQAdminExt.shutdown();
+            }
+        }
+        else {
+            cockpitTopicService.insert(topic, cockpitUser.getTeam().getId());
+        }
         return topic;
     }
 
