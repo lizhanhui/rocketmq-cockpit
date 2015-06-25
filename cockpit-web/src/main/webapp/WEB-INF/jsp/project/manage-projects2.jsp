@@ -36,7 +36,7 @@
                             </table>
                         </td>
                         <td>
-                            <div id="cContainer" style="min-width:600px;height:300px"></div>
+                            <div id="cContainer" style="min-width:300px;height:400px"></div>
                         </td>
                     </tr>
                     <tr>
@@ -53,7 +53,7 @@
                             </table>
                         </td>
                         <td>
-                            <div id="tContainer" style="min-width:600px;height:3 00px"></div>
+                            <div id="tContainer" style="min-width:300px;height:400px"></div>
                         </td>
                     </tr>
                 </table>

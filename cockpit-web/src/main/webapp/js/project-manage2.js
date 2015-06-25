@@ -10,7 +10,7 @@ $(document).ready(function () {
                 linearGradient: {x1: 0, y1: 0, x2: 1, y2: 1},
                 stops: [[0, 'rgb(255, 255, 255)'], [1, 'rgb(240, 240, 255)']]
             },
-            borderWidth: 2,
+            borderWidth: 1,
             plotBackgroundColor: 'rgba(255, 255, 255, .9)',
             plotShadow: true,
             plotBorderWidth: 1
@@ -113,6 +113,7 @@ $(document).ready(function () {
                                 consumerGroup = ConsumerGroup.groupName;
                             }
                             var operationLink = $("<a class='showConsumerGroup' href='javascript:;'>show</a>");
+                            operationLink.attr("va", ConsumerGroup.groupName);
                             var operation = $("<td></td>");
                             operation.append(operationLink);
                             var item = $("<tr><td>" + ConsumerGroup.groupName + "</td></tr>");
@@ -120,26 +121,7 @@ $(document).ready(function () {
                             $(".cTable-content").append(item);
                         });
                         //获取第一个结果，并展示其积压曲线
-                        $.ajax({
-                            async: false,
-                            url: "cockpit/api/consume-progress" + "/" + consumerGroup + "/" + "-1" + "/" + "-1" + "/" + "-1",
-                            type: "GET",
-                            contentType: "application/json; charset=UTF-8",
-                            dataType: "json",
-                            success: function (backdata) {
-                                var line = consumerGroup;
-                                var x = [];
-                                backdata.forEach(function (consumeProgress) {
-                                    var temp = [];
-                                    var time = consumeProgress.createTime.replace(new RegExp("-", "gm"), "/");
-                                    temp.push((new Date(time)).getTime());
-                                    temp.push(consumeProgress.diff);
-                                    x.push(temp);
-                                });
-                                x.reverse();
-                                showCharts(line, x);
-                            }
-                        });
+                        showGroup(consumerGroup);
                     }
                 });
 
@@ -151,14 +133,15 @@ $(document).ready(function () {
                     dataType: "json",
                     contentType: "application/json",
                     success: function (datas) {
-                        var showTopic = "";
+                        var top = "";
                         //获取结果集  插入表格
                         $(".tTable-content").children().remove();
                         datas.forEach(function (topic) {
-                            if (showTopic === "") {
-                                showTopic = topic.topic;
+                            if (top === "") {
+                                top = topic.topic;
                             }
                             var operationLink = $("<a class='showTopic' href='javascript:;'>show</a>");
+                            operationLink.attr("va", topic.topic);
                             var operation = $("<td></td>");
                             operation.append(operationLink);
                             var item = $("<tr><td>" + topic.topic + "</td></tr>");
@@ -166,38 +149,7 @@ $(document).ready(function () {
                             $(".tTable-content").append(item);
                         });
                         //获取第一个结果，并展示其积压曲线
-                        $.ajax({
-                            async: false,
-                            url: "cockpit/api/topic-progress" + "/" + showTopic,
-                            type: "GET",
-                            contentType: "application/json; charset=UTF-8",
-                            dataType: "json",
-                            success: function(backdata) {
-                                var line = showTopic;
-                                var firstB = -1;
-                                var x = [];
-                                backdata.reverse();
-                                backdata.forEach(function(consumeProgress){
-                                    var temp = [];
-                                    var time = consumeProgress.createTime.replace(new RegExp("-","gm"),"/");
-                                    temp.push((new Date(time)).getTime());
-                                    if (-1 === firstB){
-
-                                    }else{
-                                        if (consumeProgress.brokerOffset >= firstB){
-                                            temp.push(Math.round(100*(consumeProgress.brokerOffset - firstB)/(5*60))/100);
-                                        }else{
-                                            temp.push(Math.round(0));
-                                        }
-                                        x.push(temp);
-                                    }
-
-                                    firstB = consumeProgress.brokerOffset;
-                                });
-
-                                showTCharts(line, x);
-                            }
-                        });
+                        showTopic(top);
                     }
                 });
             } else {
@@ -205,6 +157,16 @@ $(document).ready(function () {
             }
         };
     });
+
+    $(document).on("click", ".showConsumerGroup", function(){
+        var consumerGroup = $(this).attr("va");
+        showGroup(consumerGroup);
+    });
+
+    $(document).on("click", ".showTopic", function() {
+        var topic = $(this).attr("va");
+        showTopic(topic);
+    })
 });
 
 function createOption(text) {
@@ -214,8 +176,66 @@ function createOption(text) {
     return selOption;
 }
 
-function showCharts(xsets, ysets) {
-    $('#cContainer').highcharts({
+function showGroup(consumerGroup){
+    $.ajax({
+        async: false,
+        url: "cockpit/api/consume-progress" + "/" + consumerGroup + "/" + "-1" + "/" + "-1" + "/" + "-1",
+        type: "GET",
+        contentType: "application/json; charset=UTF-8",
+        dataType: "json",
+        success: function (backdata) {
+            var line = consumerGroup;
+            var x = [];
+            backdata.forEach(function (consumeProgress) {
+                var temp = [];
+                var time = consumeProgress.createTime.replace(new RegExp("-", "gm"), "/");
+                temp.push((new Date(time)).getTime());
+                temp.push(consumeProgress.diff);
+                x.push(temp);
+            });
+            x.reverse();
+            showCharts('#cContainer', line, x);
+        }
+    });
+}
+
+function showTopic(topic){
+    $.ajax({
+        async: false,
+        url: "cockpit/api/topic-progress" + "/" + topic,
+        type: "GET",
+        contentType: "application/json; charset=UTF-8",
+        dataType: "json",
+        success: function(backdata) {
+            var line = topic;
+            var firstB = -1;
+            var x = [];
+            backdata.reverse();
+            backdata.forEach(function(consumeProgress){
+                var temp = [];
+                var time = consumeProgress.createTime.replace(new RegExp("-","gm"),"/");
+                temp.push((new Date(time)).getTime());
+                if (-1 === firstB){
+
+                }else{
+                    if (consumeProgress.brokerOffset >= firstB){
+                        temp.push(Math.round(100*(consumeProgress.brokerOffset - firstB)/(5*60))/100);
+                    }else{
+                        temp.push(Math.round(0));
+                    }
+                    x.push(temp);
+                }
+
+                firstB = consumeProgress.brokerOffset;
+            });
+
+            showCharts('#tContainer', line, x);
+        }
+    });
+}
+
+function showCharts(target ,xsets, ysets) {
+    $(target).highcharts({
         chart: {
             type: 'spline'
         },
@@ -255,43 +275,3 @@ function showCharts(xsets, ysets) {
     });
 }
 
-function showTCharts(xsets, ysets) {
-    $('#tContainer').highcharts({
-        chart: {
-            type: 'spline'
-        },
-        title: {
-            text: 'diff'
-        },
-        subtitle: {
-            text: xsets
-        },
-        xAxis: {
-            type: 'datetime',
-            dateTimeLabelFormats: { // don't display the dummy year
-                second: '%H:%M:%S',
-                day: '%e. %b',
-                month: '%b \'%y',
-                year: '%Y'
-            }
-        },
-        yAxis: {
-            title: {
-                text: 'diff (times)'
-            },
-            min: null,
-            startOnTick: false
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.series.name + '</b><br/>' +
-                    new Date(this.x) + ': ' + this.y + ' times';
-            }
-        },
-
-        series: [{
-            name: xsets,
-            data: ysets
-        }]
-    });
-}

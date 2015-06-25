@@ -41,7 +41,7 @@ public class ConsumerGroupServiceController {
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ConsumerGroup get(@PathVariable("id") long id) {
-        return consumerGroupMapper.get(id);
+        return consumerGroupMapper.get(id, null, null, null);
     }
 
     @RequestMapping(value = "/cluster-name/{clusterName}", method = RequestMethod.GET)
