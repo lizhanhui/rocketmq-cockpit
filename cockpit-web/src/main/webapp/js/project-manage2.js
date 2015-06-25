@@ -235,9 +235,13 @@ function showTopic(topic){
 }
 
 function showCharts(target ,xsets, ysets) {
+    var bodyWidth = document.documentElement.clientWidth;
+    var bodyHeight = Math.max(document.documentElement.clientHeight, document.body.scrollHeight);
     $(target).highcharts({
         chart: {
-            type: 'spline'
+            type: 'spline',
+            width: 0.55 * bodyWidth,
+            height: 0.35 * bodyHeight
         },
         title: {
             text: 'diff'
