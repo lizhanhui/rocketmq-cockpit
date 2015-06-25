@@ -1,11 +1,12 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler.command;
 
-import com.alibaba.rocketmq.common.MixAll;
-import com.alibaba.rocketmq.common.protocol.body.Connection;
-import com.alibaba.rocketmq.common.protocol.body.ConsumerRunningInfo;
 import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitBrokerServiceImpl;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupServiceImpl;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -19,6 +20,12 @@ import java.util.Set;
 public class SyncConsumerGroupCommand implements SubCommand {
 
     private Set<String> consumerGroups = new HashSet<>();
+
+    private Set<String> brokerList = new HashSet<>();
+
+    private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
+
+    private CockpitConsumerGroupService cockpitConsumerGroupService = new CockpitConsumerGroupServiceImpl();
 
     @Override
     public String commandName() {
@@ -53,9 +60,13 @@ public class SyncConsumerGroupCommand implements SubCommand {
         try{
             adminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
             adminExt.start();
-            getBaseGroups(adminExt);
+            consumerGroups = cockpitConsumerGroupService.getGroups(adminExt);
+
+            doList(adminExt);
 
             for (String comGroup:consumerGroups) {
+                System.out.println("now we check consumer group : " + comGroup);
+                System.out.println(cockpitConsumerGroupService.getGroupConfig(adminExt, comGroup));
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -64,21 +75,7 @@ public class SyncConsumerGroupCommand implements SubCommand {
         }
     }
 
-    private void getBaseGroups(DefaultMQAdminExt defaultMQAdminExt){
-        boolean flag = true;
-        while (flag) {
-            try {
-                Set<String> topics = defaultMQAdminExt.fetchAllTopicList().getTopicList();
-                for (String topic : topics) {
-                    if (topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX) || topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX))
-                        consumerGroups.add(topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX) ? topic.replace(MixAll.RETRY_GROUP_TOPIC_PREFIX, "") :
-                                topic.replace(MixAll.DLQ_GROUP_TOPIC_PREFIX, ""));
-                }
-
-                flag = false;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    private void doList(DefaultMQAdminExt defaultMQAdminExt) {
+        brokerList.addAll(cockpitBrokerService.getALLBrokers(defaultMQAdminExt));
     }
 }

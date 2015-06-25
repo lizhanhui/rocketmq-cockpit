@@ -1,5 +1,9 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
+import com.alibaba.rocketmq.common.MixAll;
+import com.alibaba.rocketmq.common.protocol.body.Connection;
+import com.alibaba.rocketmq.common.protocol.body.ConsumerConnection;
+import com.alibaba.rocketmq.common.protocol.body.ConsumerRunningInfo;
 import com.alibaba.rocketmq.common.subscription.SubscriptionGroupConfig;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.CommandUtil;
@@ -11,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 @Service("cockpitConsumerGroupService")
@@ -56,6 +62,49 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
     @Override
     public ConsumerGroup getBaseBean(String consumerGroupName) {
         return consumerGroupMapper.getBase(consumerGroupName);
+    }
+
+    @Override
+    public Set<String> getGroups(DefaultMQAdminExt defaultMQAdminExt) {
+        Set<String> consumerGroups = new HashSet<>();
+        boolean flag = true;
+        while (flag) {
+            try {
+                Set<String> topics = defaultMQAdminExt.fetchAllTopicList().getTopicList();
+                for (String topic : topics) {
+                    if (topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX) || topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX))
+                        consumerGroups.add(topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX) ? topic.replace(MixAll.RETRY_GROUP_TOPIC_PREFIX, "") :
+                                topic.replace(MixAll.DLQ_GROUP_TOPIC_PREFIX, ""));
+                }
+
+                flag = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return consumerGroups;
+    }
+
+    @Override
+    public SubscriptionGroupConfig getGroupConfig(DefaultMQAdminExt defaultMQAdminExt, String groupName) {
+        try{
+            ConsumerConnection consumerConnection = defaultMQAdminExt.examineConsumerConnectionInfo(groupName);
+            if (null != consumerConnection){
+                Iterator<Connection> conns = consumerConnection.getConnectionSet().iterator();
+                while (conns.hasNext()){
+                    Connection connection = conns.next();
+                    String clientId = connection.getClientId();
+                    if (null != clientId && !clientId.isEmpty()){
+                        ConsumerRunningInfo info = defaultMQAdminExt.getConsumerRunningInfo(groupName, clientId, true);
+                        if (null != info)
+                            return null;
+                    }
+                }
+            }
+        }catch (Exception e){
+            System.out.println("try to get SubscriptionGroupConfig failed! group :" + groupName + e);
+        }
+        return null;
     }
 
     @Override
