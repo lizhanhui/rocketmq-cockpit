@@ -3,8 +3,8 @@
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper">
 
     <insert id="insert" parameterType="ConsumerGroup" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO consumer_group (id, cluster_name, group_name, consume_enable, consume_broadcast_enable, update_time)
-        VALUES (NULL, #{clusterName}, #{groupName}, #{consumeEnable}, #{consumeBroadcastEnable}, #{updateTime})
+        INSERT INTO consumer_group (id, cluster_name, group_name, consume_enable, consume_broadcast_enable, update_time, retry_queue_num)
+        VALUES (NULL, #{clusterName}, #{groupName}, #{consumeEnable}, #{consumeBroadcastEnable}, #{updateTime}, #{retryQueueNum})
     </insert>
 
     <insert id="associateTeam">
@@ -89,10 +89,26 @@
         </if>
     </select>
 
-    <select id="get" resultMap="consumerGroupMap" parameterType="long">
+    <select id="get" resultMap="consumerGroupMap">
         SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, broker_address, broker_id, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
         FROM consumer_group
-        WHERE id = #{id}
+        WHERE 1 = 1
+        <if test="id > 0">
+            AND id = #{id}
+        </if>
+
+        <if test="groupName != null">
+            AND group_name = #{groupName}
+        </if>
+
+        <if test="clusterName != null">
+            AND cluster_name = #{clusterName}
+        </if>
+
+        <if test="broker != null">
+            AND broker_address = #{broker}
+        </if>
+        limit 1
     </select>
 
     <select id="getBase" resultMap="consumerGroupMap" parameterType="java.lang.String">

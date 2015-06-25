@@ -11,7 +11,10 @@ public interface ConsumerGroupMapper {
                              @Param("clusterName") String clusterName,
                              @Param("consumerGroupName") String consumerGroupName);
 
-    ConsumerGroup get(long id);
+    ConsumerGroup get(@Param("id") long id,
+                      @Param("groupName") String groupName,
+                      @Param("clusterName") String clusterName,
+                      @Param("broker") String broker);
 
     ConsumerGroup getBase(String name);
 
