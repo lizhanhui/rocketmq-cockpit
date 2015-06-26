@@ -50,12 +50,12 @@
     </delete>
 
     <update id="register" parameterType="long">
-        UPDATE topic SET status_id = 2
+        UPDATE topic SET status_id = 2, update_time = now()
         WHERE id = #{id}
     </update>
 
     <update id="unregister" parameterType="long" >
-        UPDATE topic SET status_id = 3
+        UPDATE topic SET status_id = 3, update_time = now()
         WHERE id = #{id}
     </update>
 
