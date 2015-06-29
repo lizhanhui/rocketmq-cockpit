@@ -71,11 +71,11 @@
                     </tr>
                     <tr style="display:none">
                         <td>retry_max_times:</td>
-                        <td><input type="text" class="form-control retry_max_times" placeholder="retry_max_times"></td>
+                        <td><input type="text" class="form-control retry_max_times" placeholder="retry_max_times" value="3"></td>
                     </tr>
                     <tr style="display:none">
                         <td>retry_queue_num:</td>
-                        <td><input type="text" class="form-control retry_queue_num" placeholder="retry_queue_num"></td>
+                        <td><input type="text" class="form-control retry_queue_num" placeholder="retry_queue_num" value="3"></td>
                     </tr>
                     <tr style="display:none">
                         <td>consume_from_min_enable:</td>
