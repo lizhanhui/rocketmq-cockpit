@@ -81,7 +81,7 @@ public class DownConsumerCommand implements SubCommand {
             doMap(adminExt);
             Set<String> consumerGroups = cockpitConsumerGroupService.getGroups(adminExt);
             for (String consumerGroup : consumerGroups) {
-                logger.info("now we check :" + consumerGroup);
+                logger.info("now we check consumer group:" + consumerGroup);
                 downloadConsumerGroupConfig(adminExt, consumerGroup);
             }
         } catch (Exception e) {
@@ -118,6 +118,8 @@ public class DownConsumerCommand implements SubCommand {
                     //若获取到相同group Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
                     else if (oldC.getStatus() != Status.ACTIVE)
                         consumerGroupMapper.register(oldC.getId());
+                    //现阶段Consumer Group不与Broker信息做强关联，因此无论brokers中哪一个Broker可完成Consumer Group信息，
+                    // 后续步骤均省略，当Broker信息为必须信息，则不再省略。
                     break  outer;
                 } catch (Exception e) {
                     e.printStackTrace();

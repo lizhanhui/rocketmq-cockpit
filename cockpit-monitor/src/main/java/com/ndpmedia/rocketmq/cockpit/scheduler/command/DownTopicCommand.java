@@ -76,7 +76,7 @@ public class DownTopicCommand implements SubCommand {
 
             Set<String> topics = cockpitTopicService.getTopics(adminExt);
             for (String topicName : topics) {
-                logger.info("now we check :" + topicName);
+                logger.info("now we check topic :" + topicName);
                 TopicConfig topicConfig = getTopicConfig(adminExt, topicName);
                 if (null != topicConfig)
                     downloadTopicConfig(adminExt, topicConfig);
