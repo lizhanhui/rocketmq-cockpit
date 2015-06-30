@@ -31,8 +31,10 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
 
     @Override
     public void addRef(String project, String consumerGroup, String topic) {
-        projectMapper.createRefC(project, consumerGroup);
-        projectMapper.createRefT(project, topic);
+        if (null != consumerGroup && !consumerGroup.isEmpty() && !consumerGroup.equals("$EMPTY$"))
+            projectMapper.createRefC(project, consumerGroup);
+        if (null != topic && !topic.isEmpty() && !topic.equals("$EMPTY$"))
+            projectMapper.createRefT(project, topic);
     }
 
     @Transactional
