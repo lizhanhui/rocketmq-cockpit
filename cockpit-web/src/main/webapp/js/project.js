@@ -195,13 +195,13 @@ function checkInfo(num){
                     dataType: "json",
                     contentType: 'application/json',
                     success: function(consumerGroup){
-                            if (consumerGroup.groupName === text){
-                                check.style.color = "red";
-                                check.innerHTML = "This group is exist. Make sure you want make this group connect to your project.";
-                            }else{
-                                check.style.color = "green";
-                                check.innerHTML = "group name is ok.";
-                            }
+                        if (consumerGroup.groupName === text){
+                            check.style.color = "red";
+                            check.innerHTML = "This group is exist. Make sure you want make this group connect to your project.";
+                        }else{
+                            check.style.color = "green";
+                            check.innerHTML = "group name is ok.";
+                        }
                     }
                 });
             }
@@ -220,15 +220,13 @@ function checkInfo(num){
                     contentType: "application/json; charset=UTF-8",
                     dataType: "json",
                     success: function(data) {
-                        data.forEach(function(topic) {
-                            if (topic.topic === text){
-                                check.style.color = "red";
-                                check.innerHTML = "This topic is exist. Make sure you want make this topic connect to your project.";
-                            }else{
-                                check.style.color = "green";
-                                check.innerHTML = "topic name is ok.";
-                            }
-                        });
+                        if (null == data || data.length == 0) {
+                            check.style.color = "green";
+                            check.innerHTML = "topic name is ok.";
+                        } else {
+                            check.style.color = "red";
+                            check.innerHTML = "This topic is exist. Make sure you want make this topic connect to your project.";
+                        }
                     }
                 });
             }
