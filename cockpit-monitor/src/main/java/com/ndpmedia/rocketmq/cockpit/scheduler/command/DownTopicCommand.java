@@ -100,8 +100,8 @@ public class DownTopicCommand implements SubCommand {
         Set<String> brokers = cockpitTopicService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
 
         for (String broker : brokers) {
-            boolean flag =true;
-            while (flag) {
+            int flag = 0;
+            while (flag++ < 5) {
                 try {
                     Topic topic = TopicTranslate.translateFrom(topicConfig, brokerToCluster.get(broker), broker);
                     Topic oldT = topicMapper.get(0L, topic.getTopic(), topic.getBrokerAddress(), null);
@@ -111,7 +111,7 @@ public class DownTopicCommand implements SubCommand {
                     //若获取到相同Topic Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
                     else if (oldT.getStatus() != Status.ACTIVE)
                         topicMapper.register(oldT.getId());
-                    flag = false;
+                    break;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

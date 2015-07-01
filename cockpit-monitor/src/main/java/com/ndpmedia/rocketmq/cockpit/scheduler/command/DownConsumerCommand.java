@@ -101,8 +101,8 @@ public class DownConsumerCommand implements SubCommand {
 
         outer:
         for (String broker : brokers) {
-            boolean flag =true;
-            while (flag) {
+            int flag = 0;
+            while (flag++ < 5) {
                 try {
                     ConsumerGroup cg = new ConsumerGroup();
                     cg.setGroupName(consumerGroup);
