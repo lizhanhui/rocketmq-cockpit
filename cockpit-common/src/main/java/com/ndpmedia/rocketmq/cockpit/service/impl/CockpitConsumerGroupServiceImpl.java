@@ -67,8 +67,8 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
     @Override
     public Set<String> getGroups(DefaultMQAdminExt defaultMQAdminExt) {
         Set<String> consumerGroups = new HashSet<>();
-        boolean flag = true;
-        while (flag) {
+        int flag = 0;
+        while (flag++ < 5) {
             try {
                 Set<String> topics = defaultMQAdminExt.fetchAllTopicList().getTopicList();
                 for (String topic : topics) {
@@ -77,7 +77,7 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
                                 topic.replace(MixAll.DLQ_GROUP_TOPIC_PREFIX, ""));
                 }
 
-                flag = false;
+                break;
             } catch (Exception e) {
                 e.printStackTrace();
             }

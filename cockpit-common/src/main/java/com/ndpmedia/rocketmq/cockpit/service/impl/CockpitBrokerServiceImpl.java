@@ -27,12 +27,12 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
     public Set<String> getALLBrokers(DefaultMQAdminExt defaultMQAdminExt) {
         logger.info("[cockpit broker] try to get broker list");
         Set<String> brokerList = new HashSet<>();
-        boolean flag = true;
+        int flag = 0;
         ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
-        while(flag) {
+        while(flag++ < 5) {
             try {
                 clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
-                flag = false;
+                break;
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -72,12 +72,12 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
         Map<String, String> brokerToCluster = new HashMap<>();
 
         logger.info("[sync topic] try to get broker list");
-        boolean flag = true;
+        int flag = 0;
         ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
-        while(flag) {
+        while(flag++ < 5) {
             try {
                 clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
-                flag = false;
+                break;
             }catch (Exception e){
                 e.printStackTrace();
             }
