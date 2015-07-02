@@ -89,15 +89,15 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         topicConfig.setTopicName(topic);
 
         TopicRouteData topicRouteData = null;
-        boolean flag = true;
-        while (flag) {
+        int flag = 0;
+        while (flag++ < 5) {
             try {
                 topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
-                flag = false;
+                break;
             } catch (Exception e) {
                 e.printStackTrace();
                 if (e.getMessage().contains("No topic route info"))
-                    flag = false;
+                    break;
             }
         }
         if (null != topicRouteData) {
@@ -126,11 +126,11 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
     @Override
     public Set<String> getTopicBrokers(DefaultMQAdminExt defaultMQAdminExt, String topic) {
         TopicRouteData topicRouteData = null;
-        boolean flag = true;
-        while (flag) {
+        int flag = 0;
+        while (flag++ < 5) {
             try {
                 topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
-                flag = false;
+                break;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -154,11 +154,11 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         Set<String> localBroker = getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
 
         if (!localBroker.contains(broker)) {
-            boolean flag = true;
-            while (flag) {
+            int flag = 0;
+            while (flag++ < 5) {
                 try {
                     defaultMQAdminExt.createAndUpdateTopicConfig(broker, topicConfig);
-                    flag = false;
+                    break;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
