@@ -1,7 +1,7 @@
 var selectDefault = "----请选择-----";
 
 $(document).ready(function () {
-
+    addcloud();
 
     Highcharts.theme = {
         colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
@@ -156,6 +156,8 @@ $(document).ready(function () {
 
             }
         };
+
+        hideCloud();
     });
 
     $(document).on("click", ".showConsumerGroup", function(){
@@ -177,6 +179,7 @@ function createOption(text) {
 }
 
 function showGroup(consumerGroup){
+    showCloud();
     $.ajax({
         async: false,
         url: "cockpit/api/consume-progress" + "/" + consumerGroup + "/" + "-1" + "/" + "-1" + "/" + "-1",
@@ -195,11 +198,14 @@ function showGroup(consumerGroup){
             });
             x.reverse();
             showCharts('#cContainer', line, x);
+
+            hideCloud();
         }
     });
 }
 
 function showTopic(topic){
+    showCloud();
     $.ajax({
         async: false,
         url: "cockpit/api/topic-progress" + "/" + topic,
@@ -230,6 +236,8 @@ function showTopic(topic){
             });
 
             showCharts('#tContainer', line, x);
+
+            hideCloud();
         }
     });
 }
