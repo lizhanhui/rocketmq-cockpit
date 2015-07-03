@@ -52,6 +52,7 @@ $(document).ready(function() {
 
     $(".cancelTopic").click(function() {
         document.getElementById("addTopicDIV").style.display="none";
+        document.getElementById("topicDIV").style.display="block";
         document.getElementById("addButton").style.display="block";
         $("input.topic").val("");
         $("input.order").val("");
@@ -59,6 +60,8 @@ $(document).ready(function() {
 
     $(".cancelMes").click(function() {
         document.getElementById("sendMessageTestDIV").style.display="none";
+        document.getElementById("addButton").style.display="block";
+        document.getElementById("topicDIV").style.display="block";
         $("input.send_topic").val("");
         $("input.send_producerGroup").val("");
         $("input.send_tag").val("");
@@ -279,13 +282,16 @@ function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read
 function _sendFun(topic) {
     document.getElementById("sendMessageTestDIV").style.display = "block";
     document.getElementById("topicDetailDIV").style.display="none";
+    document.getElementById("topicDIV").style.display="none";
+    document.getElementById("addButton").style.display="none";
     $("input.send_topic").val(topic);
 }
 
 function addButton(){
     document.getElementById("addButton").style.display="none";
-
     document.getElementById("addTopicDIV").style.display="block";
+    document.getElementById("topicDetailDIV").style.display="none";
+    document.getElementById("topicDIV").style.display="none";
 }
 
 function closeDetail(){

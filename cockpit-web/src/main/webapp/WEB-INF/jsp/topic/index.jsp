@@ -65,7 +65,7 @@
         </tr>
     </table>
 </div>
-
+<div id="topicDIV">
 <button id="addButton" onclick="addButton();">Add</button>
       <table cellspacing="0" class="display" id="topic" width="100%">
         <thead>
@@ -85,7 +85,7 @@
         <tbody>
         </tbody>
       </table>
-
+</div>
 <div id="topicDetailDIV" class="col-xs-8 col-xs-offset-2 text-left table-responsive">
 <button id="closeDetail" onclick="closeDetail();">close</button>
       <table cellspacing="0" class="display" id="topicDetail" width="100%" style="margin-left: 0px;">
