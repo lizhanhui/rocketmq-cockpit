@@ -1,7 +1,7 @@
 var selectDefault = "----请选择-----";
 
 $(document).ready(function () {
-
+    addcloud();
 
     Highcharts.theme = {
         colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
@@ -156,6 +156,8 @@ $(document).ready(function () {
 
             }
         };
+
+        hideCloud();
     });
 
     $(document).on("click", ".showConsumerGroup", function(){
@@ -177,6 +179,7 @@ function createOption(text) {
 }
 
 function showGroup(consumerGroup){
+    showCloud();
     $.ajax({
         async: false,
         url: "cockpit/api/consume-progress" + "/" + consumerGroup + "/" + "-1" + "/" + "-1" + "/" + "-1",
@@ -194,12 +197,15 @@ function showGroup(consumerGroup){
                 x.push(temp);
             });
             x.reverse();
-            showCharts('#cContainer', line, x);
+            showCharts('#cContainer', 'diff', line, x);
+
+            hideCloud();
         }
     });
 }
 
 function showTopic(topic){
+    showCloud();
     $.ajax({
         async: false,
         url: "cockpit/api/topic-progress" + "/" + topic,
@@ -229,12 +235,14 @@ function showTopic(topic){
                 firstB = consumeProgress.brokerOffset;
             });
 
-            showCharts('#tContainer', line, x);
+            showCharts('#tContainer', 'tps', line, x);
+
+            hideCloud();
         }
     });
 }
 
-function showCharts(target ,xsets, ysets) {
+function showCharts(target , context, xsets, ysets) {
     var bodyWidth = document.documentElement.clientWidth;
     var bodyHeight = Math.max(document.documentElement.clientHeight, document.body.scrollHeight);
     $(target).highcharts({
@@ -244,7 +252,7 @@ function showCharts(target ,xsets, ysets) {
             height: 0.35 * bodyHeight
         },
         title: {
-            text: 'diff'
+            text: context
         },
         subtitle: {
             text: xsets
@@ -260,7 +268,7 @@ function showCharts(target ,xsets, ysets) {
         },
         yAxis: {
             title: {
-                text: 'diff (times)'
+                text: context + '(times)'
             },
             min: null,
             startOnTick: false
