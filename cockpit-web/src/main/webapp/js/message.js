@@ -74,15 +74,15 @@ $(document).ready(function() {
                                $(".itable-content").append(backlog);
                             }
 
-                            removecloud();
+                            hideCloud();
                         },
                          error: function() {
-                             removecloud();
+                             hideCloud();
                              alert("Error");
                          }
                     });
 
-                removecloud();
+                hideCloud();
             }
         });
     });

@@ -63,7 +63,7 @@ $(document).ready(function() {
         var row = $(this).parent().parent();
         var id = row.children().eq(0).html();
         if ($.trim(id) === "" ) {
-            removecloud();
+            hideCloud();
             return false;
         }
         $.ajax({
