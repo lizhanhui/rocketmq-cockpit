@@ -1,22 +1,9 @@
+var oTable;
+
 $(document).ready(function() {
     addcloud();
-    $.get("cockpit/api/consumer-group", function(data) {
-        $(".table-content").children().remove();
-        data.forEach(function(consumerGroup) {
-            var operationLink = $("<a class='removeItem' href='javascript:;'>Remove</a>");
-            var approveLink = $("<a class='approveItem' href='javascript:;'>Approve</a>");
 
-            var operation = $("<td></td>");
-            if (consumerGroup.status != "ACTIVE"){
-                operation.append(approveLink);
-                operation.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-            }
-            operation.append(operationLink);
-            var item = $("<tr><td style='display:none'>" + consumerGroup.id + "</td><td>" + consumerGroup.clusterName + "</td><td>" + consumerGroup.whichBrokerWhenConsumeSlowly + "</td><td>" + consumerGroup.groupName + "</td><td>" + consumerGroup.consumeEnable + "</td><td>" + consumerGroup.consumeBroadcastEnable + "</td><td>" + consumerGroup.brokerAddress + "</td><td>" + consumerGroup.brokerId + "</td><td>" + consumerGroup.retryMaxTimes + "</td><td>" + consumerGroup.retryQueueNum + "</td><td>" + consumerGroup.consumeFromMinEnable + "</td><td>" + consumerGroup.status + "</td><td>" + consumerGroup.createTime + "</td></tr>");
-            item.append(operation);
-            $(".table-content").append(item);
-        });
-    });
+    oTable=initTable();
 
     $(".addConsumerGroup").click(function() {
         showCloud();
@@ -41,95 +28,142 @@ $(document).ready(function() {
             return false;
         } else {
             $.ajax({
-                        async: false,
-                        url: "cockpit/api/consumer-group",
-                        type: "PUT",
-                        dataType: "json",
-                        contentType: 'application/json',
-                        data: ob,
-                        success: function() {
-                            location.reload(true);
-                        },
-                        error: function() {
-                            hideCloud();
-                            alert(" ERROR ");
-                        }
-                    });
-        }
-    });
-
-    $(document).on("click", ".removeItem", function() {
-        showCloud();
-        var row = $(this).parent().parent();
-        var id = row.children().eq(0).html();
-        if ($.trim(id) === "" ) {
-            hideCloud();
-            return false;
-        }
-        $.ajax({
-            async: false,
-            url: "cockpit/api/consumer-group/" + id,
-            type: "DELETE",
-            dataType: "json",
-            contentType: "application/json",
-            success: function() {
-                row.remove();
-                hideCloud();
-            },
-            error: function() {
-                location.reload(true);
-            }
-        });
-    });
-
-    $(document).on("click", ".approveItem", function() {
-        showCloud();
-            var row = $(this).parent().parent();
-            var id = row.children().eq(0).html();
-            var clusterName = row.children().eq(1).html();
-            var whichBrokerWhenConsumeSlowly = row.children().eq(2).html();
-            var groupName = row.children().eq(3).html();
-            var consumeEnable = row.children().eq(4).html();
-            var consumeBroadcastEnable = row.children().eq(5).html();
-            var brokerAddress = row.children().eq(6).html();
-            var brokerId = row.children().eq(7).html();
-            var retryMaxTimes = row.children().eq(8).html();
-            var retryQueueNum = row.children().eq(9).html();
-            var consumeFromMinEnable = row.children().eq(10).html();
-            var order = "ACTIVE";
-            var ob = JSON.stringify({"id":id, "clusterName":clusterName,"whichBrokerWhenConsumeSlowly":whichBrokerWhenConsumeSlowly,
-                                     "groupName":groupName, "consumeEnable":consumeEnable, "consumeBroadcastEnable":consumeBroadcastEnable,
-                                     "brokerAddress":brokerAddress, "brokerId":brokerId, "retryMaxTimes":retryMaxTimes,
-                                     "retryQueueNum":retryQueueNum, "consumeFromMinEnable":consumeFromMinEnable,"order":order});
-
-            if ($.trim(id) === "" ) {
-                hideCloud();
-                return false;
-            }
-
-            $.ajax({
                 async: false,
-                data: ob,
-                url: "cockpit/manage/consumer-group",
-                type: "POST",
+                url: "cockpit/api/consumer-group",
+                type: "PUT",
                 dataType: "json",
-                contentType: "application/json",
+                contentType: 'application/json',
+                data: ob,
                 success: function() {
-                    $.ajax({
-                        async: false,
-                        url: "cockpit/api/consumer-group/" + id,
-                        type: "POST",
-                        dataType: "json",
-                        contentType: "application/json",
-                        success: function() {
-                            location.reload(true);
-                        }
-                    });
-
+                    window.location.reload(true);
+                },
+                error: function() {
                     hideCloud();
+                    alert(" ERROR ");
                 }
             });
+        }
     });
 
     hideCloud();
 });
+
+
+function initTable(){
+    var table = $('#consumerGroup').dataTable({
+        "processing": true,
+        "sAjaxSource": "cockpit/api/consumer-group",
+        "sAjaxDataProp": "data",
+        "bPaginate": true,  //是否分页。
+        "bFilter": true,  //是否可过滤。
+        "bLengthChange": true, //是否允许自定义每页显示条数.
+        "scrollX": true,
+        "columns": [
+            { "data": "clusterName" },
+            { "data": "whichBrokerWhenConsumeSlowly" },
+            { "data": "groupName" },
+            { "data": "consumeEnable" },
+            { "data": "consumeBroadcastEnable" },
+            { "data": "brokerAddress" },
+            { "data": "brokerId" },
+            { "data": "retryMaxTimes" },
+            { "data": "retryQueueNum" },
+            { "data": "consumeFromMinEnable" },
+            { "data": "status" },
+            { "data": "createTime" },
+            { "data": "id",
+                "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                    if (oData.status != "ACTIVE"){
+                        $(nTd).html("<a href='javascript:void(0);' " + "onclick='_editFun(\"" + oData.id + "\",\"" + oData.clusterName + "\",\"" + oData.whichBrokerWhenConsumeSlowly + "\",\"" + oData.groupName + "\",\"" + oData.consumeEnable + "\",\"" + oData.consumeBroadcastEnable + "\",\"" + oData.brokerAddress + "\",\"" + oData.brokerId + "\",\"" + oData.retryMaxTimes + "\",\"" + oData.retryQueueNum + "\",\"" + oData.consumeFromMinEnable + "\")'>Approve</a>&nbsp;&nbsp;")
+                            .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.id + "\",\"" + oData.clusterName + "\",\"" + oData.groupName +  "\")'>Delete</a>");
+                    }else {
+                        $(nTd).html("&nbsp;&nbsp;")
+                            .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.id+ "\",\"" + oData.clusterName + "\",\"" + oData.groupName + "\")'>Delete</a>");
+                    }
+                }
+            }
+        ],
+        "fnCreatedRow": function (nRow, aData, iDataIndex) {
+            //add selected class
+            $(nRow).click(function () {
+                if ($(this).hasClass('row_selected')) {
+                    $(this).removeClass('row_selected');
+                } else {
+                    oTable.$('tr.row_selected').removeClass('row_selected');
+                    $(this).addClass('row_selected');
+                }
+            });
+        }
+    });
+    return table;
+}
+
+
+function _deleteFun(id, cluster_name, groupName) {
+    showCloud();
+
+    $.ajax({
+        async: false,
+        url: "cockpit/api/consumer-group/" + id,
+        type: "DELETE",
+        dataType: "json",
+        contentType: "application/json",
+        success: function() {
+            row.remove();
+            hideCloud();
+        },
+        error: function() {
+            location.reload(true);
+        }
+    });
+
+    var cells = oTable.children().eq(1).children();
+        var index = 0;
+        var max = cells.length
+        while (index < max){
+            cell = cells.eq(index);
+            if (cell.children().eq(2).html() === groupName && cell.children().eq(0).html() === cluster_name ){
+                cell.remove();
+            }
+            index++;
+        }
+}
+
+
+function _editFun(id, clusterName, whichBrokerWhenConsumeSlowly, groupName, consumeEnable, consumeBroadcastEnable, brokerAddress, brokerId, retryMaxTimes, retryQueueNum, consumeFromMinEnable) {
+    showCloud();
+    var order = "ACTIVE";
+    var ob = JSON.stringify({"id":id, "clusterName":clusterName,"whichBrokerWhenConsumeSlowly":whichBrokerWhenConsumeSlowly,
+                             "groupName":groupName, "consumeEnable":consumeEnable, "consumeBroadcastEnable":consumeBroadcastEnable,
+                             "brokerAddress":brokerAddress, "brokerId":brokerId, "retryMaxTimes":retryMaxTimes,
+                             "retryQueueNum":retryQueueNum, "consumeFromMinEnable":consumeFromMinEnable,"order":order});
+
+    if ($.trim(id) === "" ) {
+        hideCloud();
+        return false;
+    }
+
+    $.ajax({
+        async: false,
+        data: ob,
+        url: "cockpit/manage/consumer-group",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        success: function() {
+            $.ajax({
+                async: false,
+                url: "cockpit/api/consumer-group/" + id,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                complete: function() {
+                    location.reload(true);
+                }
+            });
+
+            hideCloud();
+        }
+    });
+}
+

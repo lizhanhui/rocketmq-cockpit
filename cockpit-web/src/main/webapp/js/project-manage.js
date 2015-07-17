@@ -7,9 +7,9 @@ $(document).ready(function() {
             var addTopicLink = $("<a class='addTItem' href='javascript:;'>add topic</a>");
             var operation = $("<td></td>");
             operation.append(addConsumerGroupLink);
-            operation.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+            operation.append("&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;");
             operation.append(addTopicLink);
-            operation.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+            operation.append("&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;");
             operation.append(operationLink);
             var item = $("<tr><td style='display:none'>" + project.id + "</td><td>" + project.name + "</td><td>" + project.description + "</td></tr>");
             item.append(operation);

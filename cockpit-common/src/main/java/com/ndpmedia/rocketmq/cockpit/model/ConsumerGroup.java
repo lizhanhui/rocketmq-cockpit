@@ -26,7 +26,7 @@ public class ConsumerGroup {
 
     private Integer retryMaxTimes = 3;
 
-    private Integer retryQueueNum = 3;
+    private Integer retryQueueNum = 1;
 
     private boolean consumeFromMinEnable;
 
