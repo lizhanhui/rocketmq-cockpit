@@ -38,31 +38,32 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
             }
         }
 
-        Set<Map.Entry<String, Set<String>>> clusterSet =
-                clusterInfoSerializeWrapper.getClusterAddrTable().entrySet();
+        if (null != clusterInfoSerializeWrapper.getClusterAddrTable()) {
+            Set<Map.Entry<String, Set<String>>> clusterSet =
+                    clusterInfoSerializeWrapper.getClusterAddrTable().entrySet();
 
-        for (Map.Entry<String, Set<String>> next : clusterSet) {
-            Set<String> brokerNameSet = new HashSet<String>();
-            brokerNameSet.addAll(next.getValue());
+            for (Map.Entry<String, Set<String>> next : clusterSet) {
+                Set<String> brokerNameSet = new HashSet<String>();
+                brokerNameSet.addAll(next.getValue());
 
-            for (String brokerName : brokerNameSet) {
-                BrokerData brokerData = clusterInfoSerializeWrapper.getBrokerAddrTable().get(brokerName);
-                if (brokerData != null) {
-                    Set<Map.Entry<Long, String>> brokerAddrSet = brokerData.getBrokerAddrs().entrySet();
-                    Iterator<Map.Entry<Long, String>> itAddr = brokerAddrSet.iterator();
+                for (String brokerName : brokerNameSet) {
+                    BrokerData brokerData = clusterInfoSerializeWrapper.getBrokerAddrTable().get(brokerName);
+                    if (brokerData != null) {
+                        Set<Map.Entry<Long, String>> brokerAddrSet = brokerData.getBrokerAddrs().entrySet();
+                        Iterator<Map.Entry<Long, String>> itAddr = brokerAddrSet.iterator();
 
-                    while (itAddr.hasNext()) {
-                        Map.Entry<Long, String> next1 = itAddr.next();
-                        if (next1.getKey() != 0){
-                            logger.info("this broker maybe not master ." + next1.getValue());
-                            continue;
+                        while (itAddr.hasNext()) {
+                            Map.Entry<Long, String> next1 = itAddr.next();
+                            if (next1.getKey() != 0) {
+                                logger.info("this broker maybe not master ." + next1.getValue());
+                                continue;
+                            }
+                            brokerList.add(next1.getValue());
                         }
-                        brokerList.add(next1.getValue());
                     }
                 }
             }
         }
-
         logger.info("[cockpit broker] now we get broker list , size : " + brokerList.size() + brokerList);
         return brokerList;
     }
@@ -82,29 +83,31 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
                 e.printStackTrace();
             }
         }
-        Set<Map.Entry<String, Set<String>>> clusterSet =
-                clusterInfoSerializeWrapper.getClusterAddrTable().entrySet();
 
-        for (Map.Entry<String, Set<String>> next : clusterSet) {
-            Set<String> brokerNameSet = new HashSet<String>();
-            brokerNameSet.addAll(next.getValue());
-            String cluster = next.getKey();
+        if (null != clusterInfoSerializeWrapper.getClusterAddrTable()) {
+            Set<Map.Entry<String, Set<String>>> clusterSet =
+                    clusterInfoSerializeWrapper.getClusterAddrTable().entrySet();
+
+            for (Map.Entry<String, Set<String>> next : clusterSet) {
+                Set<String> brokerNameSet = new HashSet<String>();
+                brokerNameSet.addAll(next.getValue());
+                String cluster = next.getKey();
 
 
-            for (String brokerName : brokerNameSet) {
-                BrokerData brokerData = clusterInfoSerializeWrapper.getBrokerAddrTable().get(brokerName);
-                if (brokerData != null) {
-                    Set<Map.Entry<Long, String>> brokerAddrSet = brokerData.getBrokerAddrs().entrySet();
-                    Iterator<Map.Entry<Long, String>> itAddr = brokerAddrSet.iterator();
+                for (String brokerName : brokerNameSet) {
+                    BrokerData brokerData = clusterInfoSerializeWrapper.getBrokerAddrTable().get(brokerName);
+                    if (brokerData != null) {
+                        Set<Map.Entry<Long, String>> brokerAddrSet = brokerData.getBrokerAddrs().entrySet();
+                        Iterator<Map.Entry<Long, String>> itAddr = brokerAddrSet.iterator();
 
-                    while (itAddr.hasNext()) {
-                        Map.Entry<Long, String> next1 = itAddr.next();
-                        brokerToCluster.put(next1.getValue(), cluster);
+                        while (itAddr.hasNext()) {
+                            Map.Entry<Long, String> next1 = itAddr.next();
+                            brokerToCluster.put(next1.getValue(), cluster);
+                        }
                     }
                 }
             }
         }
-
         logger.info("[sync topic] now we get broker list , size : " + brokerToCluster.size() + " [] " + brokerToCluster);
         return brokerToCluster;
     }
