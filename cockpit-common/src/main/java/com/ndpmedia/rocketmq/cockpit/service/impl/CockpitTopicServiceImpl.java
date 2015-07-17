@@ -125,6 +125,7 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
 
     @Override
     public Set<String> getTopicBrokers(DefaultMQAdminExt defaultMQAdminExt, String topic) {
+        Set<String> topicBroker = new HashSet<>();
         TopicRouteData topicRouteData = null;
         int flag = 0;
         while (flag++ < 5) {
@@ -136,15 +137,15 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
             }
         }
 
-        List<BrokerData> brokerDatas = topicRouteData.getBrokerDatas();
-        Set<String> topicBroker = new HashSet<>();
+        if (null != topicRouteData) {
+            List<BrokerData> brokerDatas = topicRouteData.getBrokerDatas();
 
-        for (BrokerData brokerData : brokerDatas) {
-            for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
-                topicBroker.add(entry.getValue());
+            for (BrokerData brokerData : brokerDatas) {
+                for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
+                    topicBroker.add(entry.getValue());
+                }
             }
         }
-
         return topicBroker;
     }
 

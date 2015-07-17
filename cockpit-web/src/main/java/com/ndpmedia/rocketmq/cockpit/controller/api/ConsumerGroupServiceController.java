@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/api/consumer-group")
@@ -34,8 +32,16 @@ public class ConsumerGroupServiceController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public List<ConsumerGroup> list(HttpServletRequest request) {
-        return consumerGroupMapper.list(getTeamId(request), null, null);
+    public Map<String, Object> list(HttpServletRequest request) {
+        CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
+        long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
+        List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(getTeamId(request), null, null);
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("sEcho", 1);
+        result.put("iTotalRecords", consumerGroups.size());
+        result.put("iTotalDisplayRecords", consumerGroups.size());
+        result.put("aaData", consumerGroups);
+        return result;
     }
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
