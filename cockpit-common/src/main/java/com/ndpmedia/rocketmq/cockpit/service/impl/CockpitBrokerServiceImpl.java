@@ -113,6 +113,35 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
     }
 
     @Override
+    public Set<String> getAllNames(DefaultMQAdminExt defaultMQAdminExt) {
+        logger.info("[cockpit name] try to get cluster name, broker name list");
+        Set<String> nameList = new HashSet<>();
+        int flag = 0;
+        ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
+        while(flag++ < 5) {
+            try {
+                clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
+                break;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        if (null != clusterInfoSerializeWrapper.getClusterAddrTable()) {
+            Set<Map.Entry<String, Set<String>>> clusterSet =
+                    clusterInfoSerializeWrapper.getClusterAddrTable().entrySet();
+
+            for (Map.Entry<String, Set<String>> next : clusterSet) {
+                nameList.addAll(next.getValue());
+                nameList.add(next.getKey());
+
+            }
+        }
+        logger.info("[cockpit name] now we get cluster name, broker name list , size : " + nameList.size() + nameList);
+        return nameList;
+    }
+
+    @Override
     public boolean removeAllTopic(String broker) {
         try {
 

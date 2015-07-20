@@ -33,8 +33,6 @@ public class ConsumerGroupServiceController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> list(HttpServletRequest request) {
-        CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-        long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
         List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(getTeamId(request), null, null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
