@@ -21,6 +21,8 @@ public class SyncTopicCommand implements SubCommand {
 
     private Set<String> brokerList = new HashSet<>();
 
+    private Set<String> nameList = new HashSet<>();
+
     private CockpitTopicService cockpitTopicService = new CockpitTopicServiceImpl();
 
     private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
@@ -60,11 +62,16 @@ public class SyncTopicCommand implements SubCommand {
         try {
             adminExt.start();
             doList(adminExt);
+            doBaseServer(adminExt);
 
             Set<String> topics = cockpitTopicService.getTopics(adminExt);
 
             for (String topicName : topics) {
                 System.out.println("now we check :" + topicName);
+                if (nameList.contains(topicName)){
+                    System.out.println("[notice] this topic name is " + topicName);
+                    continue;
+                }
                 TopicConfig topicConfig = getTopicConfig(adminExt, topicName);
                 if (null != topicConfig)
                     rebuildTopicConfig(adminExt, topicConfig, commandLine);
@@ -78,6 +85,10 @@ public class SyncTopicCommand implements SubCommand {
 
     private void doList(DefaultMQAdminExt defaultMQAdminExt) {
         brokerList.addAll(cockpitBrokerService.getALLBrokers(defaultMQAdminExt));
+    }
+
+    private void doBaseServer(DefaultMQAdminExt defaultMQAdminExt){
+        nameList.addAll(cockpitBrokerService.getAllNames(defaultMQAdminExt));
     }
 
     private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) {
