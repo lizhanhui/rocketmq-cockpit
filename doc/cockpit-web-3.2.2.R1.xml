@@ -19,7 +19,7 @@ detected.
   <!--  + war OR resourceBase                                          -->
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
   <Set name="contextPath">/</Set>
-  <Set name="war"><Property name="jetty.webapps" default="."/>/cockpit-web-3.2.2.war</Set>
+  <Set name="war"><Property name="jetty.webapps" default="."/>/cockpit-web-3.2.2.R1.war</Set>
 
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
   <!-- Optional context configuration                                  -->
