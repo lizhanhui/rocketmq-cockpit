@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.ndpmedia.rocketmq.cockpit</groupId>
         <artifactId>rocketmq-cockpit</artifactId>
-        <version>3.2.2.R1</version>
+        <version>3.2.2.R2</version>
     </parent>
     <artifactId>cockpit-web</artifactId>
     <name>${artifactId} ${project.version}</name>
@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.ndpmedia.rocketmq.cockpit</groupId>
             <artifactId>cockpit-common</artifactId>
-            <version>3.2.2.R1</version>
+            <version>3.2.2.R2</version>
         </dependency>
 
         <dependency>
