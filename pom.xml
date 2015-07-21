@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ndpmedia.rocketmq.cockpit</groupId>
     <artifactId>rocketmq-cockpit</artifactId>
-    <version>3.2.2</version>
+    <version>3.2.2.R1</version>
     <name>rocketmq-cockpit ${project.version}</name>
 
     <modules>
@@ -25,14 +25,15 @@
         <spring.version>3.2.5.RELEASE</spring.version>
         <cxf.version>3.0.2</cxf.version>
         <guava.version>18.0</guava.version>
-        <rocketmq.version>3.2.2</rocketmq.version>
+        <rocketmq.version>3.2.2.R1</rocketmq.version>
     </properties>
 
     <repositories>
         <!-- Internal Nexus Repository. GitHub user, please comment the following repository out. -->
         <repository>
-            <id>Local Nexus Repository</id>
-            <url>http://172.30.10.200:8081/nexus/content/repositories/releases/</url>
+            <id>nexus-release</id>
+            <name>Local Nexus Repository</name>
+            <url>http://172.30.10.160:8081/nexus/content/repositories/releases/</url>
         </repository>
     </repositories>
 
