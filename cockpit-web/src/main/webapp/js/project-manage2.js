@@ -95,7 +95,6 @@ $(document).ready(function () {
         divP.appendChild(selectP);
 
         selectP.onchange = function () {
-
             var project = $("#selectP").children('option:selected').val();
             if (-1 != project) {
                 $.ajax({
@@ -179,6 +178,8 @@ function createOption(text) {
 }
 
 function showGroup(consumerGroup){
+    var bodyHeight = Math.max(document.documentElement.clientHeight, document.body.scrollHeight);
+    document.getElementById("bgDiv").style.height = bodyHeight + "px";
     showCloud();
     $.ajax({
         async: false,
@@ -205,6 +206,8 @@ function showGroup(consumerGroup){
 }
 
 function showTopic(topic){
+    var bodyHeight = Math.max(document.documentElement.clientHeight, document.body.scrollHeight);
+    document.getElementById("bgDiv").style.height = bodyHeight + "px";
     showCloud();
     $.ajax({
         async: false,
