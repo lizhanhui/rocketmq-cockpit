@@ -10,6 +10,8 @@ public interface CockpitConsumerGroupService {
 
     boolean update(ConsumerGroup consumerGroup);
 
+    boolean clear(ConsumerGroup consumerGroup);
+
     void insert(ConsumerGroup consumerGroup, long teamId);
 
     void delete(long consumerGroupId);
