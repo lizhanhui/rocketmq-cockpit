@@ -99,34 +99,30 @@ function initTable(){
 }
 
 
-function _deleteFun(id, cluster_name, groupName) {
+function _deleteFun(id, clusterName, groupName) {
     showCloud();
-
     $.ajax({
         async: false,
-        url: "cockpit/api/consumer-group/" + id,
+        url: "cockpit/manage/consumer-group/" + clusterName + "/" + groupName,
         type: "DELETE",
         dataType: "json",
         contentType: "application/json",
         success: function() {
-            row.remove();
-            hideCloud();
-        },
-        error: function() {
-            location.reload(true);
+            $.ajax({
+                async: false,
+                url: "cockpit/api/consumer-group/" + id,
+                type: "DELETE",
+                dataType: "json",
+                contentType: "application/json",
+                success: function() {
+                    hideCloud();
+                },
+                error: function() {
+                    location.reload(true);
+                }
+            });
         }
     });
-
-    var cells = oTable.children().eq(1).children();
-        var index = 0;
-        var max = cells.length
-        while (index < max){
-            cell = cells.eq(index);
-            if (cell.children().eq(2).html() === groupName && cell.children().eq(0).html() === cluster_name ){
-                cell.remove();
-            }
-            index++;
-        }
 }
 
 

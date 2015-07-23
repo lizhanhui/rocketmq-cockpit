@@ -52,6 +52,34 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
         return true;
     }
 
+    @Override
+    public boolean clear(ConsumerGroup consumerGroup) {
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+        defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
+        try {
+            defaultMQAdminExt.start();
+            if (null != consumerGroup.getBrokerAddress() && !consumerGroup.getBrokerAddress().isEmpty()){
+                defaultMQAdminExt.deleteSubscriptionGroup(consumerGroup.getBrokerAddress(), consumerGroup.getGroupName());
+            } else {
+                Set<String> masterSet = CommandUtil
+                        .fetchMasterAddrByClusterName(defaultMQAdminExt, consumerGroup.getClusterName());
+
+                if (null != masterSet && !masterSet.isEmpty()) {
+                    for (String brokerAddress : masterSet) {
+                        defaultMQAdminExt.deleteSubscriptionGroup(brokerAddress, consumerGroup.getGroupName());
+                    }
+                }
+            }
+        }catch (Exception e){
+            System.out.println("DELETE CONSUMER GROUP ON BROKER FIALED!" + e);
+            return false;
+        }finally {
+            defaultMQAdminExt.shutdown();
+        }
+
+        return true;
+    }
+
     @Transactional
     @Override
     public void delete(long consumerGroupId) {
