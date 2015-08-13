@@ -126,7 +126,7 @@ public class DownConsumerCommand implements SubCommand {
                 }
             }
 
-            logger.info("[sync topic]save consumer group : " + consumerGroup + " with broker :" + broker);
+            logger.info("[sync topic]save consumer group : " + consumerGroup + " from broker :" + broker);
         }
     }
 }
