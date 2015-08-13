@@ -117,7 +117,7 @@ public class DownTopicCommand implements SubCommand {
                 }
             }
 
-            logger.info("[sync topic]add topic config:" + topicConfig + " to broker :" + broker);
+            logger.info("[sync topic]add topic config:" + topicConfig + " from broker :" + broker);
         }
     }
 }
