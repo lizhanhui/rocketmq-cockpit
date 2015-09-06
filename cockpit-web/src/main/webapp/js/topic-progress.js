@@ -114,16 +114,18 @@ $(document).ready(function() {
                 success: function(backdata) {
                     var line = topic;
                     var firstB = -1;
+                    var lastT = (new Date()).getTime() - 1000 * 60 * 60 *24 ;
                     backdata.reverse();
                     backdata.forEach(function(consumeProgress){
                         var temp = [];
                         var time = consumeProgress.createTime.replace(new RegExp("-","gm"),"/");
-                        temp.push((new Date(time)).getTime());
+                        var milTime = (new Date(time)).getTime();
+                        temp.push(milTime);
                         if (-1 === firstB){
 
                         }else{
                             if (consumeProgress.brokerOffset >= firstB){
-                               temp.push(Math.round(100*(consumeProgress.brokerOffset - firstB)/(5*60))/100);
+                               temp.push(Math.round(100*1000*(consumeProgress.brokerOffset - firstB)/(milTime - lastT))/100);
                             }else{
                                 temp.push(Math.round(0));
                             }
@@ -131,6 +133,7 @@ $(document).ready(function() {
                         }
 
                         firstB = consumeProgress.brokerOffset;
+                        lastT = milTime;
                     });
 
                     showCharts(line, x);
