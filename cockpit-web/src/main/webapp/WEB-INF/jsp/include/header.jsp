@@ -62,9 +62,7 @@
                     <a href="javascript:;">
                         <strong>
                             <span style="color: #5cb85c;">Hi</span>
-                            <c:choose>
                                     <span style="color: #f0ad4e;"><c:out value="${handle_in_session}" /></span>
-                            </c:choose>
                         </strong>
                     </a>
                 </li>
