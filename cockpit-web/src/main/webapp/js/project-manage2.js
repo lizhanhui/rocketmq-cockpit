@@ -158,7 +158,9 @@ function changeProject(project){
                     $(".cTable-content").append(item);
                 });
                 //获取第一个结果，并展示其积压曲线
-                showGroup(consumerGroup);
+                if ( "" !== consumerGroup){
+                    showGroup(consumerGroup);
+                }
             }
         });
 
@@ -186,7 +188,9 @@ function changeProject(project){
                     $(".tTable-content").append(item);
                 });
                 //获取第一个结果，并展示其积压曲线
-                showTopic(top);
+                if ("" !== top){
+                    showTopic(top);
+                }
             }
         });
     } else {
