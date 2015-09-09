@@ -3,6 +3,19 @@ var selectDefault = "----请选择-----";
 $(document).ready(function () {
     addcloud();
 
+    var cookieString = new String(document.cookie);
+    var cookieHeader = "projectName=";
+    var beginPosition = cookieString.indexOf(cookieHeader);
+    if (beginPosition != -1){
+        cookieString = cookieString.substring(beginPosition);
+        var ends=cookieString.indexOf(";");
+        if (ends!=-1){
+            cookieString = cookieString.substring(0,ends);
+        }
+    }else{
+        cookieString = "";
+    }
+
     Highcharts.theme = {
         colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
         chart: {
@@ -96,66 +109,16 @@ $(document).ready(function () {
 
         selectP.onchange = function () {
             var project = $("#selectP").children('option:selected').val();
-            if (-1 != project) {
-                $.ajax({
-                    async: false,
-                    url: "cockpit/api/project/" + project,//查询该project对应的Consumer Group
-                    type: "GET",
-                    dataType: "json",
-                    contentType: "application/json",
-                    success: function (datas) {
-                        var consumerGroup = "";
-                        //获取结果集 插入表格
-                        $(".cTable-content").children().remove();
-                        datas.forEach(function (ConsumerGroup) {
-                            if (consumerGroup === "") {
-                                consumerGroup = ConsumerGroup.groupName;
-                            }
-                            var operationLink = $("<a class='showConsumerGroup' href='javascript:;'>show</a>");
-                            operationLink.attr("va", ConsumerGroup.groupName);
-                            var operation = $("<td></td>");
-                            operation.append(operationLink);
-                            var item = $("<tr><td>" + ConsumerGroup.groupName + "</td></tr>");
-                            item.append(operation);
-                            $(".cTable-content").append(item);
-                        });
-                        //获取第一个结果，并展示其积压曲线
-                        showGroup(consumerGroup);
-                    }
-                });
-
-                $.ajax({
-                    async: false,
-                    url: "cockpit/api/project/" + project,//查询该project对应的Topic
-                    type: "POST",
-                    data: project,
-                    dataType: "json",
-                    contentType: "application/json",
-                    success: function (datas) {
-                        var top = "";
-                        //获取结果集  插入表格
-                        $(".tTable-content").children().remove();
-                        datas.forEach(function (topic) {
-                            if (top === "") {
-                                top = topic.topic;
-                            }
-                            var operationLink = $("<a class='showTopic' href='javascript:;'>show</a>");
-                            operationLink.attr("va", topic.topic);
-                            var operation = $("<td></td>");
-                            operation.append(operationLink);
-                            var item = $("<tr><td>" + topic.topic + "</td></tr>");
-                            item.append(operation);
-                            $(".tTable-content").append(item);
-                        });
-                        //获取第一个结果，并展示其积压曲线
-                        showTopic(top);
-                    }
-                });
-            } else {
-
-            }
+            changeProject(project);
         };
 
+        if ("" !== cookieString) {
+            changeProject(cookieString.split("=")[1]);
+            optionSelectedByValue(selectP, cookieString.split("=")[1]);
+            var date=new Date();
+            date.setTime(date.getTime()-1000);
+            document.cookie = "projectName=x;expires="+date.toGMTString();
+        }
         hideCloud();
     });
 
@@ -170,11 +133,81 @@ $(document).ready(function () {
     })
 });
 
+function changeProject(project){
+    if (-1 != project) {
+        $.ajax({
+            async: false,
+            url: "cockpit/api/project/" + project,//查询该project对应的Consumer Group
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            success: function (datas) {
+                var consumerGroup = "";
+                //获取结果集 插入表格
+                $(".cTable-content").children().remove();
+                datas.forEach(function (ConsumerGroup) {
+                    if (consumerGroup === "") {
+                        consumerGroup = ConsumerGroup.groupName;
+                    }
+                    var operationLink = $("<a class='showConsumerGroup' href='javascript:;'>show</a>");
+                    operationLink.attr("va", ConsumerGroup.groupName);
+                    var operation = $("<td></td>");
+                    operation.append(operationLink);
+                    var item = $("<tr><td>" + ConsumerGroup.groupName + "</td></tr>");
+                    item.append(operation);
+                    $(".cTable-content").append(item);
+                });
+                //获取第一个结果，并展示其积压曲线
+                showGroup(consumerGroup);
+            }
+        });
+
+        $.ajax({
+            async: false,
+            url: "cockpit/api/project/" + project,//查询该project对应的Topic
+            type: "POST",
+            data: project,
+            dataType: "json",
+            contentType: "application/json",
+            success: function (datas) {
+                var top = "";
+                //获取结果集  插入表格
+                $(".tTable-content").children().remove();
+                datas.forEach(function (topic) {
+                    if (top === "") {
+                        top = topic.topic;
+                    }
+                    var operationLink = $("<a class='showTopic' href='javascript:;'>show</a>");
+                    operationLink.attr("va", topic.topic);
+                    var operation = $("<td></td>");
+                    operation.append(operationLink);
+                    var item = $("<tr><td>" + topic.topic + "</td></tr>");
+                    item.append(operation);
+                    $(".tTable-content").append(item);
+                });
+                //获取第一个结果，并展示其积压曲线
+                showTopic(top);
+            }
+        });
+    } else {
+
+    }
+}
+
 function createOption(text) {
     var selOption = document.createElement("option");
     selOption.value = null === text ? -1 : text;
     selOption.innerHTML = null === text ? selectDefault : text;
     return selOption;
+}
+
+function optionSelectedByValue(select, value){
+    for ( var i = 0 ; i < select.options.length ; i++){
+        if (select.options[i].value === value){
+            select.options[i].selected = true;
+            break;
+        }
+    }
 }
 
 function showGroup(consumerGroup){

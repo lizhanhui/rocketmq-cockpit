@@ -5,12 +5,15 @@ $(document).ready(function() {
             var operationLink = $("<a class='removeItem' href='javascript:;'>Remove</a>");
             var addConsumerGroupLink = $("<a class='addCGItem' href='javascript:;'>add consumer group</a>");
             var addTopicLink = $("<a class='addTItem' href='javascript:;'>add topic</a>");
+            var jumpLink = $("<a class='jumpShow' href='javascript:;'>show it</a>");
             var operation = $("<td></td>");
             operation.append(addConsumerGroupLink);
             operation.append("&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;");
             operation.append(addTopicLink);
             operation.append("&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;");
             operation.append(operationLink);
+            operation.append("&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;");
+            operation.append(jumpLink);
             var item = $("<tr><td style='display:none'>" + project.id + "</td><td>" + project.name + "</td><td>" + project.description + "</td></tr>");
             item.append(operation);
             $(".table-content").append(item);
@@ -51,6 +54,14 @@ $(document).ready(function() {
 
         document.getElementById("addTopicDIV").style.display = "block";
         $("input.tProject").val(name);
+    });
+
+    $(document).on("click", ".jumpShow", function() {
+        var row = $(this).parent().parent();
+        var name = row.children().eq(1).html();
+
+        document.cookie="projectName=" + name;
+        location.href="cockpit/project/manage2";
     });
 
     $(".cancelConsumer").click(function() {
