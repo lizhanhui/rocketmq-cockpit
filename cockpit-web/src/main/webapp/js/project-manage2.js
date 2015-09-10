@@ -115,6 +115,7 @@ $(document).ready(function () {
         if ("" !== cookieString) {
             changeProject(cookieString.split("=")[1]);
             optionSelectedByValue(selectP, cookieString.split("=")[1]);
+            $('h1').html(cookieString.split("=")[1]);
             var date=new Date();
             date.setTime(date.getTime()-1000);
             document.cookie = "projectName=x;expires="+date.toGMTString();
@@ -135,6 +136,7 @@ $(document).ready(function () {
 
 function changeProject(project){
     if (-1 != project) {
+        $('h1').html(project);
         $.ajax({
             async: false,
             url: "cockpit/api/project/" + project,//查询该project对应的Consumer Group
