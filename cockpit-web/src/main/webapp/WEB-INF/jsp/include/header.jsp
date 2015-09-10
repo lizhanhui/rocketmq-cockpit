@@ -12,7 +12,7 @@
             </button>
             <a  style="color:gray" class="navbar-brand" href="#">RocketMQ Cockpit</a>
         </div>
-        <div id="navbar" class="navbar-collapse collapse" style="background-color:black">
+        <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <!--
                 <li class="active"><a href="#">Home</a></li>
