@@ -19,7 +19,7 @@
                 -->
 
                     <li class="dropdown">
-                        <a style="color:white" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Topic<span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Topic<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="cockpit/topic/">Manage Topics</a></li>
                             <li><a href="cockpit/topic-progress/">Topic Progress</a> </li>
@@ -27,16 +27,16 @@
                     </li>
 
                     <li class="dropdown">
-                        <a style="color:white" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Consumer Group<span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Consumer Group<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="cockpit/consumer-group/">Manage Consumer Groups</a></li>
                             <li><a href="cockpit/consume-progress/">Consumer Group Progress </a> </li>
                         </ul>
                     </li>
-                <li><a  style="color:white" href="cockpit/message/">Query Message</a></li>
+                <li><a href="cockpit/message/">Query Message</a></li>
 
                 <li class="dropdown">
-                    <a style="color:white" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Project<span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Project<span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         <li><a href="cockpit/project/manage">Manage</a></li>
                         <li><a href="cockpit/project/create">Launch New Project</a> </li>
@@ -44,7 +44,7 @@
                 </li>
 
                     <li class="dropdown">
-                        <a style="color:white" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin<span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="cockpit/admin/user">Manage User</a></li>
                             <li><a href="cockpit/ip/">IP Mapping</a></li>
