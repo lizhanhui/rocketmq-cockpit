@@ -220,7 +220,7 @@ function checkInfo(num){
                     contentType: 'application/json',
                     success: function(consumerGroup){
                         if (consumerGroup.groupName === text){
-                            check.style.color = "red";
+                            check.style.color = "blue";
                             check.innerHTML = "This group is exist. Make sure you want make this group connect to your project.";
                         }else{
                             check.style.color = "green";
@@ -248,7 +248,7 @@ function checkInfo(num){
                             check.style.color = "green";
                             check.innerHTML = "topic name is ok.";
                         } else {
-                            check.style.color = "red";
+                            check.style.color = "blue";
                             check.innerHTML = "This topic is exist. Make sure you want make this topic connect to your project.";
                         }
                     }

@@ -66,7 +66,7 @@
     </table>
 </div>
 <div id="topicDIV">
-<button id="addButton" onclick="addButton();">Add</button>
+
       <table cellspacing="0" class="display" id="topic" width="100%">
         <thead>
            <tr>
