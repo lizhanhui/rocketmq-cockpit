@@ -145,9 +145,9 @@
                 <thead>
                     <tr>
                         <td style="display:none;">id</td>
-                        <td>Project Name</td>
-                        <td>Project desc</td>
-                        <td>Operation</td>
+                        <td class="text-center">Project Name</td>
+                        <td class="text-center">Project desc</td>
+                        <td class="text-center">Operation</td>
                     </tr>
                 </thead>
                 <tbody class="table-striped table-content">
