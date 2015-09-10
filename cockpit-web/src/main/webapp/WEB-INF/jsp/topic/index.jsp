@@ -13,6 +13,11 @@
 <body>
     <jsp:include page="../include/header.jsp"></jsp:include>
 <div class="container-fluid">
+<div class="row">
+    <div class="col-md-8 col-md-offset-2 text-center">
+      <h1>TOPIC</h1>
+    </div>
+  </div>
     <div id="addTopicDIV" class="col-xs-8 col-xs-offset-2 text-left table-responsive">
         <table class="table table-bordered">
             <tr><td>Topic:</td><td>  <input type="text" class="form-control topic" placeholder="topic"></td></tr>
