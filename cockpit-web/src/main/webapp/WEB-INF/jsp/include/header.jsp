@@ -60,13 +60,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li>
                     <a href="javascript:;">
-                        <strong>
-                            <!--
-                            <span style="color: #5cb85c;">Hi</span>
-                            <span style="color: #f0ad4e;"><c:out value="${handle_in_session}" /></span>
-                            -->
-                            Welcome
-                        </strong>
+                        <strong>Welcome</strong>
                     </a>
                 </li>
                 <li><a href="cockpit/logout">Logout</a></li>
