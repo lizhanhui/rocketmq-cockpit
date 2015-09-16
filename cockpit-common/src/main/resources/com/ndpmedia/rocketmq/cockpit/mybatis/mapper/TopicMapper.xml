@@ -7,29 +7,27 @@
         VALUES (NULL, #{topic}, #{clusterName}, #{permission}, #{writeQueueNum}, #{readQueueNum}, #{unit}, #{hasUnitSubscription}, #{brokerAddress}, #{order}, #{status.id}, #{createTime}, #{updateTime})
     </insert>
 
-    <insert id="associateTeam">
-        INSERT INTO topic_team_xref(topic_id, team_id)
-        VALUES (#{topicId}, #{teamId})
+    <insert id="connectProject">
+        INSERT INTO project_topic_xref(topic_id, project_id)
+        VALUES (#{topicId}, #{projectId})
     </insert>
 
-    <select id="getTeamId" resultType="long">
-        SELECT team_id
-        FROM topic_team_xref
+    <select id="getProjects" resultType="long" parameterType="long">
+        SELECT project_id
+        FROM project_topic_xref
         WHERE topic_id = #{topicId}
-        GROUP BY team_id
     </select>
 
-    <delete id="removeTopicTeamAssociation">
+    <delete id="disconnectProject">
         DELETE
-        FROM topic_team_xref
+        FROM project_topic_xref
         WHERE 1 = 1
-
         <if test="topicId > 0">
             AND topic_id = #{topicId}
         </if>
 
-        <if test="teamId > 0">
-            AND team_id = #{teamId}
+        <if test="projectId > 0">
+            AND project_id = #{projectId}
         </if>
     </delete>
 
@@ -99,54 +97,16 @@
     <select id="list" resultMap="topicMap">
         SELECT topic, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, order_type, min(create_time) as create_time, max(update_time) as update_time
         FROM topic
-        <if test="teamId > 0">
-            JOIN topic_team_xref AS xref ON id = xref.topic_id
+        <if test="projectId > 0">
+            JOIN project_topic_xref AS xref ON id = xref.topic_id
         </if>
         WHERE 1 = 1
-        <if test="teamId > 0">
-            AND xref.team_id = #{teamId}
-        </if>
-
-        <if test="topic != null">
-            AND topic = #{topic}
+        <if test="projectId > 0">
+            AND xref.project_id = #{projectId}
         </if>
 
         <if test="statusId > 0">
-            AND status_id = #{statusId}
-        </if>
-
-        GROUP BY topic, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, order_type
-    </select>
-
-    <select id="delList" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
-        FROM topic
-        WHERE status_id = 3
-    </select>
-
-    <select id="activeList" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
-        FROM topic
-        WHERE status_id = 2
-    </select>
-
-    <select id="detailList" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
-        FROM topic
-        <if test="teamId > 0">
-            JOIN topic_team_xref AS xref ON id = xref.topic_id
-        </if>
-        WHERE 1 = 1
-        <if test="teamId > 0">
-            AND xref.team_id = #{teamId}
-        </if>
-
-        <if test="topic != null">
-            AND topic = #{topic}
-        </if>
-
-        <if test="statusId > 0">
-            AND status_id = #{statusId}
+            AND status_id = #{status}
         </if>
     </select>
 </mapper>

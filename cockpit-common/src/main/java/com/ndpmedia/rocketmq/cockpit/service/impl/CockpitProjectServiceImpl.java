@@ -14,7 +14,7 @@ import java.util.List;
 @Service("cockpitProjectService")
 public class CockpitProjectServiceImpl implements CockpitProjectService {
 
-    private Logger logger = LoggerFactory.getLogger(CockpitProjectServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CockpitProjectServiceImpl.class);
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -40,10 +40,9 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
     @Transactional
     @Override
     public void remove(long projectId) {
-        Project project = projectMapper.get(projectId, null);
+        projectMapper.disconnectTopic(projectId);
+        projectMapper.disconnectConsumerGroup(projectId);
         projectMapper.delete(projectId);
-        projectMapper.deleteC(project.getName());
-        projectMapper.deleteT(project.getName());
     }
 
     @Override

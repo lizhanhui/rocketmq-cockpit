@@ -7,9 +7,9 @@
         VALUES (NULL, #{clusterName}, #{groupName}, #{consumeEnable}, #{consumeBroadcastEnable}, #{updateTime}, #{retryQueueNum})
     </insert>
 
-    <insert id="associateTeam">
-        INSERT INTO consumer_group_team_xref(consumer_group_id, team_id)
-                VALUES (#{consumerGroupId}, #{teamId})
+    <insert id="connectProject">
+        INSERT INTO project_consumer_group_xref(consumer_group_id, project_id)
+        VALUES (#{consumerGroupId}, #{projectId})
     </insert>
 
     <update id="update" parameterType="ConsumerGroup">
@@ -36,16 +36,16 @@
         WHERE id = #{id}
     </delete>
 
-    <delete id="deleteConsumerGroupTeamAssociation">
+    <delete id="disconnectProject">
         DELETE
-        FROM consumer_group_team_xref
+        FROM project_consumer_group_xref
         WHERE 1 = 1
         <if test="consumerGroupId > 0">
             AND consumer_group_id = #{consumerGroupId}
         </if>
 
-        <if test="teamId > 0">
-            AND team_id = #{teamId}
+        <if test="projectId > 0">
+            AND project_id = #{projectId}
         </if>
     </delete>
 
@@ -71,13 +71,13 @@
     <select id="list" resultMap="consumerGroupMap">
         SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, broker_address, broker_id, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
         FROM consumer_group
-        <if test="teamId > 0">
-            JOIN consumer_group_team_xref AS xref ON xref.consumer_group_id = id
+        <if test="projectId > 0">
+            JOIN project_consumer_group_xref AS xref ON xref.consumer_group_id = id
         </if>
         WHERE 1 = 1
 
-        <if test="teamId > 0">
-            AND xref.team_id = #{teamId}
+        <if test="projectId > 0">
+            AND xref.project_id = #{projectId}
         </if>
 
         <if test="clusterName != null">
@@ -108,7 +108,7 @@
         <if test="broker != null">
             AND broker_address = #{broker}
         </if>
-        limit 1
+        LIMIT 1
     </select>
 
     <select id="getBase" resultMap="consumerGroupMap" parameterType="java.lang.String">

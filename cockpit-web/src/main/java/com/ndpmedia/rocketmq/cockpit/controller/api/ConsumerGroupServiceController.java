@@ -67,10 +67,8 @@ public class ConsumerGroupServiceController {
 
     @RequestMapping(method = RequestMethod.PUT)
     @ResponseBody
-    public ConsumerGroup add(@RequestBody ConsumerGroup consumerGroup, HttpServletRequest request) {
-        CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-        long teamId = cockpitUser.getTeam().getId();
-        cockpitConsumerGroupService.insert(consumerGroup, teamId);
+    public ConsumerGroup add(@RequestBody ConsumerGroup consumerGroup, long projectId) {
+        cockpitConsumerGroupService.insert(consumerGroup, projectId);
         return consumerGroup;
     }
 

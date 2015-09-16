@@ -12,11 +12,9 @@ public interface CockpitConsumerGroupService {
 
     boolean clear(ConsumerGroup consumerGroup);
 
-    void insert(ConsumerGroup consumerGroup, long teamId);
+    void insert(ConsumerGroup consumerGroup, long projectId);
 
     void delete(long consumerGroupId);
-
-    ConsumerGroup getBaseBean(String consumerGroupName);
 
     Set<String> getGroups(DefaultMQAdminExt defaultMQAdminExt);
 

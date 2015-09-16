@@ -1,5 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
+import com.ndpmedia.rocketmq.cockpit.model.Project;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,22 +22,15 @@ public interface TopicMapper {
     Topic get(@Param("id") long id,@Param("topic")  String topic,@Param("broker")  String broker,@Param("cluster")  String cluster);
 
     /**
-     * List by team ID and topic.
-     * @param teamId Team ID, 0 for administrator.
-     * @param topic Topic name.
+     * List by project or status.
+     * @param projectId Project ID.
      * @return List of topics.
      */
-    List<Topic> list(@Param("teamId") long teamId, @Param("topic") String topic, @Param("statusId") long statusId);
+    List<Topic> list(@Param("projectId") long projectId, @Param("status") long status);
 
-    List<Topic> detailList(@Param("teamId") long teamId, @Param("topic") String topic, @Param("statusId") long statusId);
+    List<Long> getProjects(long topicId);
 
-    List<Topic> delList();
+    void connectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
 
-    List<Topic> activeList();
-
-    List<Long> getTeamId(@Param("topicId") long topicId);
-
-    void associateTeam(@Param("topicId") long topicId, @Param("teamId") long teamId);
-
-    void removeTopicTeamAssociation(@Param("topicId") long topicId, @Param("teamId") long teamId);
+    void disconnectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
 }

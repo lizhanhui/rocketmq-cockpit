@@ -137,15 +137,15 @@ CREATE TABLE IF NOT EXISTS project (
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS project_topic_xref (
-  project_name VARCHAR(255) NOT NULL REFERENCES project(name),
-  topic_name VARCHAR(255) NOT NULL REFERENCES topic(topic),
-  CONSTRAINT uniq_project_topic UNIQUE (project_name, topic_name)
+  project_id VARCHAR(255) NOT NULL REFERENCES project(id),
+  topic_id VARCHAR(255) NOT NULL REFERENCES topic(id),
+  CONSTRAINT uniq_project_topic UNIQUE (project_id, topic_id)
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS project_consumer_group_xref (
-  project_name VARCHAR(255) NOT NULL REFERENCES project(name),
-  consumer_group_name VARCHAR(255) NOT NULL REFERENCES consumer_group(group_name),
-  CONSTRAINT uniq_project_consumer_group UNIQUE (project_name, consumer_group_name)
+  project_id VARCHAR(255) NOT NULL REFERENCES project(id),
+  consumer_group_id VARCHAR(255) NOT NULL REFERENCES consumer_group(id),
+  CONSTRAINT uniq_project_consumer_group UNIQUE (project_id, consumer_group_id)
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS cockpit_user (

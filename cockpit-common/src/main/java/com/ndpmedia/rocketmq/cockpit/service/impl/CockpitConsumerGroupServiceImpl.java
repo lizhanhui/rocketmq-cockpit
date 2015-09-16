@@ -83,13 +83,8 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
     @Transactional
     @Override
     public void delete(long consumerGroupId) {
-        consumerGroupMapper.deleteConsumerGroupTeamAssociation(consumerGroupId, 0);
+        consumerGroupMapper.deleteConsumerGroupProjectAssociation(consumerGroupId, 0);
         consumerGroupMapper.delete(consumerGroupId);
-    }
-
-    @Override
-    public ConsumerGroup getBaseBean(String consumerGroupName) {
-        return consumerGroupMapper.getBase(consumerGroupName);
     }
 
     @Override
@@ -137,9 +132,9 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
 
     @Override
     @Transactional
-    public void insert(ConsumerGroup consumerGroup, long teamId) {
+    public void insert(ConsumerGroup consumerGroup, long projectId) {
         consumerGroupMapper.insert(consumerGroup);
-        consumerGroupMapper.associateTeam(consumerGroup.getId(), teamId);
+        consumerGroupMapper.associateProject(consumerGroup.getId(), projectId);
     }
 
 

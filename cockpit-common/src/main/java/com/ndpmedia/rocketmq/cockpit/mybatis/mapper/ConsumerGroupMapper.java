@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ConsumerGroupMapper {
 
-    List<ConsumerGroup> list(@Param("teamId") long teamId,
+    List<ConsumerGroup> list(@Param("projectId") long projectId,
                              @Param("clusterName") String clusterName,
                              @Param("consumerGroupName") String consumerGroupName);
 
@@ -26,10 +26,10 @@ public interface ConsumerGroupMapper {
 
     void delete(long id);
 
-    void deleteConsumerGroupTeamAssociation(@Param(value = "consumerGroupId") long consumerGroupId,
-                                            @Param(value = "teamId") long teamId);
+    void disconnectProject(@Param(value = "consumerGroupId") long consumerGroupId,
+                           @Param(value = "projectId") long projectId);
 
-    void associateTeam(@Param(value = "consumerGroupId") long consumerGroupId,
-                       @Param(value = "teamId") long teamId);
+    void connectProject(@Param(value = "consumerGroupId") long consumerGroupId,
+                        @Param(value = "projectId") long projectId);
 
 }
