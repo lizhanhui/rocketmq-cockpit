@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS topic (
 -- update_time TIMESTAMP NOT NULL DEFAULT 0 ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = INNODB;
 
-CREATE TABLE broker_topic_xref (
+CREATE TABLE topic_broker_xref (
   broker_id INT NOT NULL REFERENCES broker(id),
   topic_id INT NOT NULL REFERENCES topic(id),
   status INT NOT NULL REFERENCES status_lu(id),
@@ -179,22 +179,6 @@ CREATE TABLE IF NOT EXISTS cockpit_user_login (
   retry INT NOT NULL DEFAULT 0,
   lock_time BIGINT NOT NULL DEFAULT 0
 ) ENGINE = INNODB;
-
--- Resource ownership
-
-CREATE TABLE IF NOT EXISTS topic_team_xref(
-  topic_id INT NOT NULL REFERENCES topic(id) ON DELETE RESTRICT ,
-  team_id INT NOT NULL REFERENCES team(id) ON DELETE RESTRICT ,
-  CONSTRAINT UNIQUE (topic_id, team_id)
-) ENGINE = INNODB;
-
-
-CREATE TABLE IF NOT EXISTS consumer_group_team_xref(
-  consumer_group_id INT NOT NULL REFERENCES consumer_group(id) ON DELETE RESTRICT ,
-  team_id INT NOT NULL REFERENCES team(id) ON DELETE RESTRICT ,
-  CONSTRAINT UNIQUE (consumer_group_id, team_id)
-) ENGINE = INNODB;
-
 
 -- Login
 CREATE TABLE IF NOT EXISTS login (
