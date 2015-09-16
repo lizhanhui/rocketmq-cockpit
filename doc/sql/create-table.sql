@@ -61,9 +61,10 @@ CREATE TABLE broker_topic_xref (
   CONSTRAINT uniq_broker_topic UNIQUE (broker_id, topic_id)
 ) ENGINE = INNODB;
 
-CREATE TABLE topic_data_center_xref(
+CREATE TABLE topic_dc_xref(
   topic_id INT NOT NULL REFERENCES topic(id),
   dc_id INT NOT NULL REFERENCES data_center(id),
+  status INT REFERENCES status_lu(id),
   CONSTRAINT uniq_topic_dc UNIQUE (topic_id, dc_id)
 ) ENGINE = INNODB;
 
