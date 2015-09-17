@@ -8,7 +8,6 @@ import com.ndpmedia.rocketmq.cockpit.scheduler.command.DownTopicCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,8 +71,8 @@ public class TopicScheduler {
                 cockpitTopicDBService.deactivate(topic.getId());
                 //确认该Topic是否具有其他Broker
                 if (!cockpitTopicDBService.exists(topic.getTopic())){
-                    List<Long> teamIds = cockpitTopicService.getTeamId(topic);
-                    logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + Arrays.toString(teamIds.toArray()));
+                    List<Long> projectIds = cockpitTopicDBService.getProjectIDs(topic.getId(), null);
+                    logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + Arrays.toString(projectIds.toArray()));
                     //topic route信息可能无法获得，导致topic config无法获取broker端版本，使用数据库端版本构建
                     TopicConfig topicConfig = cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, topic.getTopic());
                     if (null == topicConfig)
@@ -82,12 +81,11 @@ public class TopicScheduler {
                     for (String broker : brokers){
                         topic.setBrokerAddress(broker);
                         cockpitTopicRocketMQService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
-
-                        if (teamIds.isEmpty())
-                            continue;
-
-                        for (long teamId:teamIds)
-                            cockpitTopicDBService.insert(topic, teamId);
+                        if (!projectIds.isEmpty()) {
+                            for (long projectId :projectIds) {
+                                cockpitTopicDBService.insert(topic, projectId);
+                            }
+                        }
                     }
                 }
             }

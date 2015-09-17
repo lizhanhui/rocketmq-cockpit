@@ -25,7 +25,7 @@ public interface TopicMapper {
                      @Param("broker") String broker,
                      @Param("cluster") String cluster);
 
-    List<Long> getProjects(long topicId);
+    List<Long> getProjects(long topicId, String topic);
 
     void connectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
 

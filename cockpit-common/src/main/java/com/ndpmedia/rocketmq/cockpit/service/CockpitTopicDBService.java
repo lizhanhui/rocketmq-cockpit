@@ -46,4 +46,6 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
     void remove(long topicId, long projectId);
 
     boolean exists(String topic);
+
+    List<Long> getProjectIDs(long topicId, String topic);
 }

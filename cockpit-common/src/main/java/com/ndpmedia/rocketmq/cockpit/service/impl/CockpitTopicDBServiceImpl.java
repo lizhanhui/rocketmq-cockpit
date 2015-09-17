@@ -99,5 +99,8 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
         return topicMapper.get(0, topic) != null;
     }
 
-
+    @Override
+    public List<Long> getProjectIDs(long topicId, String topic) {
+        return topicMapper.getProjects(topicId, topic);
+    }
 }

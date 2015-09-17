@@ -12,10 +12,19 @@
         VALUES (#{topicId}, #{projectId})
     </insert>
 
-    <select id="getProjects" resultType="long" parameterType="long">
-        SELECT project_id
-        FROM project_topic_xref
-        WHERE topic_id = #{topicId}
+    <select id="getProjects" resultType="long">
+        SELECT DISTINCT xref.project_id
+        FROM project_topic_xref AS xref
+        <if test="topic != null">
+            JOIN topic AS t ON t.id = xref.topic_id
+        </if>
+        WHERE 1 = 1
+        <if test="topic != null">
+            AND topic = #{topic}
+        </if>
+        <if test="topicId > 0">
+            AND topic_id = #{topicId}
+        </if>
     </select>
 
     <delete id="disconnectProject">
