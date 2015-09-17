@@ -12,9 +12,6 @@ import org.apache.commons.cli.PosixParser;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by robert on 2015/5/29.
- */
 public class SimpleAdmin {
     private static List<SubCommand> cmdList = new ArrayList<>();
 

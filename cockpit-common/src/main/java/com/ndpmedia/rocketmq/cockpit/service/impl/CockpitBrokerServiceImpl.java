@@ -12,9 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-/**
- * Created by robert on 2015/6/9.
- */
 @Service("cockpitBrokerService")
 public class CockpitBrokerServiceImpl implements CockpitBrokerService {
 

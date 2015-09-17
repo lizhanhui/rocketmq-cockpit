@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper">
 
-    <insert id="insert" parameterType="ConsumerGroup" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO consumer_group (id, cluster_name, group_name, consume_enable, consume_broadcast_enable, update_time, retry_queue_num)
         VALUES (NULL, #{clusterName}, #{groupName}, #{consumeEnable}, #{consumeBroadcastEnable}, #{updateTime}, #{retryQueueNum})
     </insert>
@@ -12,7 +12,7 @@
         VALUES (#{consumerGroupId}, #{projectId})
     </insert>
 
-    <update id="update" parameterType="ConsumerGroup">
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
         UPDATE consumer_group
         SET cluster_name = #{clusterName},
             which_broker_when_consume_slowly = #{whichBrokerWhenConsumeSlowly},
@@ -22,12 +22,6 @@
             retry_max_times = #{retryMaxTimes}, retry_queue_num = #{retryQueueNum},
             consume_from_min_enable = #{consumeFromMinEnable}, status_id = #{status.id},
             create_time = #{createTime}, update_time = #{updateTime}
-    </update>
-
-    <update id="register" parameterType="long">
-        UPDATE consumer_group
-        SET status_id = 2
-        WHERE id = #{id}
     </update>
 
     <delete id="delete" parameterType="long">
@@ -49,7 +43,7 @@
         </if>
     </delete>
 
-    <resultMap id="consumerGroupMap" type="ConsumerGroup">
+    <resultMap id="consumerGroupMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
         <id column="id" property="id" />
         <result column="cluster_name" property="clusterName" />
         <result column="which_broker_when_consume_slowly" property="whichBrokerWhenConsumeSlowly" />
@@ -87,6 +81,10 @@
         <if test="consumerGroupName != null">
             AND group_name = #{consumerGroupName}
         </if>
+
+        <if test="broker != null">
+            AND broker_address = #{broker}
+        </if>
     </select>
 
     <select id="get" resultMap="consumerGroupMap">
@@ -100,21 +98,5 @@
         <if test="groupName != null">
             AND group_name = #{groupName}
         </if>
-
-        <if test="clusterName != null">
-            AND cluster_name = #{clusterName}
-        </if>
-
-        <if test="broker != null">
-            AND broker_address = #{broker}
-        </if>
-        LIMIT 1
-    </select>
-
-    <select id="getBase" resultMap="consumerGroupMap" parameterType="java.lang.String">
-        SELECT id, cluster_name, group_name, consume_enable, consume_broadcast_enable, retry_max_times, retry_queue_num, consume_from_min_enable
-        FROM consumer_group
-        WHERE group_name = #{name}
-        GROUP by group_name
     </select>
 </mapper>

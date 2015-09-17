@@ -16,7 +16,7 @@ public class TopicTranslate {
      * @param topic topic
      * @return topic config
      */
-    public static TopicConfig translateFrom(Topic topic){
+    public static TopicConfig wrap(Topic topic){
         TopicConfig topicConfig = new TopicConfig();
         topicConfig.setTopicName(topic.getTopic());
         topicConfig.setWriteQueueNums(topic.getWriteQueueNum());
@@ -33,7 +33,7 @@ public class TopicTranslate {
      * @param broker broker
      * @return topic
      */
-    public static Topic translateFrom(TopicConfig topicConfig, String cluster, String broker){
+    public static Topic wrap(TopicConfig topicConfig, String cluster, String broker){
         Topic topic = new Topic();
         topic.setBrokerAddress(broker);
         topic.setClusterName(cluster);

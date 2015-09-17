@@ -6,7 +6,6 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
@@ -20,16 +19,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-/**
- * Created by robert on 2015/5/29.
- */
 @Component
 public class DownTopicCommand implements SubCommand {
 
     private Logger logger = LoggerFactory.getLogger(DownTopicCommand.class);
-
-    @Autowired
-    private TopicMapper topicMapper;
 
     @Autowired
     private CockpitBrokerService cockpitBrokerService;
@@ -103,14 +96,14 @@ public class DownTopicCommand implements SubCommand {
             int flag = 0;
             while (flag++ < 5) {
                 try {
-                    Topic topic = TopicTranslate.translateFrom(topicConfig, brokerToCluster.get(broker), broker);
-                    Topic oldT = topicMapper.get(0L, topic.getTopic(), topic.getBrokerAddress(), null);
+                    Topic topic = TopicTranslate.wrap(topicConfig, brokerToCluster.get(broker), broker);
+                    Topic oldT = cockpitTopicService.get(0L, topic.getTopic(), topic.getBrokerAddress(), null);
                     //若未获取到相同Topic Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
                     if (null == oldT)
-                        topicMapper.insert(topic);
+                        cockpitTopicService.insert(topic, 1);
                     //若获取到相同Topic Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
                     else if (oldT.getStatus() != Status.ACTIVE)
-                        topicMapper.register(oldT.getId());
+                        cockpitTopicService.activate(oldT.getId());
                     break;
                 } catch (Exception e) {
                     e.printStackTrace();

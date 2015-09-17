@@ -8,6 +8,7 @@ import com.alibaba.rocketmq.common.subscription.SubscriptionGroupConfig;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.CommandUtil;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
+import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
@@ -24,6 +25,23 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
 
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
+
+    public ConsumerGroup get(long consumerGroupId, String consumerGroupName) {
+        if (consumerGroupId <=0 && null == consumerGroupName) {
+            throw new IllegalArgumentException("Either consumer group ID or Name should be present");
+        }
+
+        return consumerGroupMapper.get(consumerGroupId, consumerGroupName);
+    }
+
+    @Override
+    public void activate(long consumerGroupId) {
+        ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId, null);
+        if (null != consumerGroup && consumerGroup.getStatus() != Status.ACTIVE) {
+            consumerGroup.setStatus(Status.ACTIVE);
+            consumerGroupMapper.update(consumerGroup);
+        }
+    }
 
     @Override
     public boolean update(ConsumerGroup consumerGroup) {
@@ -83,7 +101,7 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
     @Transactional
     @Override
     public void delete(long consumerGroupId) {
-        consumerGroupMapper.deleteConsumerGroupProjectAssociation(consumerGroupId, 0);
+        consumerGroupMapper.disconnectProject(consumerGroupId, 0);
         consumerGroupMapper.delete(consumerGroupId);
     }
 
@@ -134,7 +152,7 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
     @Transactional
     public void insert(ConsumerGroup consumerGroup, long projectId) {
         consumerGroupMapper.insert(consumerGroup);
-        consumerGroupMapper.associateProject(consumerGroup.getId(), projectId);
+        consumerGroupMapper.connectProject(consumerGroup.getId(), projectId);
     }
 
 

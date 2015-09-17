@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper">
 
-    <insert id="insert" parameterType="Topic" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.Topic" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO topic (id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time)
         VALUES (NULL, #{topic}, #{clusterName}, #{permission}, #{writeQueueNum}, #{readQueueNum}, #{unit}, #{hasUnitSubscription}, #{brokerAddress}, #{order}, #{status.id}, #{createTime}, #{updateTime})
     </insert>
@@ -31,7 +31,7 @@
         </if>
     </delete>
 
-    <update id="update" parameterType="Topic">
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.Topic">
         UPDATE topic SET topic = #{topic}, cluster_name = #{clusterName},
             permission = #{permission}, write_queue_num = #{writeQueueNum},
             read_queue_num = #{readQueueNum}, unit = #{unit},
@@ -47,17 +47,7 @@
         WHERE id = #{id}
     </delete>
 
-    <update id="register" parameterType="long">
-        UPDATE topic SET status_id = 2, update_time = now()
-        WHERE id = #{id}
-    </update>
-
-    <update id="unregister" parameterType="long" >
-        UPDATE topic SET status_id = 3, update_time = now()
-        WHERE id = #{id}
-    </update>
-
-    <resultMap id="topicMap" type="Topic">
+    <resultMap id="topicMap" type="com.ndpmedia.rocketmq.cockpit.model.Topic">
         <id column="id" property="id" />
         <result column="topic" property="topic" />
         <result column="cluster_name" property="clusterName" />
@@ -85,20 +75,13 @@
         <if test="topic != null">
             AND topic = #{topic}
         </if>
-        <if test="broker != null">
-            AND broker_address = #{broker}
-        </if>
-        <if test="cluster != null">
-            AND cluster_name = #{cluster}
-        </if>
-        limit 1
     </select>
 
     <select id="list" resultMap="topicMap">
-        SELECT topic, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, order_type, min(create_time) as create_time, max(update_time) as update_time
-        FROM topic
+        SELECT t.id, t.topic, t.permission, t.write_queue_num, t.read_queue_num, t.unit, t.has_unit_subscription, t.order_type, min(create_time) as create_time, max(update_time) as update_time
+        FROM topic AS t
         <if test="projectId > 0">
-            JOIN project_topic_xref AS xref ON id = xref.topic_id
+            JOIN project_topic_xref AS xref ON t.id = xref.topic_id
         </if>
         WHERE 1 = 1
         <if test="projectId > 0">
@@ -107,6 +90,14 @@
 
         <if test="statusId > 0">
             AND status_id = #{status}
+        </if>
+
+        <if test="broker != null">
+            AND t.broker_address = #{broker}
+        </if>
+
+        <if test="cluster != null">
+            AND t.cluster_name = #{cluster}
         </if>
     </select>
 </mapper>

@@ -9,20 +9,15 @@ public interface ConsumerGroupMapper {
 
     List<ConsumerGroup> list(@Param("projectId") long projectId,
                              @Param("clusterName") String clusterName,
-                             @Param("consumerGroupName") String consumerGroupName);
+                             @Param("consumerGroupName") String consumerGroupName,
+                             @Param("broker") String broker);
 
     ConsumerGroup get(@Param("id") long id,
-                      @Param("groupName") String groupName,
-                      @Param("clusterName") String clusterName,
-                      @Param("broker") String broker);
-
-    ConsumerGroup getBase(String name);
+                      @Param("groupName") String groupName);
 
     long insert(ConsumerGroup consumerGroup);
 
     void update(ConsumerGroup consumerGroup);
-
-    void register(long id);
 
     void delete(long id);
 

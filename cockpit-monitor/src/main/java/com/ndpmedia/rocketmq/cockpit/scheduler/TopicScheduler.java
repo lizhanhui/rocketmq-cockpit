@@ -2,6 +2,7 @@ package com.ndpmedia.rocketmq.cockpit.scheduler;
 
 import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
+import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.DownTopicCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
@@ -56,22 +57,22 @@ public class TopicScheduler {
             defaultMQAdminExt.start();
 
             Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
-            List<Topic> topics = cockpitTopicService.getActiveTopics();
+            List<Topic> topics = cockpitTopicService.getTopics(Status.ACTIVE);
             for (Topic topic : topics) {
                 //现阶段可对应的Broker与Topic信息不做处理
                 if (brokers.isEmpty() || brokers.contains(topic.getBrokerAddress()))
                     continue;
 
                 //注销已有激活信息
-                cockpitTopicService.unregister(topic.getId());
+                cockpitTopicService.deactivate(topic.getId());
                 //确认该Topic是否具有其他Broker
                 if (cockpitTopicService.getTopic(topic.getTopic()).isEmpty()){
                     List<Long> teamIds = cockpitTopicService.getTeamId(topic);
                     logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + Arrays.toString(teamIds.toArray()));
-                    //topic route信息可能无法获得，导致topicconfig无法获取broker端版本，使用数据库端版本构建
+                    //topic route信息可能无法获得，导致topic config无法获取broker端版本，使用数据库端版本构建
                     TopicConfig topicConfig = cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic.getTopic());
                     if (null == topicConfig)
-                        topicConfig = TopicTranslate.translateFrom(topic);
+                        topicConfig = TopicTranslate.wrap(topic);
 
                     for (String broker : brokers){
                         topic.setBrokerAddress(broker);

@@ -44,10 +44,3 @@ INSERT INTO consumer_group(group_name, broker_address, broker_id) VALUES ('C_GKT
 
 INSERT INTO name_server_kv(id, name_space, `key`, `value`, status_id) VALUES (NULL , "DC_SELECTOR", "DC_DISPATCH_STRATEGY", "BY_RATIO", 2);
 INSERT INTO name_server_kv(id, name_space, `key`, `value`, status_id) VALUES (NULL , "DC_SELECTOR", "DC_DISPATCH_RATIO", "1:0.25,2:0.3,3:0.25,5:0.2", 2);
-
-INSERT INTO topic_team_xref(topic_id, team_id) VALUES (1, 1);
-INSERT INTO topic_team_xref(topic_id, team_id) VALUES (2, 1);
-INSERT INTO topic_team_xref(topic_id, team_id) VALUES (3, 1);
-INSERT INTO topic_team_xref(topic_id, team_id) VALUES (4, 1);
-INSERT INTO topic_team_xref(topic_id, team_id) VALUES (5, 1);
-INSERT INTO topic_team_xref(topic_id, team_id) VALUES (6, 1);

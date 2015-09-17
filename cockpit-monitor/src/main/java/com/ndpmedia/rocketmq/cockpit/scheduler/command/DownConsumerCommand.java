@@ -7,7 +7,6 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
@@ -23,16 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by robert on 2015/5/29.
- */
 @Component
 public class DownConsumerCommand implements SubCommand {
 
     private Logger logger = LoggerFactory.getLogger(DownConsumerCommand.class);
 
     @Autowired
-    private ConsumerGroupMapper consumerGroupMapper;
+    private CockpitConsumerGroupService consumerGroupService;
 
     @Autowired
     private CockpitBrokerService cockpitBrokerService;
@@ -111,13 +107,14 @@ public class DownConsumerCommand implements SubCommand {
                     cg.setConsumeEnable(true);
                     cg.setRetryQueueNum(topicConfig.getWriteQueueNums());
 
-                    ConsumerGroup oldC = consumerGroupMapper.get(0L, consumerGroup, null, null);
+                    ConsumerGroup oldC = consumerGroupService.get(0L, consumerGroup);
                     //若未获取到相同group Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
-                    if (null == oldC)
-                        consumerGroupMapper.insert(cg);
+                    if (null == oldC) {
+                        consumerGroupService.insert(cg, 1);
+                    }
                     //若获取到相同group Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
                     else if (oldC.getStatus() != Status.ACTIVE)
-                        consumerGroupMapper.register(oldC.getId());
+                        consumerGroupService.activate(oldC.getId());
                     //现阶段Consumer Group不与Broker信息做强关联，因此无论brokers中哪一个Broker可完成Consumer Group信息，
                     // 后续步骤均省略，当Broker信息为必须信息，则不再省略。
                     break  outer;

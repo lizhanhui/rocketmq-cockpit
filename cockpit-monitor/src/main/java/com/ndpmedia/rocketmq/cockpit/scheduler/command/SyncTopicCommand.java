@@ -14,9 +14,6 @@ import org.apache.commons.cli.Options;
 
 import java.util.*;
 
-/**
- * Created by robert on 2015/5/29.
- */
 public class SyncTopicCommand implements SubCommand {
 
     private Set<String> brokerList = new HashSet<>();
