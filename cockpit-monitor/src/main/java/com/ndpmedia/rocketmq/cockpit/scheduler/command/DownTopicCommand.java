@@ -4,10 +4,12 @@ import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
+import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -17,7 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class DownTopicCommand implements SubCommand {
@@ -28,7 +32,10 @@ public class DownTopicCommand implements SubCommand {
     private CockpitBrokerService cockpitBrokerService;
 
     @Autowired
-    private CockpitTopicService cockpitTopicService;
+    private CockpitTopicRocketMQService cockpitTopicRocketMQService;
+
+    @Autowired
+    private CockpitTopicDBService cockpitTopicDBService;
 
     private Map<String, String> brokerToCluster = new HashMap<>();
 
@@ -66,8 +73,7 @@ public class DownTopicCommand implements SubCommand {
         try {
             adminExt.start();
             doMap(adminExt);
-
-            Set<String> topics = cockpitTopicService.getTopics(adminExt);
+            Set<String> topics = cockpitTopicRocketMQService.fetchAllTopics(adminExt, true);
             for (String topicName : topics) {
                 logger.info("now we check topic :" + topicName);
                 TopicConfig topicConfig = getTopicConfig(adminExt, topicName);
@@ -85,25 +91,26 @@ public class DownTopicCommand implements SubCommand {
         brokerToCluster.putAll(cockpitBrokerService.getBrokerCluster(defaultMQAdminExt));
     }
 
-    private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) {
-        return cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
+    private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) throws CockpitException {
+        return cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
     }
 
-    private void downloadTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig) {
-        Set<String> brokers = cockpitTopicService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
+    private void downloadTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig) throws CockpitException {
+        Set<String> brokers = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
 
         for (String broker : brokers) {
             int flag = 0;
             while (flag++ < 5) {
                 try {
                     Topic topic = TopicTranslate.wrap(topicConfig, brokerToCluster.get(broker), broker);
-                    Topic oldT = cockpitTopicService.get(0L, topic.getTopic(), topic.getBrokerAddress(), null);
+                    Topic oldT = cockpitTopicDBService.getTopic(topic.getTopic());
                     //若未获取到相同Topic Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
-                    if (null == oldT)
-                        cockpitTopicService.insert(topic, 1);
+                    if (null == oldT) {
+                        cockpitTopicDBService.insert(topic, 1);
+                    }
                     //若获取到相同Topic Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
                     else if (oldT.getStatus() != Status.ACTIVE)
-                        cockpitTopicService.activate(oldT.getId());
+                        cockpitTopicDBService.activate(oldT.getId());
                     break;
                 } catch (Exception e) {
                     e.printStackTrace();

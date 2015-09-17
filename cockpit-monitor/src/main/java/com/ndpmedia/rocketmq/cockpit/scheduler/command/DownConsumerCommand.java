@@ -5,11 +5,12 @@ import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
+import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -34,7 +35,7 @@ public class DownConsumerCommand implements SubCommand {
     private CockpitBrokerService cockpitBrokerService;
 
     @Autowired
-    private CockpitTopicService cockpitTopicService;
+    private CockpitTopicRocketMQService cockpitTopicRocketMQService;
 
     @Autowired
     private CockpitConsumerGroupService cockpitConsumerGroupService;
@@ -91,9 +92,9 @@ public class DownConsumerCommand implements SubCommand {
         brokerToCluster.putAll(cockpitBrokerService.getBrokerCluster(defaultMQAdminExt));
     }
 
-    private void downloadConsumerGroupConfig(DefaultMQAdminExt defaultMQAdminExt, String consumerGroup) {
-        Set<String> brokers = cockpitTopicService.getTopicBrokers(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
-        TopicConfig topicConfig = cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
+    private void downloadConsumerGroupConfig(DefaultMQAdminExt defaultMQAdminExt, String consumerGroup) throws CockpitException {
+        Set<String> brokers = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
+        TopicConfig topicConfig = cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
 
         outer:
         for (String broker : brokers) {

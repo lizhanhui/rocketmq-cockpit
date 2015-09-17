@@ -14,9 +14,6 @@ import org.apache.commons.cli.Options;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by robert on 2015/5/29.
- */
 public class SyncConsumerGroupCommand implements SubCommand {
 
     private Set<String> consumerGroups = new HashSet<>();
