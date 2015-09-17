@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS topic (
   status_id INT NOT NULL DEFAULT 1 REFERENCES status_lu(id) ON DELETE RESTRICT ,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time TIMESTAMP NOT NULL DEFAULT 0
---update_time TIMESTAMP NOT NULL DEFAULT 0 ON UPDATE CURRENT_TIMESTAMP
+-- update_time TIMESTAMP NOT NULL DEFAULT 0 ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = INNODB;
 
 CREATE TABLE broker_topic_xref (
@@ -59,6 +59,13 @@ CREATE TABLE broker_topic_xref (
   topic_id INT NOT NULL REFERENCES topic(id),
   status INT NOT NULL REFERENCES status_lu(id),
   CONSTRAINT uniq_broker_topic UNIQUE (broker_id, topic_id)
+) ENGINE = INNODB;
+
+CREATE TABLE topic_dc_xref(
+  topic_id INT NOT NULL REFERENCES topic(id),
+  dc_id INT NOT NULL REFERENCES data_center(id),
+  status INT REFERENCES status_lu(id),
+  CONSTRAINT uniq_topic_dc UNIQUE (topic_id, dc_id)
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS consumer_group (
