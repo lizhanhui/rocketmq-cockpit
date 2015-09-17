@@ -1,6 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -26,6 +27,8 @@ public interface TopicMapper {
                      @Param("cluster") String cluster);
 
     List<Long> getProjects(long topicId, String topic);
+
+    List<TopicAvailability> queryTopicsAvailability();
 
     void connectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
 

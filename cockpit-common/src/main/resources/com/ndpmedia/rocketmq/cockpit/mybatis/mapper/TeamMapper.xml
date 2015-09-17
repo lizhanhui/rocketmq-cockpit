@@ -41,11 +41,25 @@
         FROM team
     </select>
 
-    <select id="getCockpitUsersByTeamId" resultType="com.ndpmedia.rocketmq.cockpit.model.CockpitUser" parameterType="long">
-        SELECT u.id AS uid, u.role, u.username, u.password
+    <resultMap id="cockpitUserResultMap" type="com.ndpmedia.rocketmq.cockpit.model.CockpitUser">
+        <id column="uid" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <collection property="cockpitRoles" column="uid" select="selectRoles" />
+    </resultMap>
+
+    <select id="selectRoles" resultType="com.ndpmedia.rocketmq.cockpit.model.CockpitRole">
+        SELECT role.id, role.name
+        FROM cockpit_role AS role
+        JOIN cockpit_user_role_xref AS xref ON role.id = xref.role_id
+        WHERE xref.user_id = #{id}
+    </select>
+
+    <select id="getCockpitUsersByTeamId" resultMap="cockpitUserResultMap" parameterType="long">
+        SELECT u.id AS uid, u.username, u.password
         FROM cockpit_user AS u
             JOIN team_user_xref AS xref ON u.id = xref.user_id
-        WHERE xref.team_id = #{id}
+        WHERE xref.team_id = #{uid}
     </select>
 
     <resultMap id="teamMap" type="com.ndpmedia.rocketmq.cockpit.model.Team">
@@ -58,7 +72,6 @@
         SELECT id, name
         FROM team
         WHERE id = #{id}
-
     </select>
 
     <select id="getTeamAndMembersByTeamName" resultMap="teamMap" parameterType="string">

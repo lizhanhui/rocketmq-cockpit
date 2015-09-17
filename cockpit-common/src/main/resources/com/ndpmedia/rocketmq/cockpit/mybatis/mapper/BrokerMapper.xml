@@ -50,4 +50,16 @@
         </if>
     </select>
 
+    <select id="queryBrokerLoad" resultType="com.ndpmedia.rocketmq.cockpit.model.BrokerLoad">
+        SELECT broker.dc AS dcId
+            , broker.id AS brokerId
+            , IFNULL(SUM(topic.read_queue_num ), 0) AS readQueueNum
+            , IFNULL(SUM(topic.write_queue_num), 0) AS writeQueueNum
+        FROM broker
+            LEFT JOIN topic_broker_xref ON broker.id = topic_broker_xref.broker_id
+            LEFT JOIN topic ON topic_broker_xref.topic_id = topic.id
+        GROUP BY broker.dc, broker.id
+        ORDER BY write_queue_num, read_queue_num ASC
+    </select>
+
 </mapper>

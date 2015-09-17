@@ -109,4 +109,15 @@
             AND t.cluster_name = #{cluster}
         </if>
     </select>
+
+    <select id="queryTopicsAvailability" resultType="com.ndpmedia.rocketmq.cockpit.model.TopicAvailability">
+        SELECT topic_dc_xref.topic_id AS topicId
+        , topic_dc_xref.dc_id AS dcId
+        , COUNT(broker.id) AS availability
+        FROM topic_dc_xref
+        LEFT JOIN topic_broker_xref ON topic_dc_xref.topic_id = topic_broker_xref.topic_id
+        LEFT JOIN broker ON broker.id = topic_broker_xref.broker_id AND broker.dc = topic_dc_xref.dc_id
+        GROUP BY topic_dc_xref.dc_id, topic_dc_xref.topic_id
+        ORDER BY availability ASC
+    </select>
 </mapper>
