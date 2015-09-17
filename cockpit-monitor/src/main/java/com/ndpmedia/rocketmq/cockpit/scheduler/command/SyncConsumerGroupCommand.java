@@ -16,8 +16,6 @@ import java.util.Set;
 
 public class SyncConsumerGroupCommand implements SubCommand {
 
-    private Set<String> consumerGroups = new HashSet<>();
-
     private Set<String> brokerList = new HashSet<>();
 
     private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
@@ -57,11 +55,11 @@ public class SyncConsumerGroupCommand implements SubCommand {
         try{
             adminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
             adminExt.start();
-            consumerGroups = cockpitConsumerGroupService.getGroups(adminExt);
+            Set<String> consumerGroups = cockpitConsumerGroupService.getGroups(adminExt);
 
             doList(adminExt);
 
-            for (String comGroup:consumerGroups) {
+            for (String comGroup: consumerGroups) {
                 System.out.println("now we check consumer group : " + comGroup);
                 System.out.println(cockpitConsumerGroupService.getGroupConfig(adminExt, comGroup));
             }
