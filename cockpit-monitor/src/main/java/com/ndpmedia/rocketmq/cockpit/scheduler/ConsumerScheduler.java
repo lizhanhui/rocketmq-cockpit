@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by robert on 2015/6/9.
  * check consumer group
- * 1.auto download consumer group from cluster or broker to data base
+ * 1.auto download consumer group from cluster or broker to database
  * 2. auto check consumer group , create or update consumer group config on cluster or broker.
  */
 @Component
