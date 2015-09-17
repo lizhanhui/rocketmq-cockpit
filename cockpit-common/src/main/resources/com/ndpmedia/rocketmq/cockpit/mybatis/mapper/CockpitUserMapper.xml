@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitUserMapper">
 
-    <resultMap id="cockpitUserMap" type="CockpitUser">
+    <resultMap id="cockpitUserMap" type="com.ndpmedia.rocketmq.cockpit.model.CockpitUser">
         <id column="uid" property="id" />
         <result column="username" property="username" />
         <result column="password" property="password" />
@@ -12,15 +12,15 @@
                 typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
                 javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
         <association property="team" resultMap="teamMap" />
-        <collection property="cockpitRoles" column="uid" ofType="CockpitRole" select="queryRoles" />
+        <collection property="cockpitRoles" column="uid" ofType="com.ndpmedia.rocketmq.cockpit.model.CockpitRole" select="queryRoles" />
     </resultMap>
 
-    <resultMap id="teamMap" type="Team">
+    <resultMap id="teamMap" type="com.ndpmedia.rocketmq.cockpit.model.Team">
         <id column="tid" property="id" />
         <result column="name" property="name" />
     </resultMap>
 
-    <insert id="insert" parameterType="CockpitUser" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.CockpitUser" useGeneratedKeys="true" keyProperty="id">
       INSERT INTO cockpit_user(id, username, password, email, status_id)
       VALUES (NULL, #{username}, #{password}, #{email}, #{status.id})
     </insert>
@@ -76,7 +76,7 @@
         </if>
     </select>
 
-    <select id="queryRoles" resultType="CockpitRole">
+    <select id="queryRoles" resultType="com.ndpmedia.rocketmq.cockpit.model.CockpitRole">
         SELECT r.id, r.name
         FROM cockpit_role AS r
              JOIN cockpit_user_role_xref AS xref ON xref.role_id = r.id

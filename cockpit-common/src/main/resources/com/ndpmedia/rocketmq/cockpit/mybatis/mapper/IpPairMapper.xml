@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.IpPairMapper">
-    <insert id="insert" parameterType="IPPair" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.IPPair" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO ip_mapping (id, inner_ip, public_ip, create_time, update_time)
         VALUES (NULL, #{innerIP}, #{publicIP}, #{createTime}, #{updateTime})
     </insert>
 
-    <update id="update" parameterType="IPPair">
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.IPPair">
         UPDATE ip_mapping
         SET inner_ip = #{innerIP}, public_ip = #{publicIP}, create_time = #{createTime}, update_time = #{updateTime}
         WHERE id = #{id}
@@ -18,7 +18,7 @@
         WHERE id = #{id}
     </delete>
 
-    <resultMap id="ipPairMap" type="IPPair">
+    <resultMap id="ipPairMap" type="com.ndpmedia.rocketmq.cockpit.model.IPPair">
         <id column="id" property="id" />
         <result column="inner_ip" property="innerIP" />
         <result column="public_ip" property="publicIP" />

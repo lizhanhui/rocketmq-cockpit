@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitRoleMapper">
-    <insert id="insert" parameterType="CockpitRole" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.CockpitRole" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO cockpit_role(id, name)
         VALUES (NULL, #{name})
     </insert>
 
-    <update id="update" parameterType="CockpitRole">
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.CockpitRole">
         UPDATE cockpit_role
         SET name = #{name}
         WHERE id = #{id}
@@ -17,7 +17,7 @@
         WHERE id = #{id}
     </delete>
 
-    <select id="list" resultType="CockpitRole">
+    <select id="list" resultType="com.ndpmedia.rocketmq.cockpit.model.CockpitRole">
         SELECT id, name
         FROM cockpit_role
     </select>

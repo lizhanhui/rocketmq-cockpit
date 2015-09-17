@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.NameServerKVMapper">
 
-    <resultMap id="kvMap" type="KV">
+    <resultMap id="kvMap" type="com.ndpmedia.rocketmq.cockpit.model.KV">
         <id property="id" column="id"/>
         <result property="nameSpace" column="name_space"/>
         <result property="key" column="`key`"/>
@@ -30,7 +30,7 @@
         WHERE id = #{id}
     </select>
 
-    <select id="listByStatus" resultType="KV" parameterType="arraylist">
+    <select id="listByStatus" resultType="com.ndpmedia.rocketmq.cockpit.model.KV" parameterType="arraylist">
         SELECT id, name_space, `key`, `value`, status_id
         FROM name_server_kv
         WHERE status_id IN
@@ -39,12 +39,12 @@
         </foreach>
     </select>
 
-    <insert id="insert" parameterType="KV" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.KV" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO name_server_kv(id, name_space, `key`, `value`, status_id)
         VALUES (NULL, #{nameSpace}, #{key}, #{value}, #{status.id})
     </insert>
 
-    <update id="update" parameterType="KV">
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.KV">
         UPDATE name_server_kv SET name_space = #{nameSpace}, `key` = #{key}, `value` = #{value},
         status_id = #{status.id}
         WHERE id = #{id}

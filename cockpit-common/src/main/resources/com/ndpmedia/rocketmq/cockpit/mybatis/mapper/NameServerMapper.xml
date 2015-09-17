@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.NameServerMapper">
-    <insert id="insert" parameterType="NameServer" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.NameServer" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO name_server(id, ip, port, create_time, update_time)
         VALUES (NULL, #{ip}, #{port}, #{createTime}, #{updateTime})
     </insert>
 
-    <update id="update" parameterType="NameServer">
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.NameServer">
         UPDATE name_server
         SET ip = #{ip}, port = #{port}, create_time = #{createTime}, update_time = #{updateTime}
         WHERE id = #{id}
@@ -18,7 +18,7 @@
         WHERE id = #{id}
     </delete>
 
-    <resultMap id="nameServerMap" type="NameServer">
+    <resultMap id="nameServerMap" type="com.ndpmedia.rocketmq.cockpit.model.NameServer">
         <id column="id" property="id" />
         <result column="ip" property="ip" />
         <result column="port" property="port" />

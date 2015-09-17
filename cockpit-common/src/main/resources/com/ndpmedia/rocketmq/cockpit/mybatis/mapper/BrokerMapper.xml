@@ -2,12 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper">
 
-    <insert id="insert" parameterType="Broker" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         INSERT INTO broker(cluster_name, broker_name, broker_id, address, version, dc, last_update_time)
         VALUES (#{clusterName}, #{brokerName}, #{brokerId}, #{address}, #{version}, #{dc}, CURRENT_TIMESTAMP)
     </insert>
 
-    <update id="refresh" parameterType="Broker">
+    <update id="refresh" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         UPDATE broker
         SET last_update_time = CURRENT_TIMESTAMP
         WHERE cluster_name = #{clusterName} AND
@@ -15,14 +15,14 @@
         broker_id = #{brokerId}
     </update>
 
-    <select id="exists" resultType="java.lang.Boolean" parameterType="Broker">
+    <select id="exists" resultType="java.lang.Boolean" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         SELECT count(1) > 0 FROM broker
         WHERE cluster_name = #{clusterName} AND
               broker_name = #{brokerName} AND
               broker_id = #{brokerId}
     </select>
 
-    <select id="list" resultType="Broker">
+    <select id="list" resultType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
         address, version, dc, last_update_time AS lastUpdateTime
         FROM broker

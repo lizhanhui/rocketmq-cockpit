@@ -48,7 +48,7 @@
         WHERE xref.team_id = #{id}
     </select>
 
-    <resultMap id="teamMap" type="Team">
+    <resultMap id="teamMap" type="com.ndpmedia.rocketmq.cockpit.model.Team">
         <id column="id" property="id" />
         <result column="name" property="name" />
         <collection property="cockpitUsers" ofType="com.ndpmedia.rocketmq.cockpit.model.CockpitUser" select="getCockpitUsersByTeamId" column="id" />

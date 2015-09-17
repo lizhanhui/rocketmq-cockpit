@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitMessageMapper">
 
-    <resultMap id="cockpitMessageMapper" type="CockpitMessageFlow">
+    <resultMap id="cockpitMessageMapper" type="com.ndpmedia.rocketmq.cockpit.model.CockpitMessageFlow">
         <id column="id" property="id" />
         <result column="topic" property="topic" />
         <result column="tags" property="tags" />

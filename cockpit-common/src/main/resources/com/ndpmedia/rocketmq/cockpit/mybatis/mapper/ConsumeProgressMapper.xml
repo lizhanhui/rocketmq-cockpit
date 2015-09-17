@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper">
 
-    <insert id="insert" parameterType="ConsumeProgress">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress">
         INSERT INTO consume_progress(id, consumer_group, topic, broker_name, queue_id, broker_offset, consumer_offset, last_timestamp, diff, create_time)
         VALUES (NULL, #{consumerGroup}, #{topic}, #{brokerName}, #{queueId}, #{brokerOffset}, #{consumerOffset}, #{lastTimestamp}, #{diff}, #{createTime})
     </insert>
@@ -19,7 +19,7 @@
         WHERE #{date} > create_time
     </delete>
 
-    <resultMap id="consumerGroupMap" type="ConsumerGroup">
+    <resultMap id="consumerGroupMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
         <id column="id" property="id" />
         <result column="cluster_name" property="clusterName" />
         <result column="which_broker_when_consume_slowly" property="whichBrokerWhenConsumeSlowly" />
@@ -38,7 +38,7 @@
         <result column="update_time" property="updateTime" />
     </resultMap>
 
-    <resultMap id="consumeProgressMap" type="ConsumeProgress">
+    <resultMap id="consumeProgressMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress">
         <id column="id" property="id" />
         <result column="topic" property="topic" />
         <result column="broker_name" property="brokerName" />
