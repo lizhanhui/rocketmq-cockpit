@@ -6,6 +6,8 @@ import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.DownTopicCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.slf4j.Logger;
@@ -32,7 +34,10 @@ public class TopicScheduler {
     private DownTopicCommand downTopicCommand;
 
     @Autowired
-    private CockpitTopicService cockpitTopicService;
+    private CockpitTopicDBService cockpitTopicDBService;
+
+    @Autowired
+    private CockpitTopicRocketMQService cockpitTopicRocketMQService;
 
     @Autowired
     private CockpitBrokerService cockpitBrokerService;
@@ -57,32 +62,32 @@ public class TopicScheduler {
             defaultMQAdminExt.start();
 
             Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
-            List<Topic> topics = cockpitTopicService.getTopics(Status.ACTIVE);
+            List<Topic> topics = cockpitTopicDBService.getTopics(Status.ACTIVE);
             for (Topic topic : topics) {
                 //现阶段可对应的Broker与Topic信息不做处理
                 if (brokers.isEmpty() || brokers.contains(topic.getBrokerAddress()))
                     continue;
 
                 //注销已有激活信息
-                cockpitTopicService.deactivate(topic.getId());
+                cockpitTopicDBService.deactivate(topic.getId());
                 //确认该Topic是否具有其他Broker
-                if (cockpitTopicService.getTopic(topic.getTopic()).isEmpty()){
+                if (!cockpitTopicDBService.exists(topic.getTopic())){
                     List<Long> teamIds = cockpitTopicService.getTeamId(topic);
                     logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + Arrays.toString(teamIds.toArray()));
                     //topic route信息可能无法获得，导致topic config无法获取broker端版本，使用数据库端版本构建
-                    TopicConfig topicConfig = cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic.getTopic());
+                    TopicConfig topicConfig = cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, topic.getTopic());
                     if (null == topicConfig)
                         topicConfig = TopicTranslate.wrap(topic);
 
                     for (String broker : brokers){
                         topic.setBrokerAddress(broker);
-                        cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
+                        cockpitTopicRocketMQService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
 
                         if (teamIds.isEmpty())
                             continue;
 
                         for (long teamId:teamIds)
-                            cockpitTopicService.insert(topic, teamId);
+                            cockpitTopicDBService.insert(topic, teamId);
                     }
                 }
             }

@@ -4,15 +4,17 @@ import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
+import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitBrokerServiceImpl;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicServiceImpl;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicRocketMQServiceImpl;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SyncTopicCommand implements SubCommand {
 
@@ -20,7 +22,7 @@ public class SyncTopicCommand implements SubCommand {
 
     private Set<String> nameList = new HashSet<>();
 
-    private CockpitTopicService cockpitTopicService = new CockpitTopicServiceImpl();
+    private CockpitTopicRocketMQService cockpitTopicRocketMQService = new CockpitTopicRocketMQServiceImpl();
 
     private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
 
@@ -61,7 +63,7 @@ public class SyncTopicCommand implements SubCommand {
             doList(adminExt);
             doBaseServer(adminExt);
 
-            Set<String> topics = cockpitTopicService.getTopics(adminExt);
+            Set<String> topics = cockpitTopicRocketMQService.fetchAllTopics(adminExt, true);
 
             for (String topicName : topics) {
                 System.out.println("now we check :" + topicName);
@@ -88,16 +90,17 @@ public class SyncTopicCommand implements SubCommand {
         nameList.addAll(cockpitBrokerService.getAllNames(defaultMQAdminExt));
     }
 
-    private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) {
-        return cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
+    private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) throws CockpitException {
+        return cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
     }
 
-    private void rebuildTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig, CommandLine commandLine) {
-        if (null != commandLine.getOptionValue('b') && commandLine.getOptionValue('b').trim().length() > 0)
-            cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, commandLine.getOptionValue('b').trim());
-        else
+    private void rebuildTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig, CommandLine commandLine) throws CockpitException {
+        if (null != commandLine.getOptionValue('b') && commandLine.getOptionValue('b').trim().length() > 0) {
+            cockpitTopicRocketMQService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, commandLine.getOptionValue('b').trim());
+        } else {
             for (String broker : brokerList) {
-                cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
+                cockpitTopicRocketMQService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
             }
+        }
     }
 }

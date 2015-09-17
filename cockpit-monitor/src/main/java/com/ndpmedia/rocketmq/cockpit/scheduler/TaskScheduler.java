@@ -4,7 +4,7 @@ import com.alibaba.rocketmq.common.MixAll;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class TaskScheduler {
     private CockpitConsumeProgressService cockpitConsumeProgressService;
 
     @Autowired
-    private CockpitTopicService cockpitTopicService;
+    private CockpitTopicRocketMQService cockpitTopicRocketMQService;
 
     /**
      * schedule:get consumer group and the topic offset.
@@ -40,7 +40,7 @@ public class TaskScheduler {
     public void queryAccumulation() {
         Date date = new Date();
         try {
-            Set<String> topicList = cockpitTopicService.fetchTopics();
+            Set<String> topicList = cockpitTopicRocketMQService.fetchAllTopics(null, true);
 
             List<ConsumeProgress> consumeProgressList;
             for (String topic : topicList) {

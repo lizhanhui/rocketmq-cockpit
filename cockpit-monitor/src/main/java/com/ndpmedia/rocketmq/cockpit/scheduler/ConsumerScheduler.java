@@ -53,7 +53,7 @@ public class ConsumerScheduler {
         try {
             defaultMQAdminExt.start();
 
-            List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(0, null, null);
+            List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(0, null, null, null);
             for (ConsumerGroup consumerGroup:consumerGroups){
                 if (consumerGroup.getStatus() != Status.ACTIVE)
                     continue;
