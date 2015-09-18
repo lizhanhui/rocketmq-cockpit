@@ -47,15 +47,12 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
                     BrokerData brokerData = clusterInfoSerializeWrapper.getBrokerAddrTable().get(brokerName);
                     if (brokerData != null) {
                         Set<Map.Entry<Long, String>> brokerAddrSet = brokerData.getBrokerAddrs().entrySet();
-                        Iterator<Map.Entry<Long, String>> itAddr = brokerAddrSet.iterator();
-
-                        while (itAddr.hasNext()) {
-                            Map.Entry<Long, String> next1 = itAddr.next();
-                            if (next1.getKey() != 0) {
-                                logger.info("this broker maybe not master ." + next1.getValue());
+                        for (Map.Entry<Long, String> nextEntry : brokerAddrSet) {
+                            if (nextEntry.getKey() != 0) {
+                                logger.info("this broker maybe not master ." + nextEntry.getValue());
                                 continue;
                             }
-                            brokerList.add(next1.getValue());
+                            brokerList.add(nextEntry.getValue());
                         }
                     }
                 }

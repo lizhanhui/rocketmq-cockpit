@@ -58,6 +58,10 @@
         FROM broker
             LEFT JOIN topic_broker_xref ON broker.id = topic_broker_xref.broker_id
             LEFT JOIN topic ON topic_broker_xref.topic_id = topic.id
+        WHERE 1 = 1
+        <if test="dc > 0">
+            AND broker.dc = #{dcId}
+        </if>
         GROUP BY broker.dc, broker.id
         ORDER BY write_queue_num, read_queue_num ASC
     </select>

@@ -1,5 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
+import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import org.apache.ibatis.annotations.Param;
@@ -29,6 +30,10 @@ public interface TopicMapper {
     List<Long> getProjects(long topicId, String topic);
 
     List<TopicAvailability> queryTopicsAvailability();
+
+    List<DataCenter> queryAllowedDC(long topicId);
+
+    List<Long> queryTopicHostingBrokerIds(@Param("topicId") long topicId, @Param("dcId") long dcId);
 
     void connectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
 

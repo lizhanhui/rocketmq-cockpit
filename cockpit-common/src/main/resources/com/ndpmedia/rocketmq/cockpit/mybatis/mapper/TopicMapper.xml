@@ -120,4 +120,26 @@
         GROUP BY topic_dc_xref.dc_id, topic_dc_xref.topic_id
         ORDER BY availability ASC
     </select>
+
+    <resultMap id="dataCenterResultMap" type="com.ndpmedia.rocketmq.cockpit.model.DataCenter">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="status" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+    </resultMap>
+
+    <select id="queryAllowedDC" resultMap="dataCenterResultMap" parameterType="long">
+        SELECT xref.status, dc.id, dc.name
+        FROM topic_dc_xref AS xref
+        JOIN data_center AS dc ON xref.dc_id = dc.id
+        WHERE xref.topic_id = #{topicId}
+    </select>
+
+    <select id="queryTopicHostingBrokerIds" resultType="java.lang.Long">
+        SELECT xref.broker_id
+        FROM topic_broker_xref AS xref
+             JOIN broker AS b ON xref.broker_id = b.id
+        WHERE xref.topic_id = #{brokerId} AND b.dc = #{dcId}
+    </select>
 </mapper>

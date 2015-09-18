@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public interface BrokerMapper {
 
@@ -22,6 +21,6 @@ public interface BrokerMapper {
                       @Param("dc") int dc,
                       @Param("lastUpdateTime") Date lastUpdateTime);
 
-    List<BrokerLoad> queryBrokerLoad();
+    List<BrokerLoad> queryBrokerLoad(@Param("dcId") int dcId);
 
 }
