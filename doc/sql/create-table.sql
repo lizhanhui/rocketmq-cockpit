@@ -88,6 +88,12 @@ CREATE TABLE IF NOT EXISTS consumer_group (
   update_time TIMESTAMP NOT NULL DEFAULT 0
 ) ENGINE = INNODB;
 
+CREATE TABLE IF NOT EXISTS topic_consumer_group_xref (
+  topic_id INT NOT NULL REFERENCES topic(id),
+  consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
+  CONSTRAINT uniq_topic_consumer_group UNIQUE (topic_id, consumer_group_id)
+) ENGINE = INNODB;
+
 CREATE TABLE IF NOT EXISTS broker_consumer_group_xref (
   broker_id INT NOT NULL REFERENCES broker(id),
   consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
