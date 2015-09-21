@@ -54,14 +54,17 @@ public class ConsumeProgressServiceController {
     public List<ConsumeProgress> list(@PathVariable("consumerGroup") String consumerGroup,
             @PathVariable("topic") String topic, @PathVariable("broker") String broker,
             @PathVariable("queue") String queue, HttpServletRequest request) {
-        if ("-1".equals(topic))
-            return consumeProgressMapper.diffList(consumerGroup, null, null, -1);
-        if ("-1".equals(broker))
-            return consumeProgressMapper.diffList(consumerGroup, topic, null, -1);
-        if ("-1".equals(queue))
-            return consumeProgressMapper.diffList(consumerGroup, topic, broker, -1);
+        int tableID = consumeProgressMapper.groupTableID(consumerGroup);
 
-        return consumeProgressMapper.diffList(consumerGroup, topic, broker, Integer.parseInt(queue));
+        if ("-1".equals(topic))
+            return consumeProgressMapper.diffList(consumerGroup, null, null, -1, "_" + tableID);
+        if ("-1".equals(broker))
+            return consumeProgressMapper.diffList(consumerGroup, topic, null, -1, "_" + tableID);
+        if ("-1".equals(queue))
+            return consumeProgressMapper.diffList(consumerGroup, topic, broker, -1, "_" + tableID);
+
+        List<ConsumeProgress> results = consumeProgressMapper.diffList(consumerGroup, topic, broker, Integer.parseInt(queue), "_" + tableID);
+        return results;
     }
 
     private long getTeamId(HttpServletRequest request) {

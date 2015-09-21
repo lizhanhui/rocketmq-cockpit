@@ -9,7 +9,11 @@ import java.util.Map;
 
 public interface ConsumeProgressMapper {
 
+    long create(@Param("group") String group);
+
     long insert(ConsumeProgress consumeProgress);
+
+    long insertPrivate(ConsumeProgress consumeProgress);
 
     void delete(long id);
 
@@ -32,7 +36,7 @@ public interface ConsumeProgressMapper {
      * @return list of consume progress records.
      */
     List<ConsumeProgress> diffList(@Param("consumerGroup") String consumerGroup, @Param("topic") String topic,
-            @Param("brokerName") String brokerName, @Param("queueId") int queueId);
+            @Param("brokerName") String brokerName, @Param("queueId") int queueId, @Param("tableID") String tableID );
 
     /**
      * Retrieve consume progress records by specified parameters. All of these parameters are optional.
@@ -73,5 +77,18 @@ public interface ConsumeProgressMapper {
      * @param date specified date
      * @return number of rows deleted.
      */
-    int bulkDelete(Date date);
+    int bulkDelete(@Param("groupName")String groupName,@Param("date") Date date);
+
+    List<Map<Object, Object>> groupTableXREFList();
+
+    int groupTableMINID();
+
+    int groupTableMAXID();
+
+    List<Integer> groupTableIDS();
+
+    int groupTableID(@Param("groupName") String groupName);
+
+    int groupTableXREFInsert(@Param("id") int id, @Param("groupName") String groupName);
+
 }

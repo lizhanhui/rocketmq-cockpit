@@ -14,7 +14,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -39,21 +42,45 @@ public class TaskScheduler {
 
     private static AtomicInteger counts = new AtomicInteger(0);
 
+    private static ConcurrentMap<String, Integer> groupTableRel = new ConcurrentHashMap();
+
+    private static Date date = new Date();
+
+    private void init(){
+        try {
+            counts.set(this.consumeProgressMapper.groupTableMAXID());
+        }catch (Exception e){
+            //nothing todo;
+        }
+
+            List<Map<Object, Object>> xrefs = this.consumeProgressMapper.groupTableXREFList();
+            for (Map<Object, Object> xref : xrefs){
+                try{
+                    groupTableRel.put(xref.get("group_name").toString(), Integer.parseInt(xref.get("id").toString()));
+                }finally {
+
+                }
+            }
+
+    }
     /**
      * schedule:get consumer group and the topic offset.
      * period:300 second
      */
     @Scheduled(fixedRate = 300000)
     public void queryAccumulation() {
-        Date date = new Date();
+        if (groupTableRel.size() == 0 )
+            init();
+        date = new Date();
+
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
             Set<String> groupList = cockpitConsumerGroupNSService.getGroups(defaultMQAdminExt);
 
-            if (groupList.size() > counts.get()){
-
+            if (groupList.size() > groupTableRel.size()){
+                createPrivateTable(groupList);
             }
 
             List<ConsumeProgress> consumeProgressList;
@@ -63,13 +90,13 @@ public class TaskScheduler {
                     if (null == cp || null == cp.getTopic() || null == cp.getBrokerName()) {
                         continue;
                     }
-                    cp.setCreateTime(date);
-                    consumeProgressMapper.insert(cp);
+
+                    updateConsumeProgressData(cp);
                 }
             }
         } catch (Exception e) {
             if (!e.getMessage().contains("offset table is empty")) {
-                logger.warn("[MONITOR][CONSUME PROCESS] main method failed." + e);
+                logger.warn("[MONITOR][CONSUME-PROGRESS] main method failed." + e);
             }
         } finally {
             defaultMQAdminExt.shutdown();
@@ -77,10 +104,21 @@ public class TaskScheduler {
     }
 
     private void createPrivateTable(Set<String> groups){
-
+        System.out.println("[MONITOR][CONSUME-PROGRESS] GROUP COUNTS HAS CHANGE. TRY TO UPDATE TABLES. TOTAL GROUP: " + groups.size());
+        for (String group:groups){
+            if (!groupTableRel.containsKey(group)) {
+                consumeProgressMapper.create(String.valueOf(counts.addAndGet(1)));
+                groupTableRel.put(group, counts.get());
+                consumeProgressMapper.groupTableXREFInsert(groupTableRel.get(group), group);
+            }
+        }
+        System.out.println("[MONITOR][CONSUME-PROGRESS] UPDATE GROUP TABLES ALREADY DONE. TOTAL COUNTS: " + groupTableRel.size());
     }
 
     private void updateConsumeProgressData(ConsumeProgress consumeProgress){
-
+        consumeProgress.setCreateTime(date);
+        consumeProgress.setTableID(groupTableRel.get(consumeProgress.getConsumerGroup()));
+        consumeProgressMapper.insert(consumeProgress);
+        consumeProgressMapper.insertPrivate(consumeProgress);
     }
 }
