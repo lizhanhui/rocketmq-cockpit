@@ -5,7 +5,7 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.DownConsumerCommand;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupNSService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class ConsumerScheduler {
     private DownConsumerCommand downConsumerCommand;
 
     @Autowired
-    private CockpitConsumerGroupService cockpitConsumerGroupService;
+    private CockpitConsumerGroupNSService cockpitConsumerGroupNSService;
 
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
@@ -58,7 +58,7 @@ public class ConsumerScheduler {
                 if (consumerGroup.getStatus() != Status.ACTIVE)
                     continue;
 
-                cockpitConsumerGroupService.update(consumerGroup);
+                cockpitConsumerGroupNSService.update(consumerGroup);
             }
         } catch (Exception e) {
             e.printStackTrace();

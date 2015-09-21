@@ -4,9 +4,9 @@ import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupNSService;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitBrokerServiceImpl;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupServiceImpl;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupNSServiceImpl;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -25,7 +25,7 @@ public class SyncConsumerGroupCommand implements SubCommand {
 
     private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
 
-    private CockpitConsumerGroupService cockpitConsumerGroupService = new CockpitConsumerGroupServiceImpl();
+    private CockpitConsumerGroupNSService cockpitConsumerGroupNSService = new CockpitConsumerGroupNSServiceImpl();
 
     @Override
     public String commandName() {
@@ -60,13 +60,13 @@ public class SyncConsumerGroupCommand implements SubCommand {
         try{
             adminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
             adminExt.start();
-            consumerGroups = cockpitConsumerGroupService.getGroups(adminExt);
+            consumerGroups = cockpitConsumerGroupNSService.getGroups(adminExt);
 
             doList(adminExt);
 
             for (String comGroup:consumerGroups) {
                 System.out.println("now we check consumer group : " + comGroup);
-                System.out.println(cockpitConsumerGroupService.getGroupConfig(adminExt, comGroup));
+                System.out.println(cockpitConsumerGroupNSService.getGroupConfig(adminExt, comGroup));
             }
         }catch (Exception e){
             e.printStackTrace();

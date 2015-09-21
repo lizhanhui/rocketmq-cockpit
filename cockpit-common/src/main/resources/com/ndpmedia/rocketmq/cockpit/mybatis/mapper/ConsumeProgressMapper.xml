@@ -2,8 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper">
 
+    <update id="create" statementType="STATEMENT">
+        CREATE TABLE IF NOT EXISTS consume_progress_${group} (
+        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        consumer_group VARCHAR(255) NOT NULL,
+        topic VARCHAR(255) NOT NULL,
+        broker_name VARCHAR(255) NOT NULL,
+        queue_id INT NOT NULL,
+        broker_offset BIGINT NOT NULL DEFAULT 0,
+        consumer_offset BIGINT NOT NULL DEFAULT 0,
+        last_timestamp BIGINT NOT NULL DEFAULT 0,
+        diff BIGINT NOT NULL DEFAULT 0,
+        create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE = INNODB;
+    </update>
+
     <insert id="insert" parameterType="ConsumeProgress">
         INSERT INTO consume_progress(id, consumer_group, topic, broker_name, queue_id, broker_offset, consumer_offset, last_timestamp, diff, create_time)
+        VALUES (NULL, #{consumerGroup}, #{topic}, #{brokerName}, #{queueId}, #{brokerOffset}, #{consumerOffset}, #{lastTimestamp}, #{diff}, #{createTime})
+    </insert>
+
+    <insert id="insertPrivate" parameterType="ConsumeProgress">
+        INSERT INTO consume_progress_${tableID} (id, consumer_group, topic, broker_name, queue_id, broker_offset, consumer_offset, last_timestamp, diff, create_time)
         VALUES (NULL, #{consumerGroup}, #{topic}, #{brokerName}, #{queueId}, #{brokerOffset}, #{consumerOffset}, #{lastTimestamp}, #{diff}, #{createTime})
     </insert>
 
@@ -15,7 +35,7 @@
 
     <delete id="bulkDelete" parameterType="date">
         DELETE
-        FROM consume_progress
+        FROM consume_progress${groupName}
         WHERE #{date} > create_time
     </delete>
 
@@ -195,7 +215,7 @@
         <if test="queueId > -1">
             , queue_id
         </if>
-        FROM consume_progress
+        FROM consume_progress${tableID}
         WHERE 1 = 1
 
         <if test="consumerGroup != null">
@@ -319,4 +339,35 @@
         </if>
         ORDER BY consumer_group , topic, broker_name, queue_id, create_time desc limit 1000
     </select>
+
+    <select id="groupTableXREFList" resultType="map">
+        SELECT id, group_name
+        FROM consumer_group_table_xref
+    </select>
+
+    <select id="groupTableMAXID" resultType="int">
+        SELECT MAX(id)
+        FROM consumer_group_table_xref
+    </select>
+
+    <select id="groupTableMINID" resultType="int">
+        SELECT MIN(id)
+        FROM consumer_group_table_xref
+    </select>
+
+    <select id="groupTableIDS" resultType="int">
+        SELECT id
+        FROM consumer_group_table_xref
+    </select>
+
+    <select id="groupTableID" resultType="int">
+        SELECT id
+        FROM consumer_group_table_xref
+        WHERE group_name = #{groupName}
+    </select>
+
+    <insert id="groupTableXREFInsert">
+        INSERT INTO consumer_group_table_xref(id, group_name)
+        VALUES (#{id}, #{groupName})
+    </insert>
 </mapper>

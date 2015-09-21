@@ -35,6 +35,12 @@
             <name>Local Nexus Repository</name>
             <url>http://172.30.10.160:8081/nexus/content/repositories/releases/</url>
         </repository>
+
+        <repository>
+            <id>nexus-snapshots</id>
+            <name>Local Nexus SNAPSHOT</name>
+            <url>http://172.30.10.160:8081/nexus/content/repositories/snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencyManagement>

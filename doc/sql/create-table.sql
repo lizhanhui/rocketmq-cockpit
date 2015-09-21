@@ -182,6 +182,12 @@ CREATE TABLE IF NOT EXISTS cockpit_user_login (
 
 -- Resource ownership
 
+CREATE TABLE IF NOT EXISTS consumer_group_table_xref (
+  id INT NOT NULL,
+  group_name VARCHAR(255) NOT NULL,
+  CONSTRAINT UNIQUE (id, group_name)
+) ENGINE = INNODB;
+
 CREATE TABLE IF NOT EXISTS topic_team_xref(
   topic_id INT NOT NULL REFERENCES topic(id) ON DELETE RESTRICT ,
   team_id INT NOT NULL REFERENCES team(id) ON DELETE RESTRICT ,
