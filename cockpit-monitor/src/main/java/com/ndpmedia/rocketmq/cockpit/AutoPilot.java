@@ -107,7 +107,7 @@ public class AutoPilot {
                     for (Long brokerId : candidateBrokers) {
                         for (Long consumerGroupId : consumerGroupIds) {
                             if (!brokerMapper.hasConsumerGroup(brokerId, consumerGroupId)) {
-                                Broker broker = brokerMapper.get(brokerId);
+                                Broker broker = brokerMapper.get(brokerId, null);
                                 ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId, null);
                                 try {
                                     // For each topic, create associated consumer group on the target, matched brokers.

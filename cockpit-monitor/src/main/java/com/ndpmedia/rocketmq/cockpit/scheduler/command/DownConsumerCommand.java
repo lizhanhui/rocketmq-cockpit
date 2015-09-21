@@ -6,8 +6,10 @@ import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
+import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
@@ -39,6 +41,9 @@ public class DownConsumerCommand implements SubCommand {
 
     @Autowired
     private CockpitConsumerGroupService cockpitConsumerGroupService;
+
+    @Autowired
+    private BrokerMapper brokerMapper;
 
     private Map<String, String> brokerToCluster = new HashMap<>();
 
@@ -96,35 +101,32 @@ public class DownConsumerCommand implements SubCommand {
         Set<String> brokers = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
         TopicConfig topicConfig = cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
 
-        outer:
-        for (String broker : brokers) {
-            int flag = 0;
-            while (flag++ < 5) {
-                try {
-                    ConsumerGroup cg = new ConsumerGroup();
-                    cg.setGroupName(consumerGroup);
-                    cg.setBrokerAddress(broker);
-                    cg.setClusterName(brokerToCluster.get(broker));
-                    cg.setConsumeEnable(true);
-                    cg.setRetryQueueNum(topicConfig.getWriteQueueNums());
+        try {
+            ConsumerGroup cg = new ConsumerGroup();
+            cg.setGroupName(consumerGroup);
+            cg.setConsumeEnable(true);
+            cg.setRetryQueueNum(topicConfig.getWriteQueueNums());
 
-                    ConsumerGroup oldC = consumerGroupService.get(0L, consumerGroup);
-                    //若未获取到相同group Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
-                    if (null == oldC) {
-                        consumerGroupService.insert(cg, 1);
-                    }
-                    //若获取到相同group Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
-                    else if (oldC.getStatus() != Status.ACTIVE)
-                        consumerGroupService.activate(oldC.getId());
-                    //现阶段Consumer Group不与Broker信息做强关联，因此无论brokers中哪一个Broker可完成Consumer Group信息，
-                    // 后续步骤均省略，当Broker信息为必须信息，则不再省略。
-                    break  outer;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            ConsumerGroup existingConsumerGroup = consumerGroupService.get(0L, consumerGroup);
+            //若未获取到相同group Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
+            if (null == existingConsumerGroup) {
+                consumerGroupService.insert(cg, 1);
+                existingConsumerGroup = cg;
+            } else if (existingConsumerGroup.getStatus() != Status.ACTIVE) {
+                //若获取到相同group Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
+                consumerGroupService.activate(existingConsumerGroup.getId());
             }
 
-            logger.info("[sync topic]save consumer group : " + consumerGroup + " from broker :" + broker);
+            for (String brokerAddress : brokers) {
+                Broker broker = brokerMapper.get(0, brokerAddress);
+                if (!brokerMapper.hasConsumerGroup(broker.getId(), existingConsumerGroup.getId())) {
+                    brokerMapper.createConsumerGroup(broker.getId(), existingConsumerGroup.getId());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+
     }
 }

@@ -68,7 +68,7 @@
             JOIN project_consumer_group_xref AS pcgx ON pcgx.consumer_group_id = id
         </if>
 
-        <if test="brokerAddress != null || brokerId >0">
+        <if test="brokerAddress != null || brokerId > 0">
             JOIN broker_consumer_group_xref AS bcgx ON bcgx.consumer_group_id = cg.id
             JOIN broker AS b ON b.id = bcgx.broker_id
         </if>
