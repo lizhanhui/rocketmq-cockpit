@@ -342,32 +342,32 @@
 
     <select id="groupTableXREFList" resultType="map">
         SELECT id, group_name
-        FROM group_table_xref
+        FROM consumer_group_table_xref
     </select>
 
     <select id="groupTableMAXID" resultType="int">
         SELECT MAX(id)
-        FROM group_table_xref
+        FROM consumer_group_table_xref
     </select>
 
     <select id="groupTableMINID" resultType="int">
         SELECT MIN(id)
-        FROM group_table_xref
+        FROM consumer_group_table_xref
     </select>
 
     <select id="groupTableIDS" resultType="int">
         SELECT id
-        FROM group_table_xref
+        FROM consumer_group_table_xref
     </select>
 
     <select id="groupTableID" resultType="int">
         SELECT id
-        FROM group_table_xref
+        FROM consumer_group_table_xref
         WHERE group_name = #{groupName}
     </select>
 
     <insert id="groupTableXREFInsert">
-        INSERT INTO group_table_xref(id, group_name)
+        INSERT INTO consumer_group_table_xref(id, group_name)
         VALUES (#{id}, #{groupName})
     </insert>
 </mapper>
