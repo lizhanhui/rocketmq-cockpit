@@ -8,6 +8,7 @@ import com.alibaba.rocketmq.common.subscription.SubscriptionGroupConfig;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.CommandUtil;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
+import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 @Service("cockpitConsumerGroupService")
@@ -50,8 +51,11 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
         try {
             defaultMQAdminExt.start();
             SubscriptionGroupConfig subscriptionGroupConfig = wrap(consumerGroup);
-            if (null != consumerGroup.getBrokerAddress()) {
-                defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(consumerGroup.getBrokerAddress(), subscriptionGroupConfig);
+            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), Status.ACTIVE.getId(), 0, 0);
+            if (null != consumerGroupHostingList && !consumerGroupHostingList.isEmpty()) {
+                for (ConsumerGroupHosting hosting : consumerGroupHostingList) {
+                    defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(hosting.getBroker().getAddress(), subscriptionGroupConfig);
+                }
             } else {
                 Set<String> masterSet = CommandUtil
                         .fetchMasterAddrByClusterName(defaultMQAdminExt, consumerGroup.getClusterName());
@@ -76,8 +80,11 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
         defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
-            if (null != consumerGroup.getBrokerAddress() && !consumerGroup.getBrokerAddress().isEmpty()){
-                defaultMQAdminExt.deleteSubscriptionGroup(consumerGroup.getBrokerAddress(), consumerGroup.getGroupName());
+            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), Status.ACTIVE.getId(), 0, 0);
+            if (null != consumerGroupHostingList && !consumerGroupHostingList.isEmpty()) {
+                for (ConsumerGroupHosting hosting : consumerGroupHostingList) {
+                    defaultMQAdminExt.deleteSubscriptionGroup(hosting.getBroker().getAddress(), consumerGroup.getGroupName());
+                }
             } else {
                 Set<String> masterSet = CommandUtil
                         .fetchMasterAddrByClusterName(defaultMQAdminExt, consumerGroup.getClusterName());
@@ -89,7 +96,7 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
                 }
             }
         }catch (Exception e){
-            System.out.println("DELETE CONSUMER GROUP ON BROKER FIALED!" + e);
+            System.out.println("DELETE CONSUMER GROUP ON BROKER FAILED!" + e);
             return false;
         }finally {
             defaultMQAdminExt.shutdown();
@@ -131,14 +138,13 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
         try{
             ConsumerConnection consumerConnection = defaultMQAdminExt.examineConsumerConnectionInfo(groupName);
             if (null != consumerConnection){
-                Iterator<Connection> conns = consumerConnection.getConnectionSet().iterator();
-                while (conns.hasNext()){
-                    Connection connection = conns.next();
+                for (Connection connection : consumerConnection.getConnectionSet()) {
                     String clientId = connection.getClientId();
-                    if (null != clientId && !clientId.isEmpty()){
+                    if (null != clientId && !clientId.isEmpty()) {
                         ConsumerRunningInfo info = defaultMQAdminExt.getConsumerRunningInfo(groupName, clientId, true);
-                        if (null != info)
+                        if (null != info) {
                             return null;
+                        }
                     }
                 }
             }
@@ -158,7 +164,7 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
 
     private SubscriptionGroupConfig wrap(ConsumerGroup consumerGroup) {
         SubscriptionGroupConfig subscriptionGroupConfig = new SubscriptionGroupConfig();
-        subscriptionGroupConfig.setBrokerId(consumerGroup.getBrokerId());
+        subscriptionGroupConfig.setBrokerId(consumerGroup.getConsumeFromBrokerId());
         subscriptionGroupConfig.setConsumeBroadcastEnable(consumerGroup.isConsumeBroadcastEnable());
         subscriptionGroupConfig.setConsumeEnable(consumerGroup.isConsumeEnable());
         subscriptionGroupConfig.setConsumeFromMinEnable(consumerGroup.isConsumeFromMinEnable());

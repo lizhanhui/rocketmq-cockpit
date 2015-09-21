@@ -8,21 +8,13 @@ public class ConsumerGroup {
 
     private int whichBrokerWhenConsumeSlowly;
 
+    private int consumeFromBrokerId;
+
     private String groupName;
 
     private boolean consumeEnable;
 
     private boolean consumeBroadcastEnable;
-
-    /**
-     * Optional value indicating which broker to create this consumer group as subscription.
-     */
-    private String brokerAddress;
-
-    /**
-     * Consume from which broker.
-     */
-    private int brokerId;
 
     private Integer retryMaxTimes = 3;
 
@@ -54,6 +46,14 @@ public class ConsumerGroup {
         this.whichBrokerWhenConsumeSlowly = whichBrokerWhenConsumeSlowly;
     }
 
+    public int getConsumeFromBrokerId() {
+        return consumeFromBrokerId;
+    }
+
+    public void setConsumeFromBrokerId(int consumeFromBrokerId) {
+        this.consumeFromBrokerId = consumeFromBrokerId;
+    }
+
     public String getGroupName() {
         return groupName;
     }
@@ -76,22 +76,6 @@ public class ConsumerGroup {
 
     public void setConsumeBroadcastEnable(boolean consumeBroadcastEnable) {
         this.consumeBroadcastEnable = consumeBroadcastEnable;
-    }
-
-    public String getBrokerAddress() {
-        return brokerAddress;
-    }
-
-    public void setBrokerAddress(String brokerAddress) {
-        this.brokerAddress = brokerAddress;
-    }
-
-    public int getBrokerId() {
-        return brokerId;
-    }
-
-    public void setBrokerId(int brokerId) {
-        this.brokerId = brokerId;
     }
 
     public Integer getRetryMaxTimes() {

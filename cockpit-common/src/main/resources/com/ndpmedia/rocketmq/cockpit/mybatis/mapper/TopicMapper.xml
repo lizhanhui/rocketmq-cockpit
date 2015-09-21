@@ -142,4 +142,10 @@
              JOIN broker AS b ON xref.broker_id = b.id
         WHERE xref.topic_id = #{brokerId} AND b.dc = #{dcId}
     </select>
+
+    <select id="queryAssociatedConsumerGroup" resultType="java.lang.Long">
+        SELECT consumer_group_id
+        FROM topic_consumer_group_xref
+        WHERE topic_id = #{topicId}
+    </select>
 </mapper>

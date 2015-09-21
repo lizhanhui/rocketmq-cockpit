@@ -18,7 +18,7 @@
             which_broker_when_consume_slowly = #{whichBrokerWhenConsumeSlowly},
             group_name = #{groupName}, consume_enable = #{consumeEnable},
             consume_broadcast_enable = #{consumeBroadcastEnable},
-            broker_address = #{brokerAddress}, broker_id = #{brokerId},
+            consume_from_broker_id = #{consumeFromBrokerId},
             retry_max_times = #{retryMaxTimes}, retry_queue_num = #{retryQueueNum},
             consume_from_min_enable = #{consumeFromMinEnable}, status_id = #{status.id},
             create_time = #{createTime}, update_time = #{updateTime}
@@ -47,11 +47,10 @@
         <id column="id" property="id" />
         <result column="cluster_name" property="clusterName" />
         <result column="which_broker_when_consume_slowly" property="whichBrokerWhenConsumeSlowly" />
+        <result column="consume_from_broker_id" property="consumeFromBrokerId" />
         <result column="group_name" property="groupName" />
         <result column="consume_enable" property="consumeEnable" />
         <result column="consume_broadcast_enable" property="consumeBroadcastEnable" />
-        <result column="broker_address" property="brokerAddress" />
-        <result column="broker_id" property="brokerId" />
         <result column="retry_max_times" property="retryMaxTimes" />
         <result column="retry_queue_num" property="retryQueueNum" />
         <result column="consume_from_min_enable" property="consumeFromMinEnable" />
@@ -63,32 +62,42 @@
     </resultMap>
 
     <select id="list" resultMap="consumerGroupMap">
-        SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, broker_address, broker_id, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
-        FROM consumer_group
+        SELECT cg.id, b.cluster_name, which_broker_when_consume_slowly, consume_from_broker_id, group_name, consume_enable, consume_broadcast_enable, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
+        FROM consumer_group AS cg
         <if test="projectId > 0">
-            JOIN project_consumer_group_xref AS xref ON xref.consumer_group_id = id
+            JOIN project_consumer_group_xref AS pcgx ON pcgx.consumer_group_id = id
         </if>
+
+        <if test="brokerAddress != null || brokerId >0">
+            JOIN broker_consumer_group_xref AS bcgx ON bcgx.consumer_group_id = cg.id
+            JOIN broker AS b ON b.id = bcgx.broker_id
+        </if>
+
         WHERE 1 = 1
 
         <if test="projectId > 0">
-            AND xref.project_id = #{projectId}
+            AND pcgx.project_id = #{projectId}
         </if>
 
         <if test="clusterName != null">
-            AND cluster_name = #{clusterName}
+            AND b.cluster_name = #{clusterName}
         </if>
 
         <if test="consumerGroupName != null">
-            AND group_name = #{consumerGroupName}
+            AND cg.group_name = #{consumerGroupName}
         </if>
 
-        <if test="broker != null">
-            AND broker_address = #{broker}
+        <if test="brokerId > 0">
+            AND b.id = #{brokerId}
+        </if>
+
+        <if test="brokerAddress != null">
+            AND b.address = #{brokerAddress}
         </if>
     </select>
 
     <select id="get" resultMap="consumerGroupMap">
-        SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, broker_address, broker_id, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
+        SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
         FROM consumer_group
         WHERE 1 = 1
         <if test="id > 0">
@@ -97,6 +106,59 @@
 
         <if test="groupName != null">
             AND group_name = #{groupName}
+        </if>
+    </select>
+
+    <resultMap id="consumerGroupHostingResultMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting">
+
+        <result column="status" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+
+        <association property="broker" javaType="com.ndpmedia.rocketmq.cockpit.model.Broker">
+            <id column="bid" property="id" />
+            <result column="cluster_name" property="clusterName" />
+            <result column="broker_name" property="brokerName" />
+            <result column="broker_id" property="brokerId" />
+            <result column="address" property="address" />
+            <result column="version" property="version" />
+            <result column="dc" property="dc" />
+            <result column="last_update_time" property="lastUpdateTime" />
+        </association>
+
+        <association property="consumerGroup" javaType="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
+            <id column="consumer_group_id" property="id" />
+            <result column="which_broker_when_consume_slowly" property="whichBrokerWhenConsumeSlowly" />
+            <result column="group_name" property="groupName" />
+            <result column="consume_enable" property="consumeEnable" />
+            <result column="consume_broadcast_enable" property="consumeBroadcastEnable" />
+            <result column="retry_max_times" property="retryMaxTimes" />
+            <result column="retry_queue_num" property="retryQueueNum" />
+            <result column="consume_from_min_enable" property="consumeFromMinEnable" />
+            <result column="consume_from_broker_id" property="consumeFromBrokerId" />
+            <result column="cluster_name" property="clusterName" />
+        </association>
+    </resultMap>
+
+    <select id="queryHosting" resultMap="consumerGroupHostingResultMap" >
+        SELECT xref.status, b.id AS bid, b.cluster_name, b.broker_name, b.broker_id, b.address, b.version, b.dc, b.last_update_time,
+        cg.id AS consumer_group_id, cg.which_broker_when_consume_slowly, cg.group_name, cg.consume_enable, cg.consume_broadcast_enable, cg.retry_max_times, cg.retry_queue_num,
+        cg.consume_from_min_enable, cg.consume_from_broker_id
+        FROM broker_consumer_group_xref AS xref
+        JOIN broker AS b ON b.id = xref.broker_id
+        JOIN consumer_group AS cg ON cg.id = xref.consumer_group_id
+        WHERE consumer_group_id = #{consumerGroupId}
+
+        <if test="status > 0">
+            AND xref.status = #{status}
+        </if>
+
+        <if test="null != brokerId">
+            broker_id = #{brokerId}
+        </if>
+
+        <if test="dcId > 0">
+            AND b.dc = #{dcId}
         </if>
     </select>
 </mapper>

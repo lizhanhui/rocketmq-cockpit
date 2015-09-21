@@ -35,6 +35,8 @@ public interface TopicMapper {
 
     List<Long> queryTopicHostingBrokerIds(@Param("topicId") long topicId, @Param("dcId") long dcId);
 
+    List<Long> queryAssociatedConsumerGroup(@Param("topicId") long topicId);
+
     void connectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
 
     void disconnectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
