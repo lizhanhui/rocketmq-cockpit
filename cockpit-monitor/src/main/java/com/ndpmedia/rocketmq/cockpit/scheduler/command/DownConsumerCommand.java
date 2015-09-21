@@ -9,7 +9,7 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupNSService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -41,7 +41,7 @@ public class DownConsumerCommand implements SubCommand {
     private CockpitTopicService cockpitTopicService;
 
     @Autowired
-    private CockpitConsumerGroupService cockpitConsumerGroupService;
+    private CockpitConsumerGroupNSService cockpitConsumerGroupNSService;
 
     private Map<String, String> brokerToCluster = new HashMap<>();
 
@@ -79,7 +79,7 @@ public class DownConsumerCommand implements SubCommand {
         try {
             adminExt.start();
             doMap(adminExt);
-            Set<String> consumerGroups = cockpitConsumerGroupService.getGroups(adminExt);
+            Set<String> consumerGroups = cockpitConsumerGroupNSService.getGroups(adminExt);
             for (String consumerGroup : consumerGroups) {
                 logger.info("now we check consumer group:" + consumerGroup);
                 downloadConsumerGroupConfig(adminExt, consumerGroup);

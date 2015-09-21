@@ -1,7 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.controller.manage;
 
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupNSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 public class ConsumerGroupManageController {
 
     @Autowired
-    private CockpitConsumerGroupService cockpitConsumerGroupService;
+    private CockpitConsumerGroupNSService cockpitConsumerGroupNSService;
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public boolean update(@ModelAttribute ConsumerGroup consumerGroup) {
-        return cockpitConsumerGroupService.update(consumerGroup);
+        return cockpitConsumerGroupNSService.update(consumerGroup);
     }
 
     @RequestMapping(value = "/{clusterName}/{groupName}", method = RequestMethod.DELETE)
@@ -25,7 +25,7 @@ public class ConsumerGroupManageController {
         ConsumerGroup consumerGroup = new ConsumerGroup();
         consumerGroup.setClusterName(clusterName);
         consumerGroup.setGroupName(groupName);
-        return cockpitConsumerGroupService.clear(consumerGroup);
+        return cockpitConsumerGroupNSService.clear(consumerGroup);
     }
 
 }

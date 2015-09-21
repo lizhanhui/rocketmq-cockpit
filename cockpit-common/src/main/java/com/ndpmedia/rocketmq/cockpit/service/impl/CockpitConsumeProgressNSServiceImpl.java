@@ -6,7 +6,7 @@ import com.alibaba.rocketmq.common.message.MessageQueue;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressNSService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-@Service("cockpitConsumeProgressService")
-public class CockpitConsumeProgressServiceImpl implements CockpitConsumeProgressService {
+@Service("cockpitConsumeProgressNSService")
+public class CockpitConsumeProgressNSServiceImpl implements CockpitConsumeProgressNSService {
 
-    private Logger logger = LoggerFactory.getLogger(CockpitConsumeProgressServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(CockpitConsumeProgressNSServiceImpl.class);
 
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
@@ -64,6 +64,44 @@ public class CockpitConsumeProgressServiceImpl implements CockpitConsumeProgress
         } finally {
             defaultMQAdminExt.shutdown();
         }
+        return consumeProgressList;
+    }
+
+    @Override
+    public List<ConsumeProgress> queryConsumerProgress(DefaultMQAdminExt defaultMQAdminExt, String groupName, String topic, String broker) {
+        List<ConsumeProgress> consumeProgressList = new ArrayList<ConsumeProgress>();
+        try {
+            // 查询特定consumer
+            ConsumeStats consumeStats = defaultMQAdminExt.examineConsumeStats(groupName);
+
+            List<MessageQueue> messageQueueList = new LinkedList<MessageQueue>();
+            messageQueueList.addAll(consumeStats.getOffsetTable().keySet());
+            Collections.sort(messageQueueList);
+
+            long diffTotal = 0L;
+
+            for (MessageQueue messageQueue : messageQueueList) {
+                OffsetWrapper offsetWrapper = consumeStats.getOffsetTable().get(messageQueue);
+                if (null != topic && !topic.equals(messageQueue.getTopic())) {
+                    continue;
+                }
+
+                if (null != broker && !broker.equals(messageQueue.getBrokerName())) {
+                    continue;
+                }
+
+                long diff = offsetWrapper.getBrokerOffset() - offsetWrapper.getConsumerOffset();
+                diffTotal += diff;
+
+                consumeProgressList.add(buildConsumeProgress(groupName, messageQueue, offsetWrapper, diff));
+            }
+
+//            consumeProgressList.add(new ConsumeProgress(consumerGroup, null, null, diffTotal));
+        } catch (Exception e) {
+            if (!e.getMessage().contains("offset table is empty"))
+                logger.warn("[MONITOR][CONSUME PROCESS] try to get " + groupName + " message diff failed." + e);
+        }
+
         return consumeProgressList;
     }
 
