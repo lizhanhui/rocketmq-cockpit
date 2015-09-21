@@ -57,7 +57,6 @@ CREATE TABLE IF NOT EXISTS topic (
 CREATE TABLE topic_broker_xref (
   broker_id INT NOT NULL REFERENCES broker(id),
   topic_id INT NOT NULL REFERENCES topic(id),
-  status INT NOT NULL REFERENCES status_lu(id),
   CONSTRAINT uniq_broker_topic UNIQUE (broker_id, topic_id)
 ) ENGINE = INNODB;
 
@@ -72,11 +71,10 @@ CREATE TABLE IF NOT EXISTS consumer_group (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   cluster_name VARCHAR(255) NOT NULL DEFAULT 'DefaultCluster',
   which_broker_when_consume_slowly INT NOT NULL DEFAULT 1,
+  consume_from_broker_id INT NOT NULL DEFAULT 0,
   group_name VARCHAR(255) NOT NULL,
   consume_enable BOOL NOT NULL DEFAULT TRUE ,
   consume_broadcast_enable BOOL NOT NULL DEFAULT FALSE,
-  broker_address VARCHAR(255),
-  broker_id INT,
   retry_max_times INT NOT NULL DEFAULT 3,
   retry_queue_num MEDIUMINT NOT NULL DEFAULT 3,
   consume_from_min_enable BOOL NOT NULL DEFAULT TRUE,
@@ -97,7 +95,6 @@ CREATE TABLE IF NOT EXISTS topic_consumer_group_xref (
 CREATE TABLE IF NOT EXISTS broker_consumer_group_xref (
   broker_id INT NOT NULL REFERENCES broker(id),
   consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
-  status SMALLINT NOT NULL REFERENCES status_lu(id),
   CONSTRAINT uniq_broker_consumer_group UNIQUE (broker_id, consumer_group_id)
 );
 

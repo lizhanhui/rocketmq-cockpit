@@ -111,13 +111,14 @@
     </select>
 
     <select id="queryTopicsAvailability" resultType="com.ndpmedia.rocketmq.cockpit.model.TopicAvailability">
-        SELECT topic_dc_xref.topic_id AS topicId
-        , topic_dc_xref.dc_id AS dcId
-        , COUNT(broker.id) AS availability
-        FROM topic_dc_xref
-        LEFT JOIN topic_broker_xref ON topic_dc_xref.topic_id = topic_broker_xref.topic_id
-        LEFT JOIN broker ON broker.id = topic_broker_xref.broker_id AND broker.dc = topic_dc_xref.dc_id
-        GROUP BY topic_dc_xref.dc_id, topic_dc_xref.topic_id
+        SELECT tdx.topic_id AS topicId
+        , tdx.dc_id AS dcId
+        , COUNT(b.id) AS availability
+        FROM topic_dc_xref AS tdx
+        LEFT JOIN topic_broker_xref AS tbx ON tdx.topic_id = tbx.topic_id
+        LEFT JOIN broker AS b ON b.id = tbx.broker_id AND b.dc = tdx.dc_id
+        WHERE b.broker_id = 0
+        GROUP BY tdx.dc_id, tdx.topic_id
         ORDER BY availability ASC
     </select>
 
@@ -140,7 +141,9 @@
         SELECT xref.broker_id
         FROM topic_broker_xref AS xref
              JOIN broker AS b ON xref.broker_id = b.id
-        WHERE xref.topic_id = #{brokerId} AND b.dc = #{dcId}
+        WHERE xref.topic_id = #{brokerId}
+              AND b.dc = #{dcId}
+              AND b.broker_id = 0
     </select>
 
     <select id="queryAssociatedConsumerGroup" resultType="java.lang.Long">

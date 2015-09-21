@@ -15,12 +15,25 @@ public interface BrokerMapper {
 
     void refresh(Broker broker);
 
+    Broker get(@Param("brokerId") long brokerId);
+
     List<Broker> list(@Param("clusterName") String clusterName,
                       @Param("brokerName") String brokerName,
                       @Param("brokerId") int brokerId,
                       @Param("dc") int dc,
                       @Param("lastUpdateTime") Date lastUpdateTime);
 
-    List<BrokerLoad> queryBrokerLoad(@Param("dcId") int dcId);
+    List<BrokerLoad> queryBrokerLoad(@Param("dcId") int dcId,
+                                     @Param("brokerId") Integer brokerId);
+
+
+    boolean hasConsumerGroup(@Param("brokerId") long brokerId,
+                             @Param("consumerGroupId")long consumerGroupId);
+
+    void createConsumerGroup(@Param("brokerId") long brokerId,
+                             @Param("consumerGroupId") long consumerGroupId);
+
+    void createTopic(@Param("brokerId") long brokerId,
+                     @Param("topicId") long topicId);
 
 }

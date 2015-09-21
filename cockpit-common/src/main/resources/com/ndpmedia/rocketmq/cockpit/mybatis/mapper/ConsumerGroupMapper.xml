@@ -110,11 +110,6 @@
     </select>
 
     <resultMap id="consumerGroupHostingResultMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting">
-
-        <result column="status" property="status"
-                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
-                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
-
         <association property="broker" javaType="com.ndpmedia.rocketmq.cockpit.model.Broker">
             <id column="bid" property="id" />
             <result column="cluster_name" property="clusterName" />
@@ -141,20 +136,15 @@
     </resultMap>
 
     <select id="queryHosting" resultMap="consumerGroupHostingResultMap" >
-        SELECT xref.status, b.id AS bid, b.cluster_name, b.broker_name, b.broker_id, b.address, b.version, b.dc, b.last_update_time,
+        SELECT b.id AS bid, b.cluster_name, b.broker_name, b.broker_id, b.address, b.version, b.dc, b.last_update_time,
         cg.id AS consumer_group_id, cg.which_broker_when_consume_slowly, cg.group_name, cg.consume_enable, cg.consume_broadcast_enable, cg.retry_max_times, cg.retry_queue_num,
         cg.consume_from_min_enable, cg.consume_from_broker_id
         FROM broker_consumer_group_xref AS xref
         JOIN broker AS b ON b.id = xref.broker_id
         JOIN consumer_group AS cg ON cg.id = xref.consumer_group_id
         WHERE consumer_group_id = #{consumerGroupId}
-
-        <if test="status > 0">
-            AND xref.status = #{status}
-        </if>
-
         <if test="null != brokerId">
-            broker_id = #{brokerId}
+            AND b.broker_id = #{brokerId}
         </if>
 
         <if test="dcId > 0">

@@ -278,7 +278,7 @@ public class CockpitTopicRocketMQServiceImpl implements CockpitTopicRocketMQServ
         return true;
     }
 
-    private static TopicConfig wrapTopicToTopicConfig(Topic topic) {
+    public static TopicConfig wrapTopicToTopicConfig(Topic topic) {
         TopicConfig topicConfig = new TopicConfig();
         topicConfig.setWriteQueueNums(topic.getWriteQueueNum());
         topicConfig.setReadQueueNums(topic.getReadQueueNum());

@@ -6,8 +6,6 @@ public class ConsumerGroupHosting {
 
     private Broker broker;
 
-    private Status status;
-
     public ConsumerGroup getConsumerGroup() {
         return consumerGroup;
     }
@@ -22,13 +20,5 @@ public class ConsumerGroupHosting {
 
     public void setBroker(Broker broker) {
         this.broker = broker;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 }

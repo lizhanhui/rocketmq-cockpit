@@ -162,7 +162,7 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
     }
 
 
-    private SubscriptionGroupConfig wrap(ConsumerGroup consumerGroup) {
+    public static SubscriptionGroupConfig wrap(ConsumerGroup consumerGroup) {
         SubscriptionGroupConfig subscriptionGroupConfig = new SubscriptionGroupConfig();
         subscriptionGroupConfig.setBrokerId(consumerGroup.getConsumeFromBrokerId());
         subscriptionGroupConfig.setConsumeBroadcastEnable(consumerGroup.isConsumeBroadcastEnable());
