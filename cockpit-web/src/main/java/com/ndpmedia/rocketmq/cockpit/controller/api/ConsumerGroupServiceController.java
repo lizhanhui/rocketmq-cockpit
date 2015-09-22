@@ -33,7 +33,7 @@ public class ConsumerGroupServiceController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> list(HttpServletRequest request) {
-        List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(getTeamId(request), null, null);
+        List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(getProjectId(request), null, null, 0, null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", consumerGroups.size());
@@ -45,21 +45,21 @@ public class ConsumerGroupServiceController {
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ConsumerGroup get(@PathVariable("id") long id) {
-        return consumerGroupMapper.get(id, null, null, null);
+        return consumerGroupMapper.get(id, null);
     }
 
     @RequestMapping(value = "/cluster-name/{clusterName}", method = RequestMethod.GET)
     @ResponseBody
     public List<ConsumerGroup> listByClusterName(@PathVariable("clusterName") String clusterName,
                                                  HttpServletRequest request) {
-        return consumerGroupMapper.list(getTeamId(request), clusterName, null);
+        return consumerGroupMapper.list(getProjectId(request), clusterName, null, 0, null);
     }
 
     @RequestMapping(value = "/consumer-group-name/{consumerGroupName}", method = RequestMethod.GET)
     @ResponseBody
     public ConsumerGroup getByConsumerGroupName(@PathVariable("consumerGroupName") String consumerGroupName,
                                                 HttpServletRequest request) {
-        List<ConsumerGroup> groups = consumerGroupMapper.list(getTeamId(request), null, consumerGroupName);
+        List<ConsumerGroup> groups = consumerGroupMapper.list(getProjectId(request), null, consumerGroupName, 0, null);
         if (groups.isEmpty())
             return new ConsumerGroup();
         return groups.get(0);
@@ -77,12 +77,6 @@ public class ConsumerGroupServiceController {
     public void update(@RequestBody ConsumerGroup consumerGroup) {
         consumerGroup.setUpdateTime(new Date());
         consumerGroupMapper.update(consumerGroup);
-    }
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    @ResponseBody
-    public void register(@PathVariable("id") long id){
-        consumerGroupMapper.register(id);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -113,6 +107,10 @@ public class ConsumerGroupServiceController {
             teamId = cockpitUser.getTeam().getId();
         }
         return teamId;
+    }
+
+    private long getProjectId(HttpServletRequest request) {
+        throw new RuntimeException("Not initialized.");
     }
 
 }

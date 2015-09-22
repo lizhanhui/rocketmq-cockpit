@@ -7,7 +7,6 @@ import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Controller
 @RequestMapping(value = "/api/topic")
@@ -39,7 +42,7 @@ public class TopicServiceController {
     public Map<String, Object> list(HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        List<Topic> topics = topicMapper.list(teamId, null, -1);
+        List<Topic> topics = topicMapper.list(0, 0, null, null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", topics.size());
@@ -53,24 +56,24 @@ public class TopicServiceController {
     public Map<String, Object> detailList(HttpServletRequest request, @PathVariable("topic") String topic) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        List<Topic> topics = topicMapper.detailList(teamId, topic, 0);
+        Topic topicEntity = topicMapper.get(0, topic);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
-        result.put("iTotalRecords", topics.size());
-        result.put("iTotalDisplayRecords", topics.size());
-        result.put("aaData", topics);
+        result.put("iTotalRecords", 1);
+        result.put("iTotalDisplayRecords", 1);
+        result.put("aaData", topicEntity);
         return result;
     }
 
     @RequestMapping(value = "/{topic}", method = RequestMethod.GET)
     @ResponseBody
-    public List<Topic> lookUp(@PathVariable("topic") String topic) {
-        return topicMapper.list(0, topic, -1);
+    public Topic lookUp(@PathVariable("topic") String topic) {
+        return topicMapper.get(0, topic);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
     @ResponseBody
-    public Topic add(@RequestBody Topic topic, HttpServletRequest request) {
+    public Topic add(@RequestBody Topic topic, long projectId, HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         if (null == topic.getBrokerAddress() || topic.getBrokerAddress().isEmpty())
         {
@@ -81,7 +84,7 @@ public class TopicServiceController {
                 Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
                 for (String broker:brokers){
                     topic.setBrokerAddress(broker);
-                    cockpitTopicService.insert(topic, cockpitUser.getTeam().getId());
+                    topicMapper.connectProject(topic.getId(), projectId);
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -90,25 +93,11 @@ public class TopicServiceController {
             }
         }
         else {
-            cockpitTopicService.insert(topic, cockpitUser.getTeam().getId());
+            topicMapper.connectProject(topic.getId(), projectId);
         }
         return topic;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    @ResponseBody
-    public void delete(@PathVariable("id") long id, HttpServletRequest request) {
-        CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-        topicMapper.delete(id);
-        //when delete topic , just clear it.
-        cockpitTopicService.remove(id, 0);
-    }
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    @ResponseBody
-    public void register(@PathVariable("id") long id) {
-        topicMapper.register(id);
-    }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
