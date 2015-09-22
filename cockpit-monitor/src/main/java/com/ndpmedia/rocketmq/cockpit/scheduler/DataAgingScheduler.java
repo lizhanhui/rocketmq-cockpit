@@ -14,7 +14,7 @@ import java.util.Calendar;
 /**
  * Created by robert on 2015/6/9.
  * data aging scheduler.
- * 1.consume progress 、message flow
+ * 1.consume progress, message flow
  * 2.login message
  */
 @Component

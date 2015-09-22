@@ -26,9 +26,9 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-public class DownConsumerCommand implements SubCommand {
+public class ConsumerGroupSyncDownCommand implements SubCommand {
 
-    private Logger logger = LoggerFactory.getLogger(DownConsumerCommand.class);
+    private Logger logger = LoggerFactory.getLogger(ConsumerGroupSyncDownCommand.class);
 
     @Autowired
     private CockpitConsumerGroupService consumerGroupService;

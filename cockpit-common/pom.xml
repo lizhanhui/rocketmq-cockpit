@@ -20,7 +20,7 @@
             </activation>
             <properties>
                 <jdbc.url>jdbc:mysql://localhost:3306/cockpit</jdbc.url>
-                <jdbc.userName>cockpit</jdbc.userName>
+                <jdbc.userName>root</jdbc.userName>
                 <jdbc.password>password</jdbc.password>
             </properties>
         </profile>

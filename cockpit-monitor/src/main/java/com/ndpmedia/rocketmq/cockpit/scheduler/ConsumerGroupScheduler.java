@@ -4,7 +4,7 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
-import com.ndpmedia.rocketmq.cockpit.scheduler.command.DownConsumerCommand;
+import com.ndpmedia.rocketmq.cockpit.scheduler.command.ConsumerGroupSyncDownCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +21,12 @@ import java.util.List;
  * 2. auto check consumer group , create or update consumer group config on cluster or broker.
  */
 @Component
-public class ConsumerScheduler {
-    private Logger logger = LoggerFactory.getLogger(ConsumerScheduler.class);
+public class ConsumerGroupScheduler {
+
+    private Logger logger = LoggerFactory.getLogger(ConsumerGroupScheduler.class);
 
     @Autowired
-    private DownConsumerCommand downConsumerCommand;
+    private ConsumerGroupSyncDownCommand consumerGroupSyncDownCommand;
 
     @Autowired
     private CockpitConsumerGroupService cockpitConsumerGroupService;
@@ -39,7 +40,7 @@ public class ConsumerScheduler {
      */
     @Scheduled(cron = "24 16 * * * *")
     public void downloadTopic() {
-        downConsumerCommand.execute(null, null, null);
+        consumerGroupSyncDownCommand.execute(null, null, null);
     }
 
     /**
