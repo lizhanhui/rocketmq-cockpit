@@ -22,9 +22,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
-/**
- * Created by robert.xu on 2015/4/7.
- */
 @Controller
 @RequestMapping(value = "/api/message")
 public class CockpitMessageServiceController {
@@ -40,13 +37,7 @@ public class CockpitMessageServiceController {
             defaultMQAdminExt.start();
             MessageExt messageExt = defaultMQAdminExt.viewMessage(id);
             return MessageTranslate.translateFrom(messageExt);
-        } catch (MQClientException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (RemotingException e) {
-            e.printStackTrace();
-        } catch (MQBrokerException e) {
+        } catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
             e.printStackTrace();
         } finally {
             defaultMQAdminExt.shutdown();
@@ -129,13 +120,7 @@ public class CockpitMessageServiceController {
             defaultMQAdminExt.start();
             return defaultMQAdminExt.queryTopicConsumeByWho(topic).getGroupList();
 
-        } catch (MQClientException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (RemotingException e) {
-            e.printStackTrace();
-        } catch (MQBrokerException e) {
+        } catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
             e.printStackTrace();
         }
         return null;
@@ -149,13 +134,7 @@ public class CockpitMessageServiceController {
         try {
             defaultMQAdminExt.start();
             return defaultMQAdminExt.consumeMessageDirectly(consumerGroup, client, msgId).toString();
-        } catch (MQClientException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (RemotingException e) {
-            e.printStackTrace();
-        } catch (MQBrokerException e) {
+        } catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
             e.printStackTrace();
         }
 

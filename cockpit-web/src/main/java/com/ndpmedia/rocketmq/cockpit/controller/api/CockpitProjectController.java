@@ -4,16 +4,19 @@ import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitProjectService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -24,10 +27,11 @@ public class CockpitProjectController {
     private CockpitProjectService cockpitProjectService;
 
     @Autowired
-    private CockpitConsumerGroupService cockpitConsumerGroupService;
+    private TopicMapper topicMapper;
 
     @Autowired
-    private CockpitTopicService cockpitTopicService;
+    private ConsumerGroupMapper consumerGroupMapper;
+
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
@@ -52,10 +56,13 @@ public class CockpitProjectController {
         return true;
     }
 
-    @RequestMapping(value = "/{project}/{consumerGroup}/{topic}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{projectId}/{consumerGroupId}/{topicId}", method = RequestMethod.PUT)
     @ResponseBody
-    public void addRef(@PathVariable("project") String project, @PathVariable("consumerGroup") String consumerGroup, @PathVariable("topic") String topic){
-        cockpitProjectService.addRef(project, consumerGroup, topic);
+    public void addProjectResources(@PathVariable("projectId") long projectId,
+                                    @PathVariable("consumerGroupId") long consumerGroupId,
+                                    @PathVariable("topicId") long topicId){
+        topicMapper.connectProject(topicId, projectId);
+        consumerGroupMapper.connectProject(consumerGroupId, projectId);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
@@ -65,25 +72,15 @@ public class CockpitProjectController {
         return true;
     }
 
-    @RequestMapping(value = "/{project}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{projectId}/consumer-groups", method = RequestMethod.GET)
     @ResponseBody
-    public List<ConsumerGroup> getConsumerGroups(@PathVariable("project") String project){
-        List<ConsumerGroup> results = new ArrayList<>();
-        List<String> groupNames = cockpitProjectService.getConsumerGroups(project);
-        for (String groupName:groupNames){
-            results.add(cockpitConsumerGroupService.getBaseBean(groupName));
-        }
-        return results;
+    public List<ConsumerGroup> getConsumerGroups(@PathVariable("projectId") long projectId){
+        return cockpitProjectService.getConsumerGroups(projectId);
     }
 
-    @RequestMapping(value = "/{project}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{projectId}/topics", method = RequestMethod.POST)
     @ResponseBody
-    public List<Topic> getTopics(@PathVariable("project") String project){
-        List<Topic> results = new ArrayList<>();
-        List<String> topicNames = cockpitProjectService.getTopics(project);
-        for (String topicName:topicNames){
-            results.add(cockpitTopicService.getBaseBean(topicName));
-        }
-        return results;
+    public List<Topic> getTopics(@PathVariable("projectId") long projectId){
+        return cockpitProjectService.getTopics(projectId);
     }
 }

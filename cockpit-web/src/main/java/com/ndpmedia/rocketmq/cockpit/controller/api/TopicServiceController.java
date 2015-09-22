@@ -6,6 +6,7 @@ import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
@@ -28,7 +29,7 @@ public class TopicServiceController {
     private TopicMapper topicMapper;
 
     @Autowired
-    private CockpitTopicService cockpitTopicService;
+    private CockpitTopicRocketMQService cockpitTopicRocketMQService;
 
     @Autowired
     private CockpitBrokerService cockpitBrokerService;

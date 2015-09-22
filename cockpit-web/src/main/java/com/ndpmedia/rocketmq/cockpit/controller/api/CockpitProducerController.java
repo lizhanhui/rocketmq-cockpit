@@ -9,9 +9,6 @@ import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Created by robert.xu on 2015/4/7.
- */
 @Controller
 @RequestMapping(value = "/api/producer")
 public class CockpitProducerController {
@@ -35,18 +32,9 @@ public class CockpitProducerController {
             SendResult sendResult = producer.send(msg);
             return sendResult.toString();
         }
-        catch (MQClientException e) {
+        catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
             e.printStackTrace();
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        catch (RemotingException e) {
-            e.printStackTrace();
-        }
-        catch (MQBrokerException e) {
-            e.printStackTrace();
-        }finally {
+        } finally {
             producer.shutdown();
         }
 
