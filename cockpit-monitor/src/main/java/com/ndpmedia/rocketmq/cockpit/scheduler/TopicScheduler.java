@@ -5,6 +5,7 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.DownTopicCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicNSService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.slf4j.Logger;
@@ -29,6 +30,9 @@ public class TopicScheduler {
 
     @Autowired
     private DownTopicCommand downTopicCommand;
+
+    @Autowired
+    private CockpitTopicNSService cockpitTopicNSService;
 
     @Autowired
     private CockpitTopicService cockpitTopicService;
@@ -69,13 +73,13 @@ public class TopicScheduler {
                     List<Long> teamIds = cockpitTopicService.getTeamId(topic);
                     logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + Arrays.toString(teamIds.toArray()));
                     //topic route信息可能无法获得，导致topicconfig无法获取broker端版本，使用数据库端版本构建
-                    TopicConfig topicConfig = cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic.getTopic());
+                    TopicConfig topicConfig = cockpitTopicNSService.getTopicConfigByTopicName(defaultMQAdminExt, topic.getTopic());
                     if (null == topicConfig)
                         topicConfig = TopicTranslate.translateFrom(topic);
 
                     for (String broker : brokers){
                         topic.setBrokerAddress(broker);
-                        cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
+                        cockpitTopicNSService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
 
                         if (teamIds.isEmpty())
                             continue;

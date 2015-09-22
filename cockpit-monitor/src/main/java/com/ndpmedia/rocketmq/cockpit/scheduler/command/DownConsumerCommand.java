@@ -10,7 +10,7 @@ import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupNSService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicNSService;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -38,7 +38,7 @@ public class DownConsumerCommand implements SubCommand {
     private CockpitBrokerService cockpitBrokerService;
 
     @Autowired
-    private CockpitTopicService cockpitTopicService;
+    private CockpitTopicNSService cockpitTopicNSService;
 
     @Autowired
     private CockpitConsumerGroupNSService cockpitConsumerGroupNSService;
@@ -96,8 +96,8 @@ public class DownConsumerCommand implements SubCommand {
     }
 
     private void downloadConsumerGroupConfig(DefaultMQAdminExt defaultMQAdminExt, String consumerGroup) {
-        Set<String> brokers = cockpitTopicService.getTopicBrokers(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
-        TopicConfig topicConfig = cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
+        Set<String> brokers = cockpitTopicNSService.getTopicBrokers(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
+        TopicConfig topicConfig = cockpitTopicNSService.getTopicConfigByTopicName(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
 
         outer:
         for (String broker : brokers) {
