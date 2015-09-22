@@ -57,6 +57,8 @@ CREATE TABLE IF NOT EXISTS topic (
 CREATE TABLE topic_broker_xref (
   broker_id INT NOT NULL REFERENCES broker(id),
   topic_id INT NOT NULL REFERENCES topic(id),
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT 0,
   CONSTRAINT uniq_broker_topic UNIQUE (broker_id, topic_id)
 ) ENGINE = INNODB;
 
@@ -95,6 +97,8 @@ CREATE TABLE IF NOT EXISTS topic_consumer_group_xref (
 CREATE TABLE IF NOT EXISTS broker_consumer_group_xref (
   broker_id INT NOT NULL REFERENCES broker(id),
   consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT 0,
   CONSTRAINT uniq_broker_consumer_group UNIQUE (broker_id, consumer_group_id)
 );
 
