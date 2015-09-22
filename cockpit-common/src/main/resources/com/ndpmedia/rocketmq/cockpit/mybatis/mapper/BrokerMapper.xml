@@ -94,7 +94,7 @@
             address, version, dc, last_update_time AS lastUpdateTime
         FROM broker
         WHERE 1 = 1
-        <if test="id > 0">
+        <if test="brokerId > 0">
             AND id = #{brokerId}
         </if>
 
