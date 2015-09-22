@@ -4,7 +4,7 @@ import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
-import com.ndpmedia.rocketmq.cockpit.scheduler.command.DownTopicCommand;
+import com.ndpmedia.rocketmq.cockpit.scheduler.command.TopicSyncDownCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
@@ -30,7 +30,7 @@ public class TopicScheduler {
     private Logger logger = LoggerFactory.getLogger(TopicScheduler.class);
 
     @Autowired
-    private DownTopicCommand downTopicCommand;
+    private TopicSyncDownCommand topicSyncDownCommand;
 
     @Autowired
     private CockpitTopicDBService cockpitTopicDBService;
@@ -47,7 +47,7 @@ public class TopicScheduler {
      */
     @Scheduled(cron = "24 12 * * * *")
     public void downloadTopic() {
-        downTopicCommand.execute(null, null, null);
+        topicSyncDownCommand.execute(null, null, null);
     }
 
     /**

@@ -14,7 +14,7 @@ import org.apache.commons.cli.Options;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SyncConsumerGroupCommand implements SubCommand {
+public class ConsumerGroupSyncUpCommand implements SubCommand {
 
     private Set<String> brokerList = new HashSet<>();
 

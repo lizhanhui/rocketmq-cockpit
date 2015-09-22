@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-public class DownTopicCommand implements SubCommand {
+public class TopicSyncDownCommand implements SubCommand {
 
-    private Logger logger = LoggerFactory.getLogger(DownTopicCommand.class);
+    private Logger logger = LoggerFactory.getLogger(TopicSyncDownCommand.class);
 
     @Autowired
     private CockpitBrokerService cockpitBrokerService;
