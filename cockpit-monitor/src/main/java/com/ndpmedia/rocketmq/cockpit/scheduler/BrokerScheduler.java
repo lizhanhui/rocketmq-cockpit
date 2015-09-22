@@ -1,12 +1,10 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
-import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
-import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,23 +19,15 @@ public class BrokerScheduler {
     @Autowired
     private BrokerMapper brokerMapper;
 
-    private DefaultMQAdminExt defaultMQAdminExt;
-
-    public BrokerScheduler() {
-        defaultMQAdminExt = new DefaultMQAdminExt(Helper.getInstanceName());
+    /**
+     * Check broker status every 30 minutes.
+     */
+    @Scheduled(fixedRate = 1800000)
+    public void checkBrokerStatus() {
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
-        } catch (MQClientException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Check broker status every 5 minutes.
-     */
-    @Scheduled(fixedRate = 300000)
-    public void checkBrokerStatus() {
-        try {
             ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
 
             Map<String, Set<String>> clusterAddrTable = clusterInfo.getClusterAddrTable();
@@ -73,6 +63,8 @@ public class BrokerScheduler {
 
         } catch (Throwable e) {
             e.printStackTrace();
+        } finally {
+            defaultMQAdminExt.shutdown();
         }
     }
 }
