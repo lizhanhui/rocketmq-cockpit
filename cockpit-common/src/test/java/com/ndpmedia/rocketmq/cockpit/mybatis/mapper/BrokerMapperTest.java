@@ -35,8 +35,26 @@ public class BrokerMapperTest {
         long brokerId = 10000;
         insertBroker(brokerId);
         Broker broker = brokerMapper.get(brokerId, null);
+
         Assert.assertNotNull(broker);
         Assert.assertEquals("DefaultCluster", broker.getClusterName());
+        Assert.assertEquals("test-broker", broker.getBrokerName());
+        Assert.assertEquals(0, broker.getBrokerId());
+        Assert.assertEquals("localhost:10911", broker.getAddress());
+        Assert.assertEquals("3.2.2", broker.getVersion());
+        Assert.assertEquals(1, broker.getDc());
+
+
+        broker = brokerMapper.get(0, "localhost:10911");
+        Assert.assertNotNull(broker);
+        Assert.assertEquals("DefaultCluster", broker.getClusterName());
+        Assert.assertEquals("test-broker", broker.getBrokerName());
+        Assert.assertEquals(0, broker.getBrokerId());
+        Assert.assertEquals("localhost:10911", broker.getAddress());
+        Assert.assertEquals("3.2.2", broker.getVersion());
+        Assert.assertEquals(1, broker.getDc());
+
+
         deleteBroker(brokerId);
     }
 }
