@@ -255,32 +255,13 @@ function showTopic(topic){
         contentType: "application/json; charset=UTF-8",
         dataType: "json",
         success: function(backdata) {
-            var line = topic;
-            var firstB = -1;
-            var lastT = (new Date()).getTime() - 1000 * 60 * 60 * 24;
-            var x = [];
-            backdata.reverse();
-            backdata.forEach(function(consumeProgress){
+            backdata.forEach(function(topicPerSecond){
                 var temp = [];
-                var time = consumeProgress.createTime.replace(new RegExp("-","gm"),"/");
-                var milTime = (new Date(time)).getTime();
-                temp.push(milTime);
-                if (-1 === firstB){
-
-                }else{
-                    if (consumeProgress.brokerOffset >= firstB){
-                        temp.push(Math.round(100*1000*(consumeProgress.brokerOffset - firstB)/(milTime - lastT))/100);
-                    }else{
-                        temp.push(Math.round(0));
-                    }
-                    x.push(temp);
-                }
-
-                firstB = consumeProgress.brokerOffset;
-                lastT = milTime;
+                temp.push(topicPerSecond.timeStamp);
+                temp.push(topicPerSecond.tps);
+                x.push(temp);
             });
-
-            showCharts('#tContainer', 'tps', line, x);
+            showCharts('#tContainer', 'tps', topic, x);
 
             hideCloud();
         }
