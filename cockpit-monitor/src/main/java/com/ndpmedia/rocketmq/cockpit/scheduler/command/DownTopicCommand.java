@@ -8,7 +8,7 @@ import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicNSService;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -35,7 +35,7 @@ public class DownTopicCommand implements SubCommand {
     private CockpitBrokerService cockpitBrokerService;
 
     @Autowired
-    private CockpitTopicService cockpitTopicService;
+    private CockpitTopicNSService cockpitTopicNSService;
 
     private Map<String, String> brokerToCluster = new HashMap<>();
 
@@ -74,7 +74,7 @@ public class DownTopicCommand implements SubCommand {
             adminExt.start();
             doMap(adminExt);
 
-            Set<String> topics = cockpitTopicService.getTopics(adminExt);
+            Set<String> topics = cockpitTopicNSService.getTopics(adminExt);
             for (String topicName : topics) {
                 logger.info("now we check topic :" + topicName);
                 TopicConfig topicConfig = getTopicConfig(adminExt, topicName);
@@ -93,11 +93,11 @@ public class DownTopicCommand implements SubCommand {
     }
 
     private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) {
-        return cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
+        return cockpitTopicNSService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
     }
 
     private void downloadTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig) {
-        Set<String> brokers = cockpitTopicService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
+        Set<String> brokers = cockpitTopicNSService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
 
         for (String broker : brokers) {
             int flag = 0;

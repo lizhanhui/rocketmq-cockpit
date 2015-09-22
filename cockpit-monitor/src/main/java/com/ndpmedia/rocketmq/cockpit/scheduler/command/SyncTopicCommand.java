@@ -5,14 +5,15 @@ import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicNSService;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitBrokerServiceImpl;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicServiceImpl;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicNSServiceImpl;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by robert on 2015/5/29.
@@ -23,7 +24,7 @@ public class SyncTopicCommand implements SubCommand {
 
     private Set<String> nameList = new HashSet<>();
 
-    private CockpitTopicService cockpitTopicService = new CockpitTopicServiceImpl();
+    private CockpitTopicNSService cockpitTopicNSService = new CockpitTopicNSServiceImpl();
 
     private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
 
@@ -64,7 +65,7 @@ public class SyncTopicCommand implements SubCommand {
             doList(adminExt);
             doBaseServer(adminExt);
 
-            Set<String> topics = cockpitTopicService.getTopics(adminExt);
+            Set<String> topics = cockpitTopicNSService.getTopics(adminExt);
 
             for (String topicName : topics) {
                 System.out.println("now we check :" + topicName);
@@ -92,15 +93,15 @@ public class SyncTopicCommand implements SubCommand {
     }
 
     private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) {
-        return cockpitTopicService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
+        return cockpitTopicNSService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
     }
 
     private void rebuildTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig, CommandLine commandLine) {
         if (null != commandLine.getOptionValue('b') && commandLine.getOptionValue('b').trim().length() > 0)
-            cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, commandLine.getOptionValue('b').trim());
+            cockpitTopicNSService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, commandLine.getOptionValue('b').trim());
         else
             for (String broker : brokerList) {
-                cockpitTopicService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
+                cockpitTopicNSService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
             }
     }
 }
