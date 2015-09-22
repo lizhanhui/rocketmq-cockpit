@@ -127,6 +127,8 @@ public class AutoPilot {
             }
         }
 
+        // TODO for each topic-broker pair, make sure its associated consumer group is there.
+
         if (null != adminExt) {
             adminExt.shutdown();
         }
