@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS broker (
   address VARCHAR(255) NOT NULL,
   version VARCHAR(100) DEFAULT '3.2.2',
   dc INT NOT NULL REFERENCES data_center(id),
-  last_update_time TIMESTAMP NOT NULL,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT 0,
   CONSTRAINT uniq_cluster_name_id UNIQUE (cluster_name, broker_name, broker_id)
 ) ENGINE = INNODB;
 

@@ -118,7 +118,7 @@
             <result column="address" property="address" />
             <result column="version" property="version" />
             <result column="dc" property="dc" />
-            <result column="last_update_time" property="lastUpdateTime" />
+            <result column="update_time" property="updateTime" />
         </association>
 
         <association property="consumerGroup" javaType="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
@@ -136,7 +136,7 @@
     </resultMap>
 
     <select id="queryHosting" resultMap="consumerGroupHostingResultMap" >
-        SELECT b.id AS bid, b.cluster_name, b.broker_name, b.broker_id, b.address, b.version, b.dc, b.last_update_time,
+        SELECT b.id AS bid, b.cluster_name, b.broker_name, b.broker_id, b.address, b.version, b.dc, b.update_time,
         cg.id AS consumer_group_id, cg.which_broker_when_consume_slowly, cg.group_name, cg.consume_enable, cg.consume_broadcast_enable, cg.retry_max_times, cg.retry_queue_num,
         cg.consume_from_min_enable, cg.consume_from_broker_id
         FROM broker_consumer_group_xref AS xref
