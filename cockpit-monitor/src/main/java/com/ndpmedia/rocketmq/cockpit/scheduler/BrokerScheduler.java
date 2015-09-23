@@ -26,6 +26,7 @@ public class BrokerScheduler {
     public void checkBrokerStatus() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+        defaultMQAdminExt.setAdminExtGroup(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
             ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();

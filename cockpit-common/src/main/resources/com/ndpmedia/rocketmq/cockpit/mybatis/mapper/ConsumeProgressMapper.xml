@@ -27,6 +27,14 @@
         VALUES (NULL, #{consumerGroup}, #{topic}, #{brokerName}, #{queueId}, #{brokerOffset}, #{consumerOffset}, #{lastTimestamp}, #{diff}, #{createTime})
     </insert>
 
+    <update id="updateTopicProgress">
+        INSERT INTO topic_progress (broker_offset,create_time,topic,broker_name,queue_id,last_timestamp)
+        SELECT MAX(broker_offset) as broker_offset, create_time , topic , broker_name , queue_id, MAX(last_timestamp) AS last_timestamp
+        FROM consume_progress
+        WHERE 1 = 1 and create_time = #{date}
+        GROUP BY create_time , topic , broker_name , queue_id
+    </update>
+
     <delete id="delete" parameterType="long">
         DELETE
         FROM consume_progress
@@ -128,10 +136,6 @@
     <select id="brokerTPSList" resultMap="consumeProgressMap">
         SELECT sum(broker_offset) as broker_offset, create_time
 
-        <if test="consumerGroup != null">
-            , consumer_group
-        </if>
-
         <if test="topic != null">
             , topic
         </if>
@@ -144,56 +148,34 @@
             , queue_id
         </if>
 
-        <if test="consumerGroup ==null">
-                FROM
-                (SELECT MAX(broker_offset) as broker_offset, create_time
-                , topic
-                , broker_name
-                , queue_id
+        FROM topic_progress
+        WHERE 1 = 1
+
+        <if test="topic != null">
+            AND topic = #{topic}
         </if>
-            FROM consume_progress
-            WHERE 1 = 1
 
-            <if test="consumerGroup != null">
-                AND consumer_group = #{consumerGroup}
-            </if>
-
-            <if test="topic != null">
-                AND topic = #{topic}
-            </if>
-
-            <if test="brokerName != null">
-                AND broker_name = #{brokerName}
-            </if>
-
-            <if test="queueId > -1">
-                AND queue_id = #{queueId}
-            </if>
-
-        <if test="consumerGroup ==null">
-                GROUP BY create_time
-                    , topic
-                    , broker_name
-                    , queue_id
-            ) temp
+        <if test="brokerName != null">
+            AND broker_name = #{brokerName}
         </if>
-            GROUP BY create_time
 
-            <if test="consumerGroup != null">
-                , consumer_group
-            </if>
+        <if test="queueId > -1">
+            AND queue_id = #{queueId}
+        </if>
 
-            <if test="topic != null">
-                , topic
-            </if>
+        GROUP BY create_time
 
-            <if test="brokerName != null">
-                , broker_name
-            </if>
+        <if test="topic != null">
+            , topic
+        </if>
 
-            <if test="queueId > -1">
-                , queue_id
-            </if>
+        <if test="brokerName != null">
+            , broker_name
+        </if>
+
+        <if test="queueId > -1">
+            , queue_id
+        </if>
         ORDER BY create_time desc limit 1000
     </select>
 

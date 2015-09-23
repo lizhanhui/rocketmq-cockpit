@@ -15,6 +15,8 @@ public interface ConsumeProgressMapper {
 
     long insertPrivate(ConsumeProgress consumeProgress);
 
+    long updateTopicProgress(@Param("date") Date date);
+
     void delete(long id);
 
     List<String> consumerGroupList();
