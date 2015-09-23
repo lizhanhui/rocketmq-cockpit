@@ -87,6 +87,7 @@ public class RocketMQUserLoginSuccessHandler extends SavedRequestAwareAuthentica
                 return;
             }
 
+            response.sendRedirect(request.getContextPath());
         } else {
             logger.error("Fatal error, principal should be a CockpitUser or sub-class instance");
         }
