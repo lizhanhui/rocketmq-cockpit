@@ -50,6 +50,13 @@
         WHERE id = #{id}
     </update>
 
+    <update id="refresh">
+        UPDATE topic_broker_xref
+        SET update_time = CURRENT_TIMESTAMP
+        WHERE broker_id = #{brokerId}
+        AND topic_id = #{topicId}
+    </update>
+
     <delete id="delete" parameterType="long">
         DELETE
         FROM topic

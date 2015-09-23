@@ -17,6 +17,9 @@ public interface TopicMapper {
 
     Topic get(@Param("id") long id, @Param("topic") String topic);
 
+    void refresh(@Param("brokerId") long brokerId,
+                 @Param("topicId") long topicId);
+
     /**
      * List by project or status.
      * @param projectId Project ID.

@@ -17,6 +17,8 @@ public interface ConsumerGroupMapper {
     ConsumerGroup get(@Param("id") long id,
                       @Param("groupName") String groupName);
 
+    void refresh(long brokerId, long consumerGroupId);
+
     long insert(ConsumerGroup consumerGroup);
 
     void update(ConsumerGroup consumerGroup);
