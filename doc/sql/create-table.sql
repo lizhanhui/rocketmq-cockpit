@@ -120,7 +120,8 @@ CREATE TABLE IF NOT EXISTS topic_progress (
   queue_id INT NOT NULL,
   broker_offset BIGINT NOT NULL DEFAULT 0,
   last_timestamp BIGINT NOT NULL DEFAULT 0,
-  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX `topic_progress_topic` (`topic`)
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS name_server_kv (
