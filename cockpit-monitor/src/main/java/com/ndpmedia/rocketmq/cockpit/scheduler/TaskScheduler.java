@@ -95,6 +95,8 @@ public class TaskScheduler {
                     updateConsumeProgressData(cp);
                 }
             }
+
+            updateTopicProgressData();
         } catch (Exception e) {
             if (!e.getMessage().contains("offset table is empty")) {
                 logger.warn("[MONITOR][CONSUME-PROGRESS] main method failed." + e);
@@ -121,5 +123,9 @@ public class TaskScheduler {
         consumeProgress.setTableID(groupTableRel.get(consumeProgress.getConsumerGroup()));
         consumeProgressMapper.insert(consumeProgress);
         consumeProgressMapper.insertPrivate(consumeProgress);
+    }
+
+    private void updateTopicProgressData(){
+        consumeProgressMapper.updateTopicProgress(date);
     }
 }
