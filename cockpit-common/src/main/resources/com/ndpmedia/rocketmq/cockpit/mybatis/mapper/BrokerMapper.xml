@@ -3,8 +3,8 @@
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper">
 
     <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
-        INSERT INTO broker(cluster_name, broker_name, broker_id, address, version, dc, update_time)
-        VALUES (#{clusterName}, #{brokerName}, #{brokerId}, #{address}, #{version}, #{dc}, CURRENT_TIMESTAMP)
+        INSERT INTO broker(cluster_name, broker_name, broker_id, address, version, dc, create_time, update_time)
+        VALUES (#{clusterName}, #{brokerName}, #{brokerId}, #{address}, #{version}, #{dc}, #{createTime}, #{updateTime})
     </insert>
 
     <insert id="createConsumerGroup">

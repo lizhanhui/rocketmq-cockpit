@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -40,11 +41,12 @@ public class BrokerScheduler {
         try {
             ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
 
-            Map<String, Set<String>> clusterAddrTable = clusterInfo.getClusterAddrTable();
-            Map<String, BrokerData> brokerDataMap = clusterInfo.getBrokerAddrTable();
+            Map<String /* Cluster */, Set<String> /* Broker Name */> clusterBrokerTable =
+                    clusterInfo.getClusterAddrTable();
+            Map<String /* Broker Name */, BrokerData> brokerDataMap = clusterInfo.getBrokerAddrTable();
 
-            if (null != clusterAddrTable && !clusterAddrTable.isEmpty()) {
-                for (Map.Entry<String, Set<String>> entry : clusterInfo.getClusterAddrTable().entrySet()) {
+            if (null != clusterBrokerTable && !clusterBrokerTable.isEmpty()) {
+                for (Map.Entry<String, Set<String>> entry : clusterBrokerTable.entrySet()) {
                     String clusterName = entry.getKey();
                     TreeSet<String> brokerNameSet = new TreeSet<String>();
                     brokerNameSet.addAll(entry.getValue());
@@ -58,7 +60,8 @@ public class BrokerScheduler {
                                 broker.setBrokerName(brokerName);
                                 broker.setBrokerId(brokerEntry.getKey().intValue());
                                 broker.setAddress(brokerEntry.getValue());
-
+                                broker.setCreateTime(new Date());
+                                broker.setUpdateTime(new Date());
                                 if (!brokerMapper.exists(broker)) {
                                     brokerMapper.insert(broker);
                                 } else {
