@@ -74,8 +74,8 @@ public class TaskScheduler {
         date = new Date();
 
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
-        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
-        defaultMQAdminExt.setAdminExtGroup(Long.toString(System.currentTimeMillis()));
+        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()) + "taskScheduler");
+        defaultMQAdminExt.setAdminExtGroup(Long.toString(System.currentTimeMillis()) + "taskScheduler");
         try {
             defaultMQAdminExt.start();
             Set<String> groupList = cockpitConsumerGroupNSService.getGroups(defaultMQAdminExt);

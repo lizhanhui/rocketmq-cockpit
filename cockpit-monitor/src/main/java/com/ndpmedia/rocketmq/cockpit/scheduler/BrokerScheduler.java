@@ -25,8 +25,8 @@ public class BrokerScheduler {
     @Scheduled(fixedRate = 1800000)
     public void checkBrokerStatus() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
-        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
-        defaultMQAdminExt.setAdminExtGroup(Long.toString(System.currentTimeMillis()));
+        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()) + "brokerScheduler");
+        defaultMQAdminExt.setAdminExtGroup(Long.toString(System.currentTimeMillis()) + "brokerScheduler");
         try {
             defaultMQAdminExt.start();
             ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();

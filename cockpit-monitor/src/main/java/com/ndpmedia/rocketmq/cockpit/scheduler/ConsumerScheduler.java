@@ -50,6 +50,7 @@ public class ConsumerScheduler {
     public void checkTopicStatus() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+        defaultMQAdminExt.setAdminExtGroup(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
 
