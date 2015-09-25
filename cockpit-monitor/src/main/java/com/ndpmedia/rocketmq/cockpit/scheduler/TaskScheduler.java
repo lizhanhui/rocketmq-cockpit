@@ -50,17 +50,17 @@ public class TaskScheduler {
         try {
             counts.set(this.consumeProgressMapper.groupTableMAXID());
         }catch (Exception e){
-            //nothing todo;
+            logger.warn("[MONITOR][CONSUME-PROGRESS] try to get total size of group-table xref failed.");
         }
 
-            List<Map<Object, Object>> xrefs = this.consumeProgressMapper.groupTableXREFList();
-            for (Map<Object, Object> xref : xrefs){
-                try{
-                    groupTableRel.put(xref.get("group_name").toString(), Integer.parseInt(xref.get("id").toString()));
-                }finally {
-
-                }
+        List<Map<Object, Object>> xrefs = this.consumeProgressMapper.groupTableXREFList();
+        for (Map<Object, Object> xref : xrefs){
+            try{
+                groupTableRel.put(xref.get("group_name").toString(), Integer.parseInt(xref.get("id").toString()));
+            }catch (Exception e){
+                logger.warn("[MONITOR][CONSUME-PROGRESS] try to get group-table xref failed.group is :" + xref.get("group_name"));
             }
+        }
 
     }
     /**
@@ -73,7 +73,7 @@ public class TaskScheduler {
             init();
         date = new Date();
 
-        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(Long.toString(System.currentTimeMillis()) + "taskScheduler");
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
@@ -88,6 +88,7 @@ public class TaskScheduler {
                 consumeProgressList = cockpitConsumeProgressNSService.queryConsumerProgress(defaultMQAdminExt, group, null, null);
                 for (ConsumeProgress cp : consumeProgressList) {
                     if (null == cp || null == cp.getTopic() || null == cp.getBrokerName()) {
+                        logger.info("[MONITOR][CONSUME-PROGRESS] this group has no progress" + group);
                         continue;
                     }
 
@@ -106,7 +107,7 @@ public class TaskScheduler {
     }
 
     private void createPrivateTable(Set<String> groups){
-        System.out.println("[MONITOR][CONSUME-PROGRESS] GROUP COUNTS HAS CHANGE. TRY TO UPDATE TABLES. TOTAL GROUP: " + groups.size());
+        logger.debug("[MONITOR][CONSUME-PROGRESS] GROUP COUNTS HAS CHANGE. TRY TO UPDATE TABLES. TOTAL GROUP: " + groups.size());
         for (String group:groups){
             if (!groupTableRel.containsKey(group)) {
                 consumeProgressMapper.create(String.valueOf(counts.addAndGet(1)));
@@ -114,7 +115,7 @@ public class TaskScheduler {
                 consumeProgressMapper.groupTableXREFInsert(groupTableRel.get(group), group);
             }
         }
-        System.out.println("[MONITOR][CONSUME-PROGRESS] UPDATE GROUP TABLES ALREADY DONE. TOTAL COUNTS: " + groupTableRel.size());
+        logger.debug("[MONITOR][CONSUME-PROGRESS] UPDATE GROUP TABLES ALREADY DONE. TOTAL COUNTS: " + groupTableRel.size());
     }
 
     private void updateConsumeProgressData(ConsumeProgress consumeProgress){

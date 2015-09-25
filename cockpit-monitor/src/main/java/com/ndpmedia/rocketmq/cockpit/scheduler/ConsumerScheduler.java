@@ -48,7 +48,7 @@ public class ConsumerScheduler {
      */
     @Scheduled(cron = "24 20 * * * *")
     public void checkTopicStatus() {
-        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(Long.toString(System.currentTimeMillis()) + "consumerScheduler");
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
@@ -61,7 +61,7 @@ public class ConsumerScheduler {
                 cockpitConsumerGroupNSService.update(consumerGroup);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn(e.toString());
         } finally {
             defaultMQAdminExt.shutdown();
         }

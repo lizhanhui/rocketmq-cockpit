@@ -55,7 +55,7 @@ public class DataAgingScheduler {
                 numberOfRecordsDeleted = consumeProgressMapper.bulkDelete("_" + id, calendar.getTime());
                 logger.info("Deleted " + numberOfRecordsDeleted + " in " + id + " consume progress records.");
             }catch (Exception e){
-                System.out.println("[MONITOR][OLD DATA DELETE] some table already deleted.");
+                logger.warn("[MONITOR][OLD DATA DELETE] some table already deleted.");
             }
         }
     }
