@@ -255,6 +255,7 @@ function showTopic(topic){
         contentType: "application/json; charset=UTF-8",
         dataType: "json",
         success: function(backdata) {
+            var x = [];
             backdata.forEach(function(topicPerSecond){
                 var temp = [];
                 temp.push(topicPerSecond.timeStamp);
