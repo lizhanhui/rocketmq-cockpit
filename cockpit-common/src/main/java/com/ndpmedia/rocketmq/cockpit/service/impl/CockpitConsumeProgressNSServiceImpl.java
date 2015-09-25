@@ -60,7 +60,7 @@ public class CockpitConsumeProgressNSServiceImpl implements CockpitConsumeProgre
 //            consumeProgressList.add(new ConsumeProgress(consumerGroup, null, null, diffTotal));
         } catch (Exception e) {
             if (!e.getMessage().contains("offset table is empty"))
-                logger.warn("[MONITOR][CONSUME PROCESS] try to get " + groupName + " message diff failed." + e);
+                logger.warn("[CockpitConsumeProgressNSService] try to get " + groupName + " message diff failed." + e);
         } finally {
             defaultMQAdminExt.shutdown();
         }
@@ -99,7 +99,7 @@ public class CockpitConsumeProgressNSServiceImpl implements CockpitConsumeProgre
 //            consumeProgressList.add(new ConsumeProgress(consumerGroup, null, null, diffTotal));
         } catch (Exception e) {
             if (!e.getMessage().contains("offset table is empty"))
-                logger.warn("[MONITOR][CONSUME PROCESS] try to get " + groupName + " message diff failed." + e);
+                logger.warn("[CockpitConsumeProgressNSService] try to get " + groupName + " message diff failed." + e);
         }
 
         return consumeProgressList;

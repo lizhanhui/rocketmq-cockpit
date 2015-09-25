@@ -5,6 +5,8 @@ import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,7 @@ import java.util.TreeSet;
 
 @Component
 public class BrokerScheduler {
+    private Logger logger = LoggerFactory.getLogger(BrokerScheduler.class);
 
     @Autowired
     private BrokerMapper brokerMapper;
@@ -24,7 +27,7 @@ public class BrokerScheduler {
      */
     @Scheduled(fixedRate = 1800000)
     public void checkBrokerStatus() {
-        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(Long.toString(System.currentTimeMillis()) + "brokerScheduler");
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
@@ -62,7 +65,7 @@ public class BrokerScheduler {
             }
 
         } catch (Throwable e) {
-            e.printStackTrace();
+            logger.warn(e.toString());
         } finally {
             defaultMQAdminExt.shutdown();
         }

@@ -54,7 +54,7 @@ public class TopicScheduler {
      */
     @Scheduled(fixedRate = 300000)
     public void checkTopicStatus() {
-        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(Long.toString(System.currentTimeMillis()) + "topicScheduler");
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
@@ -90,7 +90,7 @@ public class TopicScheduler {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn(e.toString());
         } finally {
             defaultMQAdminExt.shutdown();
         }
