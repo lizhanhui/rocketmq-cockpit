@@ -8,6 +8,8 @@ import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitProjectService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,8 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/api/project")
 public class CockpitProjectController {
+
+    private Logger logger = LoggerFactory.getLogger(CockpitProjectController.class);
 
     @Autowired
     private CockpitProjectService cockpitProjectService;
@@ -46,7 +50,7 @@ public class CockpitProjectController {
             project.setTeamId(teamId);
             cockpitProjectService.insert(project);
         }catch (Exception e){
-            e.printStackTrace();
+            logger.warn("[CockpitProjectController]try to insert project " + project.getName() + " failed." + e);
             return false;
         }
         return true;

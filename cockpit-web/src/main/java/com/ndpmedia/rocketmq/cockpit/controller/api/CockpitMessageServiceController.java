@@ -11,6 +11,8 @@ import com.ndpmedia.rocketmq.cockpit.model.CockpitMessage;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitMessageFlow;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitMessageMapper;
 import com.ndpmedia.rocketmq.cockpit.util.MessageTranslate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,8 @@ import java.util.*;
 @RequestMapping(value = "/api/message")
 public class CockpitMessageServiceController {
 
+    private Logger logger = LoggerFactory.getLogger(CockpitMessageServiceController.class);
+
     @Autowired
     private CockpitMessageMapper cockpitMessageMapper;
 
@@ -41,13 +45,13 @@ public class CockpitMessageServiceController {
             MessageExt messageExt = defaultMQAdminExt.viewMessage(id);
             return MessageTranslate.translateFrom(messageExt);
         } catch (MQClientException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get message by id failed." + e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get message by id failed." + e);
         } catch (RemotingException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get message by id failed." + e);
         } catch (MQBrokerException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get message by id failed." + e);
         } finally {
             defaultMQAdminExt.shutdown();
         }
@@ -64,7 +68,9 @@ public class CockpitMessageServiceController {
             messageExt = defaultMQAdminExt.viewMessage(id);
             return defaultMQAdminExt.messageTrackDetail(messageExt);
         } catch (Exception e) {
-            System.out.println("[QUERY MESSAGE] can not get message by id" + id);
+            logger.warn("[CockpitMessageServiceController] can not get message track by id" + id);
+        } finally {
+            defaultMQAdminExt.shutdown();
         }
 
         return null;
@@ -83,9 +89,9 @@ public class CockpitMessageServiceController {
             }
             return result;
         } catch (MQClientException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get message by key failed." + e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get message by key failed." + e);
         } finally {
             defaultMQAdminExt.shutdown();
         }
@@ -101,7 +107,7 @@ public class CockpitMessageServiceController {
         try {
             tempFileName = URLEncoder.encode(msgId, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get message body failed." + e);
         }
         response.addHeader("Content-Disposition", "attachment;filename=" + tempFileName);
         byte[] buffer = cockpitMessage.getBody();
@@ -110,7 +116,7 @@ public class CockpitMessageServiceController {
             response.getOutputStream().write(buffer, 0, buffer.length);
             response.getOutputStream().flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get message body failed." + e);
         }
     }
 
@@ -130,13 +136,15 @@ public class CockpitMessageServiceController {
             return defaultMQAdminExt.queryTopicConsumeByWho(topic).getGroupList();
 
         } catch (MQClientException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get consumer connection failed." + e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get consumer connection failed." + e);
         } catch (RemotingException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get consumer connection failed." + e);
         } catch (MQBrokerException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to get consumer connection failed." + e);
+        } finally {
+            defaultMQAdminExt.shutdown();
         }
         return null;
     }
@@ -150,13 +158,15 @@ public class CockpitMessageServiceController {
             defaultMQAdminExt.start();
             return defaultMQAdminExt.consumeMessageDirectly(consumerGroup, client, msgId).toString();
         } catch (MQClientException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to resend message failed." + e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to resend message failed." + e);
         } catch (RemotingException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to resend message failed." + e);
         } catch (MQBrokerException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitMessageServiceController] try to resend message failed." + e);
+        } finally {
+            defaultMQAdminExt.shutdown();
         }
 
         return " error ";

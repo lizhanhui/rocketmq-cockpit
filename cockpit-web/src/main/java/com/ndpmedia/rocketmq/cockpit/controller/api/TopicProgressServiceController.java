@@ -7,6 +7,8 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
 import com.ndpmedia.rocketmq.cockpit.model.TopicPerSecond;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
 import com.ndpmedia.rocketmq.cockpit.util.ConsumeProgressHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +22,8 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/api/topic-progress")
 public class TopicProgressServiceController {
+
+    private Logger logger = LoggerFactory.getLogger(TopicProgressServiceController.class);
 
     @Autowired
     private ConsumeProgressMapper consumeProgressMapper;
@@ -52,11 +56,13 @@ public class TopicProgressServiceController {
                     result.add(temp);
             }
         } catch (MQClientException e) {
-            e.printStackTrace();
+            logger.warn("[TopicProgressServiceController]try to get topic list failed." + e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("[TopicProgressServiceController]try to get topic list failed." + e);
         } catch (RemotingException e) {
-            e.printStackTrace();
+            logger.warn("[TopicProgressServiceController]try to get topic list failed." + e);
+        } finally {
+            defaultMQAdminExt.shutdown();
         }
 
         return result;
