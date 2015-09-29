@@ -201,12 +201,13 @@
                     javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
             <result column="topic_info_create_time" property="createTime" />
             <result column="topic_info_update_time" property="updateTime" />
+            <result column="sync_time" property="syncTime" />
         </association>
     </resultMap>
 
     <select id="queryHosting" resultMap="TopicHostingResultMap">
         SELECT b.id, b.cluster_name, broker_name, b.broker_id, address, version, dc, b.create_time, b.update_time
-             , xref.topic_id AS topicId, xref.permission, xref.write_queue_num, xref.read_queue_num, xref.status_id, xref.create_time AS topic_info_create_time, xref.update_time AS topic_info_update_time
+             , xref.topic_id AS topicId, xref.permission, xref.write_queue_num, xref.read_queue_num, xref.status_id, xref.create_time AS topic_info_create_time, xref.update_time AS topic_info_update_time, xref.sync_time
         FROM broker AS b
         JOIN topic_broker_xref AS xref ON b.id = xref.broker_id
         <if test="topic != null">

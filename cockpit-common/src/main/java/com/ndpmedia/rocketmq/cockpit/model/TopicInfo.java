@@ -18,6 +18,8 @@ public class TopicInfo {
 
     private Date updateTime;
 
+    private Date syncTime;
+
     public long getTopicId() {
         return topicId;
     }
@@ -72,5 +74,13 @@ public class TopicInfo {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Date getSyncTime() {
+        return syncTime;
+    }
+
+    public void setSyncTime(Date syncTime) {
+        this.syncTime = syncTime;
     }
 }

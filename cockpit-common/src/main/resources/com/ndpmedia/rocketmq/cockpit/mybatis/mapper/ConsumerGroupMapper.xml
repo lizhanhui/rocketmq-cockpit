@@ -140,12 +140,15 @@
             <result column="consume_from_broker_id" property="consumeFromBrokerId" />
             <result column="cluster_name" property="clusterName" />
         </association>
+
+        <result column="sync_time" property="syncTime" />
     </resultMap>
 
     <select id="queryHosting" resultMap="consumerGroupHostingResultMap" >
         SELECT b.id AS bid, b.cluster_name, b.broker_name, b.broker_id, b.address, b.version, b.dc, b.update_time,
         cg.id AS consumer_group_id, cg.which_broker_when_consume_slowly, cg.group_name, cg.consume_enable, cg.consume_broadcast_enable, cg.retry_max_times, cg.retry_queue_num,
-        cg.consume_from_min_enable, cg.consume_from_broker_id
+        cg.consume_from_min_enable, cg.consume_from_broker_id,
+        xref.sync_time
         FROM broker_consumer_group_xref AS xref
         JOIN broker AS b ON b.id = xref.broker_id
         JOIN consumer_group AS cg ON cg.id = xref.consumer_group_id
