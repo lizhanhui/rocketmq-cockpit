@@ -1,23 +1,22 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
-import com.alibaba.rocketmq.common.TopicConfig;
+import com.alibaba.rocketmq.common.protocol.body.TopicList;
+import com.alibaba.rocketmq.common.protocol.route.BrokerData;
+import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
-import com.ndpmedia.rocketmq.cockpit.model.Status;
+import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.TopicSyncDownCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
-import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Created by robert on 2015/6/9.
@@ -60,35 +59,31 @@ public class TopicScheduler {
         try {
             defaultMQAdminExt.start();
 
-            Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
-            List<Topic> topics = cockpitTopicDBService.getTopics(Status.ACTIVE);
-            for (Topic topic : topics) {
-                //现阶段可对应的Broker与Topic信息不做处理
-                if (brokers.isEmpty() || brokers.contains(topic.getBrokerAddress()))
-                    continue;
+            TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
+            if (null != topicList && !topicList.getTopicList().isEmpty()) {
+                for (String topic : topicList.getTopicList()) {
+                    TopicRouteData topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
+                    Topic topicEntity = cockpitTopicDBService.getTopic(topic);
+                    if (null == topicEntity) {
+                        topicEntity = new Topic();
 
-                //注销已有激活信息
-                cockpitTopicDBService.deactivate(topic.getId());
-                //确认该Topic是否具有其他Broker
-                if (!cockpitTopicDBService.exists(topic.getTopic())){
-                    List<Long> projectIds = cockpitTopicDBService.getProjectIDs(topic.getId(), null);
-                    logger.info("[topic status check] this topic " + topic.getTopic() + " belongs to " + Arrays.toString(projectIds.toArray()));
-                    //topic route信息可能无法获得，导致topic config无法获取broker端版本，使用数据库端版本构建
-                    TopicConfig topicConfig = cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, topic.getTopic());
-                    if (null == topicConfig)
-                        topicConfig = TopicTranslate.wrap(topic);
 
-                    for (String broker : brokers){
-                        topic.setBrokerAddress(broker);
-                        cockpitTopicRocketMQService.rebuildTopicConfig(defaultMQAdminExt, topicConfig, broker);
-                        if (!projectIds.isEmpty()) {
-                            for (long projectId :projectIds) {
-                                cockpitTopicDBService.insert(topic, projectId);
+                    }
+
+                    for (BrokerData brokerData : topicRouteData.getBrokerDatas()) {
+                        for (Map.Entry<Long, String> next : brokerData.getBrokerAddrs().entrySet()) {
+                            if (next.getKey() == 0) {
+                                String brokerAddress = next.getValue();
+                                Broker broker = cockpitBrokerService.get(0, brokerAddress);
+                                if (null != broker) {
+                                    cockpitTopicDBService.refresh(broker.getId(), );
+                                }
                             }
                         }
                     }
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

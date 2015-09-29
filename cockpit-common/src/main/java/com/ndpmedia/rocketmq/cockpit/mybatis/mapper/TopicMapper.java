@@ -3,6 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
+import com.ndpmedia.rocketmq.cockpit.model.TopicHosting;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -11,9 +12,15 @@ public interface TopicMapper {
 
     long insert(Topic topic);
 
+    void insertTopicBrokerInfo(@Param("topic")Topic topic,
+                               @Param("brokerId") long brokerId);
+
     void delete(long id);
 
     void update(Topic topic);
+
+    void updateTopicBrokerInfo(@Param("topic") Topic topic,
+                               @Param("brokerId") long brokerId);
 
     Topic get(@Param("id") long id, @Param("topic") String topic);
 
@@ -35,6 +42,10 @@ public interface TopicMapper {
     List<TopicAvailability> queryTopicsAvailability();
 
     List<DataCenter> queryAllowedDC(long topicId);
+
+    List<TopicHosting> queryHosting(@Param("topicId") long topicId,
+                                    @Param("topic") String topic,
+                                    @Param("dcId") int dcId);
 
     List<Long> queryTopicHostingBrokerIds(@Param("topicId") long topicId, @Param("dcId") long dcId);
 

@@ -35,8 +35,9 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
      * add topic to database by project
      * @param topic topic
      * @param projectId ID of the project this topic will be added to.
+     * @param brokerId
      */
-    void insert(Topic topic, long projectId);
+    void insert(long projectId, Topic topic, long brokerId);
 
     /**
      * delete topic and remove topic-project relationship from database
@@ -48,4 +49,6 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
     boolean exists(String topic);
 
     List<Long> getProjectIDs(long topicId, String topic);
+
+    void refresh(long brokerId, long topicId);
 }

@@ -65,7 +65,7 @@ public class BrokerScheduler {
                                 if (!brokerMapper.exists(broker)) {
                                     brokerMapper.insert(broker);
                                 } else {
-                                    brokerMapper.refresh(broker);
+                                    brokerMapper.refresh(broker.getId(), broker.getAddress());
                                 }
                             }
 

@@ -13,7 +13,8 @@ public interface BrokerMapper {
 
     void insert(Broker broker);
 
-    void refresh(Broker broker);
+    void refresh(@Param("brokerId") Long brokerId,
+                 @Param("brokerAddress") String brokerAddress);
 
     Broker get(@Param("brokerId") long brokerId, @Param("address") String address);
 

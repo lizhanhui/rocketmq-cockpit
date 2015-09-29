@@ -20,9 +20,14 @@
     <update id="refresh" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         UPDATE broker
         SET update_time = CURRENT_TIMESTAMP
-        WHERE cluster_name = #{clusterName} AND
-        broker_name = #{brokerName} AND
-        broker_id = #{brokerId}
+        WHERE 1 = 1
+        <if test="brokerAddress != null">
+          AND broker_name = #{brokerName}
+        </if>
+
+        <if test="brokerId > 0">
+            AND broker_id = #{brokerId}
+        </if>
     </update>
 
     <select id="exists" resultType="java.lang.Boolean" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker">
@@ -63,12 +68,12 @@
     <select id="queryBrokerLoad" resultType="com.ndpmedia.rocketmq.cockpit.model.BrokerLoad">
         SELECT broker.dc AS dcId
              , broker.id AS brokerId
-             , IFNULL(SUM(topic.read_queue_num ), 0) AS readQueueNum
-             , IFNULL(SUM(topic.write_queue_num), 0) AS writeQueueNum
-        FROM broker
-            LEFT JOIN topic_broker_xref ON broker.id = topic_broker_xref.broker_id
-            LEFT JOIN topic ON topic_broker_xref.topic_id = topic.id
-            JOIN broker AS b ON b.id = topic_broker_xref.broker_id
+             , IFNULL(SUM(tbx.read_queue_num ), 0) AS readQueueNum
+             , IFNULL(SUM(tbx.write_queue_num), 0) AS writeQueueNum
+        FROM broker AS b
+            LEFT JOIN topic_broker_xref AS tbx ON broker.id = tbx.broker_id
+            LEFT JOIN topic AS t ON tbx.topic_id = topic.id
+            JOIN broker AS b ON b.id = tbx.broker_id
         WHERE 1 = 1
         <if test="dc > 0">
             AND broker.dc = #{dcId}

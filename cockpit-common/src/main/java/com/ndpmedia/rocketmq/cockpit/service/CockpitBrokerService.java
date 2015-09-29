@@ -1,14 +1,13 @@
 package com.ndpmedia.rocketmq.cockpit.service;
 
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
+import com.ndpmedia.rocketmq.cockpit.model.Broker;
 
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by robert on 2015/6/9.
- */
 public interface CockpitBrokerService {
+
     /**
      * try to get broker list
      * @param defaultMQAdminExt
@@ -31,4 +30,6 @@ public interface CockpitBrokerService {
     Set<String> getAllNames(DefaultMQAdminExt defaultMQAdminExt);
 
     boolean removeAllTopic(String broker);
+
+    Broker get(long brokerId, String brokerAddress);
 }

@@ -3,6 +3,8 @@ package com.ndpmedia.rocketmq.cockpit.service.impl;
 import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
+import com.ndpmedia.rocketmq.cockpit.model.Broker;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import org.slf4j.Logger;
@@ -19,6 +21,9 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
 
     @Autowired
     private TopicMapper topicMapper;
+
+    @Autowired
+    private BrokerMapper brokerMapper;
 
     @Override
     public Set<String> getALLBrokers(DefaultMQAdminExt defaultMQAdminExt) {
@@ -143,5 +148,10 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Broker get(long brokerId, String brokerAddress) {
+        return brokerMapper.get(brokerId, brokerAddress);
     }
 }

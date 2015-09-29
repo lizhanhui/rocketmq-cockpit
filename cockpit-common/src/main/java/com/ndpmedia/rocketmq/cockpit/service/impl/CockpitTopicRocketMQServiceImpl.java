@@ -10,13 +10,13 @@ import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.admin.MQAdminExt;
-import com.alibaba.rocketmq.tools.command.CommandUtil;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
-import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -30,11 +30,12 @@ public class CockpitTopicRocketMQServiceImpl implements CockpitTopicRocketMQServ
 
     private Logger logger = LoggerFactory.getLogger(CockpitTopicRocketMQServiceImpl.class);
 
+    @Autowired
+    private TopicMapper topicMapper;
+
     @Override
     public Set<String> fetchAllTopics(MQAdminExt adminExt, boolean includeSystemTopic) throws CockpitException {
         boolean createAdmin = (null == adminExt);
-
-
         try {
             if (createAdmin) {
                 adminExt = new DefaultMQAdminExt("CockpitMQAdmin");
@@ -203,79 +204,12 @@ public class CockpitTopicRocketMQServiceImpl implements CockpitTopicRocketMQServ
 
     @Override
     public boolean createOrUpdateTopic(MQAdminExt adminExt, Topic topic) throws CockpitException {
-        boolean createAdmin = (null == adminExt);
-        try {
-            if (createAdmin) {
-                adminExt = new DefaultMQAdminExt("CockpitMQAdmin");
-                adminExt.start();
-            }
-            TopicConfig topicConfig = wrapTopicToTopicConfig(topic);
-            if (null != topic.getBrokerAddress() && !topic.getBrokerAddress().isEmpty()) {
-                adminExt.createAndUpdateTopicConfig(topic.getBrokerAddress(), topicConfig);
-                if (topic.isOrder()) {
-                    // 注册顺序消息到 nameserver
-                    String brokerName = CommandUtil.fetchBrokerNameByAddr(adminExt, topic.getBrokerAddress());
-                    String orderConf = brokerName + ":" + topicConfig.getWriteQueueNums();
-                    adminExt.createOrUpdateOrderConf(topicConfig.getTopicName(), orderConf, false);
-                }
-            } else {
-                Set<String> masterSet = CommandUtil
-                        .fetchMasterAddrByClusterName(adminExt, topic.getClusterName());
-                for (String address : masterSet) {
-                    adminExt.createAndUpdateTopicConfig(address, topicConfig);
-                }
-
-                if (topic.isOrder()) {
-                    // 注册顺序消息到 nameserver
-                    Set<String> brokerNameSet = CommandUtil
-                            .fetchBrokerNameByClusterName(adminExt, topic.getClusterName());
-                    StringBuilder orderConf = new StringBuilder();
-                    String splitter = "";
-                    for (String s : brokerNameSet) {
-                        orderConf.append(splitter).append(s).append(":").append(topicConfig.getWriteQueueNums());
-                        splitter = ";";
-                    }
-                    adminExt.createOrUpdateOrderConf(topicConfig.getTopicName(), orderConf.toString(), true);
-                }
-            }
-        } catch (Exception e) {
-            logger.warn("[ADD][TOPIC][MQADMIN]try to add topic failed." + e);
-            throw new CockpitException("Admin tool failed.", e);
-        } finally {
-            if (createAdmin && null != adminExt) {
-                adminExt.shutdown();
-            }
-        }
-        return true;
+        throw new CockpitException("Not Implemented");
     }
 
     @Override
     public boolean deleteTopic(MQAdminExt adminExt, Topic topic) throws CockpitException {
-        boolean createAdmin = (null == adminExt);
-        try {
-            if (createAdmin) {
-                adminExt = new DefaultMQAdminExt("CockpitMQAdmin");
-                adminExt.start();
-            }
-            Set<String> masterBrokerAddressSet = new HashSet<>();
-            if (null != topic.getBrokerAddress() && !topic.getBrokerAddress().isEmpty()) {
-                masterBrokerAddressSet.add(topic.getBrokerAddress());
-            } else {
-                masterBrokerAddressSet.addAll(CommandUtil.fetchMasterAddrByClusterName(adminExt, topic.getClusterName()));
-            }
-            adminExt.deleteTopicInBroker(masterBrokerAddressSet, topic.getTopic());
-            Set<String> nameServerAddress = new HashSet<String>(adminExt.getNameServerAddressList());
-            // Delete from name server.
-            adminExt.deleteTopicInNameServer(nameServerAddress, topic.getTopic(), Helper.getStringBuild(masterBrokerAddressSet, ";"));
-        } catch (Exception e) {
-            logger.warn("[DELETE][TOPIC][MQADMIN] try to delete topic failed." + e);
-            throw new CockpitException("Admin tool falters.", e);
-        } finally {
-            if (createAdmin && null != adminExt) {
-                adminExt.shutdown();
-            }
-        }
-        return true;
+        throw new CockpitException("Not Implemented");
     }
 
     public static TopicConfig wrapTopicToTopicConfig(Topic topic) {

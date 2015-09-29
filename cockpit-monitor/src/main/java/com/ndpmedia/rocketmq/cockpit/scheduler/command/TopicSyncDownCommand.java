@@ -5,6 +5,7 @@ import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
+import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
@@ -96,17 +97,18 @@ public class TopicSyncDownCommand implements SubCommand {
     }
 
     private void downloadTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig) throws CockpitException {
-        Set<String> brokers = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
+        Set<String> brokerAddresses = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
 
-        for (String broker : brokers) {
+        for (String brokerAddress : brokerAddresses) {
             int flag = 0;
             while (flag++ < 5) {
                 try {
-                    Topic topic = TopicTranslate.wrap(topicConfig, brokerToCluster.get(broker), broker);
+                    Topic topic = TopicTranslate.wrap(topicConfig, brokerToCluster.get(brokerAddress), brokerAddress);
                     Topic oldT = cockpitTopicDBService.getTopic(topic.getTopic());
                     //若未获取到相同Topic Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
                     if (null == oldT) {
-                        cockpitTopicDBService.insert(topic, 1);
+                        Broker broker = cockpitBrokerService.get(0, brokerAddress);
+                        cockpitTopicDBService.insert(1, topic, broker.getId());
                     }
                     //若获取到相同Topic Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
                     else if (oldT.getStatus() != Status.ACTIVE)
@@ -117,7 +119,7 @@ public class TopicSyncDownCommand implements SubCommand {
                 }
             }
 
-            logger.info("[sync topic]add topic config:" + topicConfig + " from broker :" + broker);
+            logger.info("[sync topic]add topic config:" + topicConfig + " from brokerAddress :" + brokerAddress);
         }
     }
 }

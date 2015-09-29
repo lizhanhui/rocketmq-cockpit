@@ -6,9 +6,6 @@ import com.ndpmedia.rocketmq.cockpit.model.Topic;
 
 import java.util.Date;
 
-/**
- * Created by robert on 2015/6/11.
- */
 public class TopicTranslate {
 
     /**
@@ -35,7 +32,6 @@ public class TopicTranslate {
      */
     public static Topic wrap(TopicConfig topicConfig, String cluster, String broker){
         Topic topic = new Topic();
-        topic.setBrokerAddress(broker);
         topic.setClusterName(cluster);
         topic.setCreateTime(new Date());
         topic.setOrder(topicConfig.isOrder());

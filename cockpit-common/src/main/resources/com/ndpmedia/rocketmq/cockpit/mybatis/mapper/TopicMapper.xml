@@ -3,8 +3,14 @@
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper">
 
     <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.Topic" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO topic (id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time)
-        VALUES (NULL, #{topic}, #{clusterName}, #{permission}, #{writeQueueNum}, #{readQueueNum}, #{unit}, #{hasUnitSubscription}, #{brokerAddress}, #{order}, #{status.id}, #{createTime}, #{updateTime})
+        INSERT INTO topic (id, topic, cluster_name, `order`, create_time, update_time)
+        VALUES (NULL, #{topic}, #{clusterName},  #{order}, #{createTime}, #{updateTime})
+    </insert>
+
+    <insert id="insertTopicBrokerInfo">
+        INSERT INTO topic_broker_xref(broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, create_time, update_time)
+        VALUES (#{brokerId}, #{topic.id}, #{topic.permission}, #{topic.readQueueNum}, #{topic.writeQueueNum},
+                #{topic.status, typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"}, #{topic.createTime}, #{topic.updateTime})
     </insert>
 
     <insert id="connectProject">
@@ -41,13 +47,24 @@
     </delete>
 
     <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.Topic">
-        UPDATE topic SET topic = #{topic}, cluster_name = #{clusterName},
-            permission = #{permission}, write_queue_num = #{writeQueueNum},
-            read_queue_num = #{readQueueNum}, unit = #{unit},
-            has_unit_subscription = #{hasUnitSubscription}, broker_address = #{brokerAddress},
-            order_type = #{order}, status_id = #{status.id},
-            create_time = #{createTime}, update_time = #{updateTime}
+        UPDATE topic
+        SET topic = #{topic},
+            cluster_name = #{clusterName},
+            `order` = #{order},
+            create_time = #{createTime},
+            update_time = #{updateTime}
         WHERE id = #{id}
+    </update>
+
+    <update id="updateTopicBrokerInfo">
+        UPDATE topic_broker_xref
+        SET permission = #{topic.permission},
+            write_queue_num = #{topic.writeQueueNum},
+            read_queue_num = #{topic.readQueueNum},
+            status_id = #{topic.status, typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"},
+            update_time = CURRENT_TIMESTAMP
+        WHERE broker_id = #{brokerId}
+        AND topic_id = #{topic.id}
     </update>
 
     <update id="refresh">
@@ -70,10 +87,7 @@
         <result column="permission" property="permission" />
         <result column="write_queue_num" property="writeQueueNum" />
         <result column="read_queue_num" property="readQueueNum" />
-        <result column="unit" property="unit" />
-        <result column="has_unit_subscription" property="hasUnitSubscription" />
-        <result column="broker_address" property="brokerAddress" />
-        <result column="order_type" property="order" />
+        <result column="`order`" property="order" />
         <result column="status_id" property="status"
                 typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
                 javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
@@ -82,8 +96,9 @@
     </resultMap>
 
     <select id="get" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
-        FROM topic
+        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, `order`, status_id, t.create_time, t.update_time
+        FROM topic AS t
+        JOIN topic_broker_xref AS xref ON t.id = xref.topic_id
         WHERE 1 = 1
         <if test="id > 0">
             AND id = #{id}
@@ -94,10 +109,14 @@
     </select>
 
     <select id="list" resultMap="topicMap">
-        SELECT t.id, t.topic, t.permission, t.write_queue_num, t.read_queue_num, t.unit, t.has_unit_subscription, t.order_type, min(create_time) as create_time, max(update_time) as update_time
+        SELECT t.id, t.topic, tbx.permission, tbx.write_queue_num, tbx.read_queue_num,  t.`order`, tbx.create_time, tbx.update_time
         FROM topic AS t
+        JOIN topic_broker_xref AS tbx ON t.id = tbx.topic_id
         <if test="projectId > 0">
             JOIN project_topic_xref AS xref ON t.id = xref.topic_id
+        </if>
+        <if test="broker != null">
+            JOIN broker AS b ON b.id = tbx.broker_id
         </if>
         WHERE 1 = 1
         <if test="projectId > 0">
@@ -109,7 +128,7 @@
         </if>
 
         <if test="broker != null">
-            AND t.broker_address = #{broker}
+            AND b.address = #{broker}
         </if>
 
         <if test="cluster != null">
@@ -157,5 +176,53 @@
         SELECT consumer_group_id
         FROM topic_consumer_group_xref
         WHERE topic_id = #{topicId}
+    </select>
+
+    <resultMap id="TopicHostingResultMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicHosting">
+        <association property="broker" javaType="com.ndpmedia.rocketmq.cockpit.model.Broker">
+            <id column="id" property="id" />
+            <result column="cluster_name" property="clusterName" />
+            <result column="broker_name" property="brokerName" />
+            <result column="broker_id" property="brokerId" />
+            <result column="address" property="address" />
+            <result column="version" property="version" />
+            <result column="dc" property="dc" />
+            <result column="create_time" property="createTime" />
+            <result column="update_time" property="updateTime" />
+        </association>
+
+        <association property="topicInfo" javaType="com.ndpmedia.rocketmq.cockpit.model.TopicInfo">
+            <result column="topicId" property="topicId" />
+            <result column="permission" property="permission" />
+            <result column="write_queue_num" property="writeQueueNum" />
+            <result column="read_queue_num" property="readQueueNum" />
+            <result column="status_id" property="status"
+                    typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                    javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+            <result column="topic_info_create_time" property="createTime" />
+            <result column="topic_info_update_time" property="updateTime" />
+        </association>
+    </resultMap>
+
+    <select id="queryHosting" resultMap="TopicHostingResultMap">
+        SELECT b.id, b.cluster_name, broker_name, b.broker_id, address, version, dc, b.create_time, b.update_time
+             , xref.topic_id AS topicId, xref.permission, xref.write_queue_num, xref.read_queue_num, xref.status_id, xref.create_time AS topic_info_create_time, xref.update_time AS topic_info_update_time
+        FROM broker AS b
+        JOIN topic_broker_xref AS xref ON b.id = xref.broker_id
+        <if test="topic != null">
+        JOIN topic AS t ON t.id = xref.topic_id
+        </if>
+        WHERE 1 = 1
+        <if test="topicId > 0">
+            AND xref.topic_id = #{topicId}
+        </if>
+
+        <if test="topic != null">
+            AND t.topic = #{topic}
+        </if>
+
+        <if test="dcId > 0">
+            AND b.dc = #{dcId}
+        </if>
     </select>
 </mapper>

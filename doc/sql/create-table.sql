@@ -42,24 +42,21 @@ CREATE TABLE IF NOT EXISTS topic (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   topic VARCHAR(255) NOT NULL,
   cluster_name VARCHAR(100) NOT NULL DEFAULT 'DefaultCluster',
-  permission TINYINT NOT NULL DEFAULT 6,
-  write_queue_num INT NOT NULL DEFAULT 4,
-  read_queue_num INT NOT NULL DEFAULT 4,
-  unit BOOL NOT NULL DEFAULT FALSE ,
-  has_unit_subscription BOOL NOT NULL DEFAULT FALSE ,
-  broker_address VARCHAR(255),
-  order_type BOOL DEFAULT FALSE,
-  status_id INT NOT NULL DEFAULT 1 REFERENCES status_lu(id) ON DELETE RESTRICT ,
+  `order` BOOL DEFAULT FALSE,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time TIMESTAMP NOT NULL DEFAULT 0
--- update_time TIMESTAMP NOT NULL DEFAULT 0 ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = INNODB;
 
 CREATE TABLE topic_broker_xref (
   broker_id INT NOT NULL REFERENCES broker(id),
   topic_id INT NOT NULL REFERENCES topic(id),
+  permission TINYINT NOT NULL DEFAULT 6,
+  write_queue_num INT NOT NULL DEFAULT 4,
+  read_queue_num INT NOT NULL DEFAULT 4,
+  status_id INT NOT NULL DEFAULT 1 REFERENCES status_lu(id) ON DELETE RESTRICT ,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time TIMESTAMP NOT NULL DEFAULT 0,
+  sync_time TIMESTAMP NOT NULL DEFAULT  0,
   CONSTRAINT uniq_broker_topic UNIQUE (broker_id, topic_id)
 ) ENGINE = INNODB;
 
@@ -92,6 +89,8 @@ CREATE TABLE IF NOT EXISTS consumer_group (
 CREATE TABLE IF NOT EXISTS topic_consumer_group_xref (
   topic_id INT NOT NULL REFERENCES topic(id),
   consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT 0,
   CONSTRAINT uniq_topic_consumer_group UNIQUE (topic_id, consumer_group_id)
 ) ENGINE = INNODB;
 
@@ -100,6 +99,7 @@ CREATE TABLE IF NOT EXISTS broker_consumer_group_xref (
   consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time TIMESTAMP NOT NULL DEFAULT 0,
+  sync_time TIMESTAMP NOT NULL DEFAULT 0,
   CONSTRAINT uniq_broker_consumer_group UNIQUE (broker_id, consumer_group_id)
 );
 

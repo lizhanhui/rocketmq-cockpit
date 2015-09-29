@@ -17,18 +17,12 @@ public class Topic {
 
     private String clusterName;
 
-    private String brokerAddress;
-
     private int writeQueueNum = DEFAULT_WRITE_QUEUE_NUM;
 
     private int readQueueNum = DEFAULT_READ_QUEUE_NUM;
 
     //READ and WRITE
     private int permission = 6;
-
-    private boolean unit;
-
-    private boolean hasUnitSubscription;
 
     private boolean order;
 
@@ -52,14 +46,6 @@ public class Topic {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
-    }
-
-    public String getBrokerAddress() {
-        return brokerAddress;
-    }
-
-    public void setBrokerAddress(String brokerAddress) {
-        this.brokerAddress = brokerAddress;
     }
 
     public int getWriteQueueNum() {
@@ -126,34 +112,15 @@ public class Topic {
         this.permission = permission;
     }
 
-    public boolean isUnit() {
-        return unit;
-    }
-
-    public void setUnit(boolean unit) {
-        this.unit = unit;
-    }
-
-    public boolean isHasUnitSubscription() {
-        return hasUnitSubscription;
-    }
-
-    public void setHasUnitSubscription(boolean hasUnitSubscription) {
-        this.hasUnitSubscription = hasUnitSubscription;
-    }
-
     @Override
     public String toString() {
         return "Topic{" +
                 "id=" + id +
                 ", topic='" + topic + '\'' +
                 ", clusterName='" + clusterName + '\'' +
-                ", brokerAddress='" + brokerAddress + '\'' +
                 ", writeQueueNum=" + writeQueueNum +
                 ", readQueueNum=" + readQueueNum +
                 ", permission=" + permission +
-                ", unit=" + unit +
-                ", hasUnitSubscription=" + hasUnitSubscription +
                 ", order=" + order +
                 ", status=" + status +
                 ", createTime=" + createTime +
