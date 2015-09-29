@@ -38,8 +38,7 @@ public class CockpitTopicNSServiceImpl implements CockpitTopicNSService {
 
             return topicList.getTopicList();
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.warn("[QUERY][TOPIC][MQADMIN] try to get topic failed." + e);
+            logger.warn("[CockpitTopicNSServiceImpl] try to get topic failed." + e);
         } finally {
             defaultMQAdminExt.shutdown();
         }
@@ -59,7 +58,7 @@ public class CockpitTopicNSServiceImpl implements CockpitTopicNSService {
                 resultT.add(topicName);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("[CockpitTopicNSServiceImpl] try to get topic list failed. " + e);
         }
 
         return resultT;
@@ -77,7 +76,7 @@ public class CockpitTopicNSServiceImpl implements CockpitTopicNSService {
                 topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
                 break;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("[CockpitTopicNSServiceImpl] try to get topic config failed.topic:" + topic + "[time]" + flag + e);
                 if (e.getMessage().contains("No topic route info"))
                     break;
             }
@@ -115,7 +114,7 @@ public class CockpitTopicNSServiceImpl implements CockpitTopicNSService {
                 topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
                 break;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("[CockpitTopicNSServiceImpl] try to get topic route failed . topic:" + topic + "[time]" + flag + e);
             }
         }
 
@@ -143,7 +142,8 @@ public class CockpitTopicNSServiceImpl implements CockpitTopicNSService {
                     defaultMQAdminExt.createAndUpdateTopicConfig(broker, topicConfig);
                     break;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.warn("[CockpitTopicNSServiceImpl]try to update topic config failed.topic:" +topicConfig.getTopicName()
+                        + "[time]" + flag + e);
                 }
             }
 

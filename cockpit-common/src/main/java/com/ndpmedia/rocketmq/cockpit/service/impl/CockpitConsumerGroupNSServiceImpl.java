@@ -11,6 +11,8 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupNSService;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import java.util.Set;
 
 @Service("cockpitConsumerGroupNSService")
 public class CockpitConsumerGroupNSServiceImpl implements CockpitConsumerGroupNSService {
+
+    private Logger logger = LoggerFactory.getLogger(CockpitConsumerGroupNSServiceImpl.class);
 
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
@@ -44,6 +48,7 @@ public class CockpitConsumerGroupNSServiceImpl implements CockpitConsumerGroupNS
                 }
             }
         } catch (Exception e) {
+            logger.warn("[CockpitConsumerGroupNSService] try to update subscription config failed! " + e);
             return false;
         } finally {
             defaultMQAdminExt.shutdown();
@@ -70,7 +75,7 @@ public class CockpitConsumerGroupNSServiceImpl implements CockpitConsumerGroupNS
                 }
             }
         }catch (Exception e){
-            System.out.println("DELETE CONSUMER GROUP ON BROKER FIALED!" + e);
+            logger.warn("[CockpitConsumerGroupNSService] delete consumer group failed! + " + e);
             return false;
         }finally {
             defaultMQAdminExt.shutdown();
@@ -117,7 +122,7 @@ public class CockpitConsumerGroupNSServiceImpl implements CockpitConsumerGroupNS
                 }
             }
         }catch (Exception e){
-            System.out.println("try to get SubscriptionGroupConfig failed! group :" + groupName + e);
+            logger.warn("[CockpitCOnsumerGroupNSService]try to get SubscriptionGroupConfig failed! group :" + groupName + e);
         }
         return null;
     }

@@ -9,6 +9,8 @@ import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +25,8 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/api/topic")
 public class TopicServiceController {
+
+    private Logger logger = LoggerFactory.getLogger(TopicServiceController.class);
 
     @Autowired
     private TopicMapper topicMapper;
@@ -83,7 +87,7 @@ public class TopicServiceController {
                     cockpitTopicService.insert(topic, cockpitUser.getTeam().getId());
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                logger.warn("[TopicServiceController]try to add topic failed." + e);
             }finally {
                 defaultMQAdminExt.shutdown();
             }

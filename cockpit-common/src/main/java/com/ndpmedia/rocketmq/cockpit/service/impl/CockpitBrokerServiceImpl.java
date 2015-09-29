@@ -34,7 +34,7 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
                 clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
                 break;
             }catch (Exception e){
-                e.printStackTrace();
+                logger.warn(e.getMessage());
             }
         }
 
@@ -80,7 +80,7 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
                 clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
                 break;
             }catch (Exception e){
-                e.printStackTrace();
+                logger.warn(e.getMessage());
             }
         }
 
@@ -123,7 +123,7 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
                 clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
                 break;
             }catch (Exception e){
-                e.printStackTrace();
+                logger.warn(e.getMessage());
             }
         }
 

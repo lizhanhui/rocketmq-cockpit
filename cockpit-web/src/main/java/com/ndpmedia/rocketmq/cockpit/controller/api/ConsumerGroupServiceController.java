@@ -9,6 +9,8 @@ import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +25,8 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/api/consumer-group")
 public class ConsumerGroupServiceController {
+
+    private Logger logger = LoggerFactory.getLogger(ConsumerGroupServiceController.class);
 
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
@@ -101,7 +105,7 @@ public class ConsumerGroupServiceController {
             defaultMQAdminExt.start();
             return defaultMQAdminExt.examineConsumerConnectionInfo(consumerGroup).getConnectionSet();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("[ConsumerGroupServiceController]try to get consumer group client failed." + e);
         } finally {
             defaultMQAdminExt.shutdown();
         }

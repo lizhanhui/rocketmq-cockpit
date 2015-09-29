@@ -50,7 +50,7 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         try{
             topicMapper.register(id);
         }catch (Exception e){
-            e.printStackTrace();
+            logger.warn("[CockpitTopicServiceImpl] try to register topic failed." + e);
             return false;
         }
         return true;
@@ -61,7 +61,7 @@ public class CockpitTopicServiceImpl implements CockpitTopicService {
         try{
             topicMapper.unregister(id);
         }catch (Exception e){
-            e.printStackTrace();
+            logger.warn("[CockpitTopicServiceImpl] try to unregister topic failed." + e);
             return false;
         }
 
