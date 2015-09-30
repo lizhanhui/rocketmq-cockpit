@@ -3,7 +3,7 @@
     <head>
 
         <jsp:include page="../include/html-title.jsp">
-            <jsp:param name="pageTitle" value="Create New Project"/>
+            <jsp:param name="pageTitle" value="Project Management"/>
         </jsp:include>
         <script src="js/project-manage2.js" type="application/javascript"></script>
         <script src="js/onloading.js" type="application/javascript"></script>
