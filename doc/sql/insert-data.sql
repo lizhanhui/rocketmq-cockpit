@@ -28,7 +28,7 @@ INSERT INTO cockpit_user_role_xref(user_id, role_id) VALUES (1, 1);
 INSERT INTO cockpit_user_role_xref(user_id, role_id) VALUES (1, 2);
 INSERT INTO cockpit_user_role_xref(user_id, role_id) VALUES (2, 2);
 
-INSERT INTO team_user_xref(team_id, user_id) VALUES (1, 1);
+INSERT INTO team_user_xref(team_id, user_id) VALUES (0, 1);
 INSERT INTO team_user_xref(team_id, user_id) VALUES (1, 2);
 
 INSERT INTO topic(topic, broker_address) VALUES ('T_QuickStart', '54.94.212.186:10911');
