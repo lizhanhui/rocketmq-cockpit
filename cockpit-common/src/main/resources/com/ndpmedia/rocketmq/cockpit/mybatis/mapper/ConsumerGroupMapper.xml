@@ -69,7 +69,9 @@
     </resultMap>
 
     <select id="list" resultMap="consumerGroupMap">
-        SELECT cg.id, b.cluster_name, which_broker_when_consume_slowly, consume_from_broker_id, group_name, consume_enable, consume_broadcast_enable, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
+        SELECT cg.id, b.cluster_name, which_broker_when_consume_slowly, consume_from_broker_id, group_name,
+               consume_enable, consume_broadcast_enable, retry_max_times, retry_queue_num, consume_from_min_enable,
+               status_id, cg.create_time, cg.update_time
         FROM consumer_group AS cg
         <if test="projectId > 0">
             JOIN project_consumer_group_xref AS pcgx ON pcgx.consumer_group_id = id
@@ -117,6 +119,7 @@
     </select>
 
     <resultMap id="consumerGroupHostingResultMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting">
+        <result column="sync_time" property="syncTime" />
         <association property="broker" javaType="com.ndpmedia.rocketmq.cockpit.model.Broker">
             <id column="bid" property="id" />
             <result column="cluster_name" property="clusterName" />
@@ -141,7 +144,6 @@
             <result column="cluster_name" property="clusterName" />
         </association>
 
-        <result column="sync_time" property="syncTime" />
     </resultMap>
 
     <select id="queryHosting" resultMap="consumerGroupHostingResultMap" >

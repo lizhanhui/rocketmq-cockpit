@@ -22,7 +22,8 @@ public class BrokerMapperTest {
     private JdbcTemplate jdbcTemplate;
 
     private void insertBroker(long brokerId) {
-        jdbcTemplate.update("INSERT INTO broker(id, cluster_name, broker_name, broker_id, address, version, dc, last_update_time) " +
+
+        jdbcTemplate.update("INSERT INTO broker(id, cluster_name, broker_name, broker_id, address, version, dc, update_time) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", brokerId, "DefaultCluster", "test-broker", 0, "localhost:10911", "3.2.2", 1, new Date());
     }
 

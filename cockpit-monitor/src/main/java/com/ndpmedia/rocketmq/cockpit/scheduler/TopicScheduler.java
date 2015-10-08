@@ -76,7 +76,7 @@ public class TopicScheduler {
                                 String brokerAddress = next.getValue();
                                 Broker broker = cockpitBrokerService.get(0, brokerAddress);
                                 if (null != broker) {
-                                    cockpitTopicDBService.refresh(broker.getId(), );
+                                    // cockpitTopicDBService.refresh(broker.getId(), );
                                 }
                             }
                         }
