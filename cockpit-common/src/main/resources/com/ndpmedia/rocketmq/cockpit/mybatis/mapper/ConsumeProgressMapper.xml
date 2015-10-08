@@ -133,6 +133,78 @@
         GROUP BY queue_id
     </select>
 
+    <select id="brokerTPSListOLD" resultMap="consumeProgressMap">
+        SELECT sum(broker_offset) as broker_offset, create_time
+
+        <if test="consumerGroup != null">
+            , consumer_group
+        </if>
+
+        <if test="topic != null">
+            , topic
+        </if>
+
+        <if test="brokerName != null">
+            , broker_name
+        </if>
+
+        <if test="queueId > -1">
+            , queue_id
+        </if>
+
+        <if test="consumerGroup ==null">
+            FROM
+            (SELECT MAX(broker_offset) as broker_offset, create_time
+            , topic
+            , broker_name
+            , queue_id
+        </if>
+        FROM consume_progress
+        WHERE 1 = 1
+
+        <if test="consumerGroup != null">
+            AND consumer_group = #{consumerGroup}
+        </if>
+
+        <if test="topic != null">
+            AND topic = #{topic}
+        </if>
+
+        <if test="brokerName != null">
+            AND broker_name = #{brokerName}
+        </if>
+
+        <if test="queueId > -1">
+            AND queue_id = #{queueId}
+        </if>
+
+        <if test="consumerGroup ==null">
+            GROUP BY create_time
+            , topic
+            , broker_name
+            , queue_id
+            ) temp
+        </if>
+        GROUP BY create_time
+
+        <if test="consumerGroup != null">
+            , consumer_group
+        </if>
+
+        <if test="topic != null">
+            , topic
+        </if>
+
+        <if test="brokerName != null">
+            , broker_name
+        </if>
+
+        <if test="queueId > -1">
+            , queue_id
+        </if>
+        ORDER BY create_time desc limit 1000
+    </select>
+
     <select id="brokerTPSList" resultMap="consumeProgressMap">
         SELECT sum(broker_offset) as broker_offset, create_time
 

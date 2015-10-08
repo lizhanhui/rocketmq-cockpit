@@ -37,7 +37,13 @@ public class TopicProgressServiceController {
     @RequestMapping(value = "/{topic}", method = RequestMethod.GET)
     @ResponseBody
     public List<TopicPerSecond> list(@PathVariable("topic") String topic) {
-        List<ConsumeProgress> consumeProgresses = consumeProgressMapper.brokerTPSList(null, topic, null, -1);
+        List<ConsumeProgress> consumeProgresses = new ArrayList<>();
+        try{
+            consumeProgresses.addAll(consumeProgressMapper.brokerTPSList(null, topic, null, -1));
+        }catch (Exception e){
+            logger.warn("[TopicProgressServiceController] try get topic progress failed.");
+            consumeProgresses.addAll(consumeProgressMapper.brokerTPSListOLD(null, topic, null, -1));
+        }
         Collections.reverse(consumeProgresses);
         return ConsumeProgressHelper.getTPSListFromDiffList(consumeProgresses);
     }

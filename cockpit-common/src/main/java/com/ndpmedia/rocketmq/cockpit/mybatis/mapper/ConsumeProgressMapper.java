@@ -65,6 +65,10 @@ public interface ConsumeProgressMapper {
     List<ConsumeProgress> list(@Param("consumerGroup") String consumerGroup, @Param("topic") String topic,
             @Param("brokerName") String brokerName, @Param("queueId") int queueId);
 
+
+    List<ConsumeProgress> brokerTPSListOLD(@Param("consumerGroup") String consumerGroup, @Param("topic") String topic,
+                                    @Param("brokerName") String brokerName, @Param("queueId") int queueId);
+
     /**
      *
      * @param topic
