@@ -12,17 +12,19 @@
     <jsp:include page="../include/header.jsp"></jsp:include>
 
 <div class="container-fluid">
+  <div  class="col-xs-2">
   <select id="queryType">
     <option value="0">Query Message By ID</option>
     <option value="1">Query Message By KEY</option>
   </select>
+  </div>
 
 <br />
 <br />
   <div class="clear-both"></div>
   <div id="queryID" style="display:block">
 
-    <div class="col-xs-4 col-xs-offset-2">
+    <div class="col-xs-4">
       <input type="text" class="form-control msgId" placeholder="message id">
     </div>
 
@@ -33,7 +35,7 @@
 <br />
     <br />
     <div class="row">
-      <div class="col-xs-8 col-xs-offset-2 text-left table-responsive">
+      <div class="col-xs-10 text-left table-responsive">
         <table class="table table-condense table-hover table-bordered">
           <tbody class="table-striped itable-content">
           </tbody>
@@ -47,7 +49,7 @@
 
   <div id="queryKEY" style="display:none">
 
-    <div class="col-xs-4 col-xs-offset-2">
+    <div class="col-xs-4">
       <input type="text" class="form-control msgTopic" placeholder="Message Topic">
     </div>
 
@@ -62,7 +64,7 @@
 <br />
     <br />
     <div class="row">
-      <div class="col-xs-8 col-xs-offset-2 text-left table-responsive">
+      <div class="col-xs-10 text-left table-responsive">
         <table class="table table-condense table-hover table-bordered">
           <thead>
           <tr>
@@ -85,7 +87,7 @@
 
   <div id="flow" style="display:none">
     <div class="row">
-      <div class="col-xs-8 col-xs-offset-2 text-left table-responsive">
+      <div class="col-xs-10 text-left table-responsive">
         <table class="table table-condense table-hover table-bordered">
           <tbody class="table-striped ftable-content">
           </tbody>

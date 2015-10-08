@@ -17,6 +17,7 @@ INSERT INTO data_center(id, name) VALUES (2, 'Singapore');
 INSERT INTO data_center(id, name) VALUES (3, 'US West');
 INSERT INTO data_center(id, name) VALUES (5, 'South America');
 
+INSERT INTO team(id, name) VALUES (0, "ADMIN");
 INSERT INTO team(id, name) VALUES (1, "TP");
 INSERT INTO team(id, name) VALUES (2, "Facebook");
 INSERT INTO team(id, name) VALUES (3, "YeahMobi");

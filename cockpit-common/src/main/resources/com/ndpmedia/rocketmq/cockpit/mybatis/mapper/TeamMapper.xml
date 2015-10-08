@@ -39,6 +39,8 @@
     <select id="list" resultType="Team">
         SELECT id, name
         FROM team
+        WHERE 1 = 1
+        AND id > 0
     </select>
 
     <select id="getCockpitUsersByTeamId" resultType="CockpitUser" parameterType="long">
