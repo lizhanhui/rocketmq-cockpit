@@ -41,6 +41,7 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
     @Override
     public void remove(long projectId) {
         Project project = projectMapper.get(projectId, null);
+        //TODO we use ID to build the reference
         projectMapper.delete(projectId);
         projectMapper.deleteC(project.getName());
         projectMapper.deleteT(project.getName());

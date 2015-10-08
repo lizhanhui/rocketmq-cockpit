@@ -120,6 +120,7 @@ $(document).ready(function() {
                             success: function() {
                                 $.ajax({
                                     async: false,
+                                    //TODO we use ID to build the reference
                                     url: "cockpit/api/project/" + projectName + "/" + groupName + "/" + topic,
                                     type: "PUT",
                                     dataType: "json",

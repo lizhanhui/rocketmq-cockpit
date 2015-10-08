@@ -46,7 +46,8 @@ public class CockpitProjectController {
     public boolean add(@RequestBody Project project, HttpServletRequest request){
         try {
             CockpitUser cockpitUser = (CockpitUser) request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-            long teamId = cockpitUser.getTeam().getId();
+            //if the admin try to create a project , we change it to team TP
+            long teamId = 0L == cockpitUser.getTeam().getId() ? 1L : cockpitUser.getTeam().getId();
             project.setTeamId(teamId);
             cockpitProjectService.insert(project);
         }catch (Exception e){
@@ -59,6 +60,7 @@ public class CockpitProjectController {
     @RequestMapping(value = "/{project}/{consumerGroup}/{topic}", method = RequestMethod.PUT)
     @ResponseBody
     public void addRef(@PathVariable("project") String project, @PathVariable("consumerGroup") String consumerGroup, @PathVariable("topic") String topic){
+        //TODO we use ID to build the reference
         cockpitProjectService.addRef(project, consumerGroup, topic);
     }
 
@@ -73,6 +75,7 @@ public class CockpitProjectController {
     @ResponseBody
     public List<ConsumerGroup> getConsumerGroups(@PathVariable("project") String project){
         List<ConsumerGroup> results = new ArrayList<>();
+        //TODO we use ID to build the reference
         List<String> groupNames = cockpitProjectService.getConsumerGroups(project);
         for (String groupName:groupNames){
             results.add(cockpitConsumerGroupService.getBaseBean(groupName));
@@ -84,6 +87,7 @@ public class CockpitProjectController {
     @ResponseBody
     public List<Topic> getTopics(@PathVariable("project") String project){
         List<Topic> results = new ArrayList<>();
+        //TODO we use ID to build the reference
         List<String> topicNames = cockpitProjectService.getTopics(project);
         for (String topicName:topicNames){
             results.add(cockpitTopicService.getBaseBean(topicName));
