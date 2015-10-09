@@ -124,7 +124,7 @@ public class CockpitTopicRocketMQServiceImpl implements CockpitTopicRocketMQServ
     }
 
     @Override
-    public Set<String> getTopicBrokers(MQAdminExt adminExt, String topic) throws CockpitException {
+    public Set<String> getTopicBrokers(MQAdminExt adminExt, String topic, boolean masterOnly) throws CockpitException {
         boolean createAdmin = (null == adminExt);
 
         try {
@@ -150,6 +150,11 @@ public class CockpitTopicRocketMQServiceImpl implements CockpitTopicRocketMQServ
 
                 for (BrokerData brokerData : brokerDatas) {
                     for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
+                        if (masterOnly) {
+                            if (entry.getKey() != MixAll.MASTER_ID) {
+                                continue;
+                            }
+                        }
                         topicBroker.add(entry.getValue());
                     }
                 }
@@ -175,7 +180,7 @@ public class CockpitTopicRocketMQServiceImpl implements CockpitTopicRocketMQServ
                 adminExt.start();
             }
 
-            Set<String> localBroker = getTopicBrokers(adminExt, topicConfig.getTopicName());
+            Set<String> localBroker = getTopicBrokers(adminExt, topicConfig.getTopicName(), true);
             if (!localBroker.contains(broker)) {
                 int flag = 0;
                 while (flag++ < 5) {

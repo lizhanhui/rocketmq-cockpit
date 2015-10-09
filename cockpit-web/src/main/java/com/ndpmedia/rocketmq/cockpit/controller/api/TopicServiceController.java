@@ -75,27 +75,27 @@ public class TopicServiceController {
     @ResponseBody
     public Topic add(@RequestBody Topic topic, long projectId, HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-        if (null == topic.getBrokerAddress() || topic.getBrokerAddress().isEmpty())
-        {
-            DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
-            defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
-            try {
-                defaultMQAdminExt.start();
-                Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
-                for (String broker:brokers){
-                    topic.setBrokerAddress(broker);
-                    topicMapper.connectProject(topic.getId(), projectId);
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }finally {
-                defaultMQAdminExt.shutdown();
-            }
-        }
-        else {
-            topicMapper.connectProject(topic.getId(), projectId);
-        }
-        return topic;
+//        if (null == topic.getBrokerAddress() || topic.getBrokerAddress().isEmpty()) {
+//            DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+//            defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+//            try {
+//                defaultMQAdminExt.start();
+//                Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
+//                for (String broker:brokers){
+//                    // topic.setBrokerAddress(broker);
+//                    // TODO Fix me.
+//                    topicMapper.connectProject(topic.getId(), projectId);
+//                }
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }finally {
+//                defaultMQAdminExt.shutdown();
+//            }
+//        } else {
+//            topicMapper.connectProject(topic.getId(), projectId);
+//        }
+//        return topic;
+        throw new RuntimeException("Not implemented.");
     }
 
 

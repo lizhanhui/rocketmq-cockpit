@@ -98,7 +98,7 @@ public class ConsumerGroupSyncDownCommand implements SubCommand {
     }
 
     private void downloadConsumerGroupConfig(DefaultMQAdminExt defaultMQAdminExt, String consumerGroup) throws CockpitException {
-        Set<String> brokers = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
+        Set<String> brokers = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup, true);
         TopicConfig topicConfig = cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
 
         try {

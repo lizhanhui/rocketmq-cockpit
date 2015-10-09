@@ -97,7 +97,7 @@ public class TopicSyncDownCommand implements SubCommand {
     }
 
     private void downloadTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig) throws CockpitException {
-        Set<String> brokerAddresses = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName());
+        Set<String> brokerAddresses = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName(), true);
 
         for (String brokerAddress : brokerAddresses) {
             int flag = 0;

@@ -24,9 +24,10 @@ public interface CockpitTopicRocketMQService extends CockpitTopicBaseService {
      * get brokers from name server by topic route
      * @param adminExt connect to name server
      * @param topic topic name
+     * @param masterOnly Indicate if we only fetch master broker addresses.
      * @return brokers
      */
-    Set<String> getTopicBrokers(MQAdminExt adminExt, String topic) throws CockpitException;
+    Set<String> getTopicBrokers(MQAdminExt adminExt, String topic, boolean masterOnly) throws CockpitException;
 
     /**
      * try to update or create topic config on broker
