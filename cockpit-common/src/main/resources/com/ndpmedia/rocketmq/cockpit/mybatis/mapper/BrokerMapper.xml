@@ -8,8 +8,8 @@
     </insert>
 
     <insert id="createConsumerGroup">
-        INSERT INTO broker_consumer_group_xref(broker_id, consumer_group_id)
-        VALUES (#{brokerId}, #{consumerGroupId})
+        INSERT INTO broker_consumer_group_xref(broker_id, consumer_group_id, create_time, update_time, sync_time)
+        VALUES (#{brokerId}, #{consumerGroupId}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     </insert>
 
     <insert id="createTopic">

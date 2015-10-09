@@ -1,11 +1,16 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
-import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
+import com.alibaba.rocketmq.client.exception.MQBrokerException;
+import com.alibaba.rocketmq.client.exception.MQClientException;
+import com.alibaba.rocketmq.common.protocol.body.SubscriptionGroupWrapper;
+import com.alibaba.rocketmq.common.subscription.SubscriptionGroupConfig;
+import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
+import com.google.common.base.Preconditions;
+import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
-import com.ndpmedia.rocketmq.cockpit.scheduler.command.ConsumerGroupSyncDownCommand;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
 import org.slf4j.Logger;
@@ -14,7 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by robert on 2015/6/9.
@@ -34,7 +40,7 @@ public class ConsumerGroupScheduler {
     private CockpitConsumerGroupDBService cockpitConsumerGroupDBService;
 
     @Autowired
-    private ConsumerGroupMapper consumerGroupMapper;
+    private CockpitBrokerService cockpitBrokerService;
 
     /**
      * update consumer group to cluster
@@ -47,22 +53,52 @@ public class ConsumerGroupScheduler {
         try {
             defaultMQAdminExt.start();
 
-            ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+            Set<String> brokerAddresses = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
 
-
-
-            List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(0, null, null, 0, null);
-            for (ConsumerGroup consumerGroup:consumerGroups){
-                if (consumerGroup.getStatus() != Status.ACTIVE) {
-                    continue;
-                }
-
-                cockpitConsumerGroupMQService.update(consumerGroup);
+            for (String brokerAddress : brokerAddresses) {
+                syncConsumerGroupByBroker(defaultMQAdminExt, brokerAddress);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to syncConsumerGroupStatus", e);
         } finally {
             defaultMQAdminExt.shutdown();
         }
     }
+
+    private void syncConsumerGroupByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress)
+            throws InterruptedException, RemotingException, MQClientException, MQBrokerException {
+        Preconditions.checkNotNull(defaultMQAdminExt, "DefaultMQAdminExt");
+        Preconditions.checkNotNull(brokerAddress, "BrokerAddress");
+
+        Broker broker = cockpitBrokerService.get(0, brokerAddress);
+        if (null == broker) {
+            logger.error("Broker Sync may has error. Detecting a non-existing broker");
+            return;
+        }
+
+        SubscriptionGroupWrapper subscriptionGroupWrapper = defaultMQAdminExt.fetchAllSubscriptionGroups(brokerAddress, 3000);
+
+        for (SubscriptionGroupConfig subscriptionGroupConfig : subscriptionGroupWrapper.getSubscriptionGroupTable().values()) {
+            ConsumerGroup consumerGroup = cockpitConsumerGroupDBService.get(0, subscriptionGroupConfig.getGroupName());
+            if (null == consumerGroup) {
+                // First create this consumer group in database.
+                consumerGroup = new ConsumerGroup();
+                consumerGroup.setClusterName(broker.getClusterName());
+                consumerGroup.setGroupName(subscriptionGroupConfig.getGroupName());
+                consumerGroup.setConsumeFromBrokerId((int)subscriptionGroupConfig.getBrokerId());
+                consumerGroup.setWhichBrokerWhenConsumeSlowly((int)subscriptionGroupConfig.getWhichBrokerWhenConsumeSlowly());
+                consumerGroup.setCreateTime(new Date());
+                consumerGroup.setUpdateTime(new Date());
+                consumerGroup.setStatus(Status.ACTIVE);
+                cockpitConsumerGroupDBService.insert(consumerGroup, 1);
+            }
+
+            if (cockpitBrokerService.hasConsumerGroup(broker.getId(), consumerGroup.getId())) {
+                cockpitConsumerGroupDBService.refresh(broker.getId(), consumerGroup.getId());
+            } else {
+                cockpitBrokerService.createConsumerGroup(broker.getId(), consumerGroup.getId());
+            }
+        }
+    }
+
 }

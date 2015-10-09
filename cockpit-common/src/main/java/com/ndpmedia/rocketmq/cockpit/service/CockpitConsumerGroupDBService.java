@@ -11,4 +11,6 @@ public interface CockpitConsumerGroupDBService {
     void insert(ConsumerGroup consumerGroup, long projectId);
 
     void delete(long consumerGroupId);
+
+    void refresh(long brokerId, long consumerGroupId);
 }

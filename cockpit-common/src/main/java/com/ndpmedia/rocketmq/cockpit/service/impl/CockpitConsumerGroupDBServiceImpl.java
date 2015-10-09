@@ -46,4 +46,9 @@ public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDB
         consumerGroupMapper.disconnectProject(consumerGroupId, 0);
         consumerGroupMapper.delete(consumerGroupId);
     }
+
+    @Override
+    public void refresh(long brokerId, long consumerGroupId) {
+        consumerGroupMapper.refresh(brokerId, consumerGroupId);
+    }
 }

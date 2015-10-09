@@ -32,4 +32,9 @@ public interface CockpitBrokerService {
     boolean removeAllTopic(String broker);
 
     Broker get(long brokerId, String brokerAddress);
+
+    boolean hasConsumerGroup(long brokerId, long consumerGroupId);
+
+
+    void createConsumerGroup(long brokerId, long consumerGroupId);
 }

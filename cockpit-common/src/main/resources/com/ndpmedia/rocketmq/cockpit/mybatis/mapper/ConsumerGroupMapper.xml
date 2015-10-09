@@ -26,9 +26,10 @@
 
     <update id="refresh">
       UPDATE broker_consumer_group_xref
-      SET update_time = CURRENT_TIMESTAMP
+      SET update_time = CURRENT_TIMESTAMP,
+          sync_time = CURRENT_TIMESTAMP
       WHERE broker_id = #{brokerId}
-        AND consumer_group_id = #{consumerGroupId}
+            AND consumer_group_id = #{consumerGroupId}
     </update>
 
     <delete id="delete" parameterType="long">

@@ -1,5 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
+import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
@@ -17,6 +18,8 @@ import java.util.*;
 @Service("cockpitBrokerService")
 public class CockpitBrokerServiceImpl implements CockpitBrokerService {
 
+    private static final int MAX_TIMEOUT_RETRY_TIMES = 5;
+
     private Logger logger = LoggerFactory.getLogger(CockpitBrokerServiceImpl.class);
 
     @Autowired
@@ -31,12 +34,12 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
         Set<String> brokerList = new HashSet<>();
         int flag = 0;
         ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
-        while(flag++ < 5) {
+        while (flag++ < MAX_TIMEOUT_RETRY_TIMES) {
             try {
                 clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
                 break;
-            }catch (Exception e){
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.info("Failed to get cluster info", e);
             }
         }
 
@@ -53,8 +56,8 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
                     if (brokerData != null) {
                         Set<Map.Entry<Long, String>> brokerAddrSet = brokerData.getBrokerAddrs().entrySet();
                         for (Map.Entry<Long, String> nextEntry : brokerAddrSet) {
-                            if (nextEntry.getKey() != 0) {
-                                logger.info("this broker maybe not master ." + nextEntry.getValue());
+                            if (nextEntry.getKey() != MixAll.MASTER_ID) {
+                                logger.info("this broker is not master ." + nextEntry.getValue());
                                 continue;
                             }
                             brokerList.add(nextEntry.getValue());
@@ -74,11 +77,11 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
         logger.info("[sync topic] try to get broker list");
         int flag = 0;
         ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
-        while(flag++ < 5) {
+        while (flag++ < 5) {
             try {
                 clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
                 break;
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -97,11 +100,8 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
                     BrokerData brokerData = clusterInfoSerializeWrapper.getBrokerAddrTable().get(brokerName);
                     if (brokerData != null) {
                         Set<Map.Entry<Long, String>> brokerAddrSet = brokerData.getBrokerAddrs().entrySet();
-                        Iterator<Map.Entry<Long, String>> itAddr = brokerAddrSet.iterator();
-
-                        while (itAddr.hasNext()) {
-                            Map.Entry<Long, String> next1 = itAddr.next();
-                            brokerToCluster.put(next1.getValue(), cluster);
+                        for (Map.Entry<Long, String> item : brokerAddrSet) {
+                            brokerToCluster.put(item.getValue(), cluster);
                         }
                     }
                 }
@@ -117,11 +117,11 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
         Set<String> nameList = new HashSet<>();
         int flag = 0;
         ClusterInfo clusterInfoSerializeWrapper = new ClusterInfo();
-        while(flag++ < 5) {
+        while (flag++ < 5) {
             try {
                 clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
                 break;
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -144,10 +144,21 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
     public boolean removeAllTopic(String broker) {
         try {
 
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean hasConsumerGroup(long brokerId, long consumerGroupId) {
+        return brokerMapper.hasConsumerGroup(brokerId, consumerGroupId);
+    }
+
+
+    @Override
+    public void createConsumerGroup(long brokerId, long consumerGroupId) {
+        brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
     }
 
     @Override

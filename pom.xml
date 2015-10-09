@@ -219,6 +219,7 @@
                 <artifactId>logback-core</artifactId>
                 <version>1.0.13</version>
             </dependency>
+
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
