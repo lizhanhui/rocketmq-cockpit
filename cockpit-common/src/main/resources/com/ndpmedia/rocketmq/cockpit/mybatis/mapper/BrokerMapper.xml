@@ -22,11 +22,11 @@
         SET update_time = CURRENT_TIMESTAMP
         WHERE 1 = 1
         <if test="brokerAddress != null">
-          AND broker_name = #{brokerName}
+          AND address = #{brokerAddress}
         </if>
 
         <if test="brokerId > 0">
-            AND broker_id = #{brokerId}
+            AND id = #{brokerId}
         </if>
     </update>
 
