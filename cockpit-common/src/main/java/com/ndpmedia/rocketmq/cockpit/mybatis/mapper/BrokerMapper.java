@@ -22,7 +22,7 @@ public interface BrokerMapper {
                       @Param("brokerName") String brokerName,
                       @Param("brokerId") int brokerId,
                       @Param("dc") int dc,
-                      @Param("lastUpdateTime") Date lastUpdateTime);
+                      @Param("updateTime") Date updateTime);
 
     List<BrokerLoad> queryBrokerLoad(@Param("dcId") int dcId,
                                      @Param("brokerId") Integer brokerId);
