@@ -9,7 +9,7 @@ import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.TopicSyncDownCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class TopicScheduler {
     private CockpitTopicDBService cockpitTopicDBService;
 
     @Autowired
-    private CockpitTopicRocketMQService cockpitTopicRocketMQService;
+    private CockpitTopicMQService cockpitTopicMQService;
 
     @Autowired
     private CockpitBrokerService cockpitBrokerService;

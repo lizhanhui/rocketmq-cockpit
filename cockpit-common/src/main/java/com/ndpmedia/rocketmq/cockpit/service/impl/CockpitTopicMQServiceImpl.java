@@ -13,7 +13,7 @@ import com.alibaba.rocketmq.tools.admin.MQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Service("cockpitTopicRocketMQService")
-public class CockpitTopicRocketMQServiceImpl implements CockpitTopicRocketMQService {
+@Service("cockpitTopicMQService")
+public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
 
-    private Logger logger = LoggerFactory.getLogger(CockpitTopicRocketMQServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(CockpitTopicMQServiceImpl.class);
 
     @Autowired
     private TopicMapper topicMapper;

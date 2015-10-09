@@ -11,38 +11,20 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Service("cockpitConsumerGroupService")
-public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupService {
+@Service("cockpitConsumerGroupMQService")
+public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQService {
 
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
-
-    public ConsumerGroup get(long consumerGroupId, String consumerGroupName) {
-        if (consumerGroupId <=0 && null == consumerGroupName) {
-            throw new IllegalArgumentException("Either consumer group ID or Name should be present");
-        }
-
-        return consumerGroupMapper.get(consumerGroupId, consumerGroupName);
-    }
-
-    @Override
-    public void activate(long consumerGroupId) {
-        ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId, null);
-        if (null != consumerGroup && consumerGroup.getStatus() != Status.ACTIVE) {
-            consumerGroup.setStatus(Status.ACTIVE);
-            consumerGroupMapper.update(consumerGroup);
-        }
-    }
 
     @Override
     public boolean update(ConsumerGroup consumerGroup) {
@@ -105,13 +87,6 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
         return true;
     }
 
-    @Transactional
-    @Override
-    public void delete(long consumerGroupId) {
-        consumerGroupMapper.disconnectProject(consumerGroupId, 0);
-        consumerGroupMapper.delete(consumerGroupId);
-    }
-
     @Override
     public Set<String> getGroups(DefaultMQAdminExt defaultMQAdminExt) {
         Set<String> consumerGroups = new HashSet<>();
@@ -154,14 +129,6 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
         return null;
     }
 
-    @Override
-    @Transactional
-    public void insert(ConsumerGroup consumerGroup, long projectId) {
-        consumerGroupMapper.insert(consumerGroup);
-        consumerGroupMapper.connectProject(consumerGroup.getId(), projectId);
-    }
-
-
     public static SubscriptionGroupConfig wrap(ConsumerGroup consumerGroup) {
         SubscriptionGroupConfig subscriptionGroupConfig = new SubscriptionGroupConfig();
         subscriptionGroupConfig.setBrokerId(consumerGroup.getConsumeFromBrokerId());
@@ -174,4 +141,6 @@ public class CockpitConsumerGroupServiceImpl implements CockpitConsumerGroupServ
         subscriptionGroupConfig.setWhichBrokerWhenConsumeSlowly(consumerGroup.getWhichBrokerWhenConsumeSlowly());
         return subscriptionGroupConfig;
     }
+
+
 }

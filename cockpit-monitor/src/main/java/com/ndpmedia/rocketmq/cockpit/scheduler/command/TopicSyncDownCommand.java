@@ -10,7 +10,7 @@ import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -33,7 +33,7 @@ public class TopicSyncDownCommand implements SubCommand {
     private CockpitBrokerService cockpitBrokerService;
 
     @Autowired
-    private CockpitTopicRocketMQService cockpitTopicRocketMQService;
+    private CockpitTopicMQService cockpitTopicMQService;
 
     @Autowired
     private CockpitTopicDBService cockpitTopicDBService;
@@ -74,7 +74,7 @@ public class TopicSyncDownCommand implements SubCommand {
         try {
             adminExt.start();
             doMap(adminExt);
-            Set<String> topics = cockpitTopicRocketMQService.fetchAllTopics(adminExt, true);
+            Set<String> topics = cockpitTopicMQService.fetchAllTopics(adminExt, true);
             for (String topicName : topics) {
                 logger.info("now we check topic :" + topicName);
                 TopicConfig topicConfig = getTopicConfig(adminExt, topicName);
@@ -93,11 +93,11 @@ public class TopicSyncDownCommand implements SubCommand {
     }
 
     private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) throws CockpitException {
-        return cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
+        return cockpitTopicMQService.getTopicConfigByTopicName(defaultMQAdminExt, topic);
     }
 
     private void downloadTopicConfig(DefaultMQAdminExt defaultMQAdminExt, TopicConfig topicConfig) throws CockpitException {
-        Set<String> brokerAddresses = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName(), true);
+        Set<String> brokerAddresses = cockpitTopicMQService.getTopicBrokers(defaultMQAdminExt, topicConfig.getTopicName(), true);
 
         for (String brokerAddress : brokerAddresses) {
             int flag = 0;

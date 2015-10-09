@@ -14,8 +14,8 @@ import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupServiceImpl;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicRocketMQServiceImpl;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupMQServiceImpl;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicMQServiceImpl;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,11 +111,11 @@ public class AutoPilot {
                                 ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId, null);
                                 try {
                                     // For each topic, create associated consumer group on the target, matched brokers.
-                                    adminExt.createAndUpdateSubscriptionGroupConfig(broker.getAddress(), CockpitConsumerGroupServiceImpl.wrap(consumerGroup));
+                                    adminExt.createAndUpdateSubscriptionGroupConfig(broker.getAddress(), CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup));
                                     brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
 
                                     // Create topic on matched brokers or update topic read/write queue number.
-                                    adminExt.createAndUpdateTopicConfig(broker.getAddress(), CockpitTopicRocketMQServiceImpl.wrapTopicToTopicConfig(topic));
+                                    adminExt.createAndUpdateTopicConfig(broker.getAddress(), CockpitTopicMQServiceImpl.wrapTopicToTopicConfig(topic));
                                     brokerMapper.createTopic(brokerId, topicAvailability.getTopicId());
                                 } catch (RemotingException | MQBrokerException | InterruptedException | MQClientException e) {
                                     LOGGER.error("Failed to create consumer group {} on broker {}", consumerGroup.getGroupName(), broker.getAddress());

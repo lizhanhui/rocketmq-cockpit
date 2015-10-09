@@ -1,12 +1,11 @@
 package com.ndpmedia.rocketmq.cockpit.controller.api;
 
-import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Controller
 @RequestMapping(value = "/api/topic")
@@ -32,7 +30,7 @@ public class TopicServiceController {
     private TopicMapper topicMapper;
 
     @Autowired
-    private CockpitTopicRocketMQService cockpitTopicRocketMQService;
+    private CockpitTopicMQService cockpitTopicMQService;
 
     @Autowired
     private CockpitBrokerService cockpitBrokerService;

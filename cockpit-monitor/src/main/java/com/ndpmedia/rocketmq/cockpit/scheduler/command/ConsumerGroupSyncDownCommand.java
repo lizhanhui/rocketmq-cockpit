@@ -11,8 +11,9 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicRocketMQService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -31,16 +32,16 @@ public class ConsumerGroupSyncDownCommand implements SubCommand {
     private Logger logger = LoggerFactory.getLogger(ConsumerGroupSyncDownCommand.class);
 
     @Autowired
-    private CockpitConsumerGroupService consumerGroupService;
+    private CockpitConsumerGroupDBService cockpitConsumerGroupDBService;
+
+    @Autowired
+    private CockpitConsumerGroupMQService cockpitConsumerGroupMQService;
 
     @Autowired
     private CockpitBrokerService cockpitBrokerService;
 
     @Autowired
-    private CockpitTopicRocketMQService cockpitTopicRocketMQService;
-
-    @Autowired
-    private CockpitConsumerGroupService cockpitConsumerGroupService;
+    private CockpitTopicMQService cockpitTopicMQService;
 
     @Autowired
     private BrokerMapper brokerMapper;
@@ -81,7 +82,7 @@ public class ConsumerGroupSyncDownCommand implements SubCommand {
         try {
             adminExt.start();
             doMap(adminExt);
-            Set<String> consumerGroups = cockpitConsumerGroupService.getGroups(adminExt);
+            Set<String> consumerGroups = cockpitConsumerGroupMQService.getGroups(adminExt);
             for (String consumerGroup : consumerGroups) {
                 logger.info("now we check consumer group:" + consumerGroup);
                 downloadConsumerGroupConfig(adminExt, consumerGroup);
@@ -98,8 +99,8 @@ public class ConsumerGroupSyncDownCommand implements SubCommand {
     }
 
     private void downloadConsumerGroupConfig(DefaultMQAdminExt defaultMQAdminExt, String consumerGroup) throws CockpitException {
-        Set<String> brokers = cockpitTopicRocketMQService.getTopicBrokers(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup, true);
-        TopicConfig topicConfig = cockpitTopicRocketMQService.getTopicConfigByTopicName(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
+        Set<String> brokers = cockpitTopicMQService.getTopicBrokers(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup, true);
+        TopicConfig topicConfig = cockpitTopicMQService.getTopicConfigByTopicName(defaultMQAdminExt, MixAll.RETRY_GROUP_TOPIC_PREFIX + consumerGroup);
 
         try {
             ConsumerGroup cg = new ConsumerGroup();
@@ -107,14 +108,14 @@ public class ConsumerGroupSyncDownCommand implements SubCommand {
             cg.setConsumeEnable(true);
             cg.setRetryQueueNum(topicConfig.getWriteQueueNums());
 
-            ConsumerGroup existingConsumerGroup = consumerGroupService.get(0L, consumerGroup);
+            ConsumerGroup existingConsumerGroup = cockpitConsumerGroupDBService.get(0L, consumerGroup);
             //若未获取到相同group Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
             if (null == existingConsumerGroup) {
-                consumerGroupService.insert(cg, 1);
+                cockpitConsumerGroupDBService.insert(cg, 1);
                 existingConsumerGroup = cg;
             } else if (existingConsumerGroup.getStatus() != Status.ACTIVE) {
                 //若获取到相同group Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态
-                consumerGroupService.activate(existingConsumerGroup.getId());
+                cockpitConsumerGroupDBService.activate(existingConsumerGroup.getId());
             }
 
             for (String brokerAddress : brokers) {

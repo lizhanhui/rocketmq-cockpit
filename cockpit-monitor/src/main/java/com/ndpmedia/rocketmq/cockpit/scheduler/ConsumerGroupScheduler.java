@@ -5,7 +5,8 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.ConsumerGroupSyncDownCommand;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,10 @@ public class ConsumerGroupScheduler {
     private ConsumerGroupSyncDownCommand consumerGroupSyncDownCommand;
 
     @Autowired
-    private CockpitConsumerGroupService cockpitConsumerGroupService;
+    private CockpitConsumerGroupMQService cockpitConsumerGroupMQService;
+
+    @Autowired
+    private CockpitConsumerGroupDBService cockpitConsumerGroupDBService;
 
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
@@ -56,10 +60,11 @@ public class ConsumerGroupScheduler {
 
             List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(0, null, null, 0, null);
             for (ConsumerGroup consumerGroup:consumerGroups){
-                if (consumerGroup.getStatus() != Status.ACTIVE)
+                if (consumerGroup.getStatus() != Status.ACTIVE) {
                     continue;
+                }
 
-                cockpitConsumerGroupService.update(consumerGroup);
+                cockpitConsumerGroupMQService.update(consumerGroup);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -4,12 +4,13 @@ import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitBrokerServiceImpl;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupServiceImpl;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +21,11 @@ public class ConsumerGroupSyncUpCommand implements SubCommand {
 
     private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
 
-    private CockpitConsumerGroupService cockpitConsumerGroupService = new CockpitConsumerGroupServiceImpl();
+    @Autowired
+    private CockpitConsumerGroupDBService cockpitConsumerGroupDBService;
+
+    @Autowired
+    private CockpitConsumerGroupMQService cockpitConsumerGroupMQService;
 
     @Override
     public String commandName() {
@@ -55,13 +60,13 @@ public class ConsumerGroupSyncUpCommand implements SubCommand {
         try{
             adminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
             adminExt.start();
-            Set<String> consumerGroups = cockpitConsumerGroupService.getGroups(adminExt);
+            Set<String> consumerGroups = cockpitConsumerGroupMQService.getGroups(adminExt);
 
             doList(adminExt);
 
             for (String comGroup: consumerGroups) {
                 System.out.println("now we check consumer group : " + comGroup);
-                System.out.println(cockpitConsumerGroupService.getGroupConfig(adminExt, comGroup));
+                System.out.println(cockpitConsumerGroupMQService.getGroupConfig(adminExt, comGroup));
             }
         }catch (Exception e){
             e.printStackTrace();

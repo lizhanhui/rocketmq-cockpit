@@ -7,7 +7,7 @@ import com.ndpmedia.rocketmq.cockpit.model.Topic;
 
 import java.util.Set;
 
-public interface CockpitTopicRocketMQService extends CockpitTopicBaseService {
+public interface CockpitTopicMQService extends CockpitTopicBaseService {
 
     Set<String> fetchAllTopics(MQAdminExt adminExt, boolean includeSystemTopic) throws CockpitException;
 
