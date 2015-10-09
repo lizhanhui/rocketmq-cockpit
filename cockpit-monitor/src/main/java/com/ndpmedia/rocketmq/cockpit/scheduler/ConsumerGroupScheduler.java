@@ -1,5 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
+import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
@@ -27,9 +28,6 @@ public class ConsumerGroupScheduler {
     private Logger logger = LoggerFactory.getLogger(ConsumerGroupScheduler.class);
 
     @Autowired
-    private ConsumerGroupSyncDownCommand consumerGroupSyncDownCommand;
-
-    @Autowired
     private CockpitConsumerGroupMQService cockpitConsumerGroupMQService;
 
     @Autowired
@@ -39,24 +37,19 @@ public class ConsumerGroupScheduler {
     private ConsumerGroupMapper consumerGroupMapper;
 
     /**
-     * schedule:check consumer group from cluster and broker.
-     * period:one hour(16:24 of an hour)
-     */
-    @Scheduled(cron = "24 16 * * * *")
-    public void downloadTopic() {
-        consumerGroupSyncDownCommand.execute(null, null, null);
-    }
-
-    /**
      * update consumer group to cluster
      * period:one hour(20:24 of an hour)
      */
     @Scheduled(cron = "24 20 * * * *")
-    public void checkTopicStatus() {
+    public void syncConsumerGroupStatus() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
+
+            ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+
+
 
             List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(0, null, null, 0, null);
             for (ConsumerGroup consumerGroup:consumerGroups){
