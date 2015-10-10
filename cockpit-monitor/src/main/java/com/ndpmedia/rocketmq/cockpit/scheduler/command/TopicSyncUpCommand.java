@@ -5,13 +5,13 @@ import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitBrokerServiceImpl;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicMQServiceImpl;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,9 +22,14 @@ public class TopicSyncUpCommand implements SubCommand {
 
     private Set<String> nameList = new HashSet<>();
 
-    private CockpitTopicMQService cockpitTopicMQService = new CockpitTopicMQServiceImpl();
+    @Autowired
+    private CockpitTopicMQService cockpitTopicMQService;
 
-    private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
+    @Autowired
+    private CockpitBrokerDBService cockpitBrokerDBService;
+
+    @Autowired
+    private CockpitBrokerMQService cockpitBrokerMQService;
 
     @Override
     public String commandName() {
@@ -83,11 +88,11 @@ public class TopicSyncUpCommand implements SubCommand {
     }
 
     private void doList(DefaultMQAdminExt defaultMQAdminExt) {
-        brokerList.addAll(cockpitBrokerService.getALLBrokers(defaultMQAdminExt));
+        brokerList.addAll(cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt));
     }
 
     private void doBaseServer(DefaultMQAdminExt defaultMQAdminExt){
-        nameList.addAll(cockpitBrokerService.getAllNames(defaultMQAdminExt));
+        nameList.addAll(cockpitBrokerMQService.getAllNames(defaultMQAdminExt));
     }
 
     private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) throws CockpitException {

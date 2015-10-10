@@ -10,7 +10,8 @@ import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
@@ -38,7 +39,10 @@ public class ConsumerGroupSyncDownCommand implements SubCommand {
     private CockpitConsumerGroupMQService cockpitConsumerGroupMQService;
 
     @Autowired
-    private CockpitBrokerService cockpitBrokerService;
+    private CockpitBrokerDBService cockpitBrokerDBService;
+
+    @Autowired
+    private CockpitBrokerMQService cockpitBrokerMQService;
 
     @Autowired
     private CockpitTopicMQService cockpitTopicMQService;
@@ -95,7 +99,7 @@ public class ConsumerGroupSyncDownCommand implements SubCommand {
     }
 
     private void doMap(DefaultMQAdminExt defaultMQAdminExt) {
-        brokerToCluster.putAll(cockpitBrokerService.getBrokerCluster(defaultMQAdminExt));
+        brokerToCluster.putAll(cockpitBrokerMQService.getBrokerCluster(defaultMQAdminExt));
     }
 
     private void downloadConsumerGroupConfig(DefaultMQAdminExt defaultMQAdminExt, String consumerGroup) throws CockpitException {

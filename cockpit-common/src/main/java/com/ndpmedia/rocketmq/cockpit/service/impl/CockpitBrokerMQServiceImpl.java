@@ -4,29 +4,21 @@ import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
-import com.ndpmedia.rocketmq.cockpit.model.Broker;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-@Service("cockpitBrokerService")
-public class CockpitBrokerServiceImpl implements CockpitBrokerService {
-
+@Service("cockpitBrokerMQService")
+public class CockpitBrokerMQServiceImpl implements CockpitBrokerMQService {
     private static final int MAX_TIMEOUT_RETRY_TIMES = 5;
 
-    private Logger logger = LoggerFactory.getLogger(CockpitBrokerServiceImpl.class);
-
-    @Autowired
-    private TopicMapper topicMapper;
-
-    @Autowired
-    private BrokerMapper brokerMapper;
+    private Logger logger = LoggerFactory.getLogger(CockpitBrokerMQServiceImpl.class);
 
     @Override
     public Set<String> getALLBrokers(DefaultMQAdminExt defaultMQAdminExt) {
@@ -150,19 +142,5 @@ public class CockpitBrokerServiceImpl implements CockpitBrokerService {
         return true;
     }
 
-    @Override
-    public boolean hasConsumerGroup(long brokerId, long consumerGroupId) {
-        return brokerMapper.hasConsumerGroup(brokerId, consumerGroupId);
-    }
 
-
-    @Override
-    public void createConsumerGroup(long brokerId, long consumerGroupId) {
-        brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
-    }
-
-    @Override
-    public Broker get(long brokerId, String brokerAddress) {
-        return brokerMapper.get(brokerId, brokerAddress);
-    }
 }

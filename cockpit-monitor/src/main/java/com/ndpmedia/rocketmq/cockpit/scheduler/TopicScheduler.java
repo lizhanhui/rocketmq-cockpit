@@ -7,7 +7,8 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.TopicSyncDownCommand;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.slf4j.Logger;
@@ -38,7 +39,10 @@ public class TopicScheduler {
     private CockpitTopicMQService cockpitTopicMQService;
 
     @Autowired
-    private CockpitBrokerService cockpitBrokerService;
+    private CockpitBrokerDBService cockpitBrokerDBService;
+
+    @Autowired
+    private CockpitBrokerMQService cockpitBrokerMQService;
 
     /**
      * schedule:check topic and topic route from cluster and broker.
@@ -74,7 +78,7 @@ public class TopicScheduler {
                         for (Map.Entry<Long, String> next : brokerData.getBrokerAddrs().entrySet()) {
                             if (next.getKey() == 0) {
                                 String brokerAddress = next.getValue();
-                                Broker broker = cockpitBrokerService.get(0, brokerAddress);
+                                Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
                                 if (null != broker) {
                                     // cockpitTopicDBService.refresh(broker.getId(), );
                                 }

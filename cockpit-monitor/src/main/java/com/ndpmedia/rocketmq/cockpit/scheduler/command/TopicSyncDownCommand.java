@@ -8,7 +8,8 @@ import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
@@ -30,7 +31,10 @@ public class TopicSyncDownCommand implements SubCommand {
     private Logger logger = LoggerFactory.getLogger(TopicSyncDownCommand.class);
 
     @Autowired
-    private CockpitBrokerService cockpitBrokerService;
+    private CockpitBrokerDBService cockpitBrokerDBService;
+
+    @Autowired
+    private CockpitBrokerMQService cockpitBrokerMQService;
 
     @Autowired
     private CockpitTopicMQService cockpitTopicMQService;
@@ -89,7 +93,7 @@ public class TopicSyncDownCommand implements SubCommand {
     }
 
     private void doMap(DefaultMQAdminExt defaultMQAdminExt) {
-        brokerToCluster.putAll(cockpitBrokerService.getBrokerCluster(defaultMQAdminExt));
+        brokerToCluster.putAll(cockpitBrokerMQService.getBrokerCluster(defaultMQAdminExt));
     }
 
     private TopicConfig getTopicConfig(DefaultMQAdminExt defaultMQAdminExt, String topic) throws CockpitException {
@@ -107,7 +111,7 @@ public class TopicSyncDownCommand implements SubCommand {
                     Topic oldT = cockpitTopicDBService.getTopic(topic.getTopic());
                     //若未获取到相同Topic Name，相同Broker地址的数据，则将该条信息作为新数据直接插入
                     if (null == oldT) {
-                        Broker broker = cockpitBrokerService.get(0, brokerAddress);
+                        Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
                         cockpitTopicDBService.insert(1, topic, broker.getId());
                     }
                     //若获取到相同Topic Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态

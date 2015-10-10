@@ -1,13 +1,14 @@
 package com.ndpmedia.rocketmq.cockpit.service;
 
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
-import com.ndpmedia.rocketmq.cockpit.model.Broker;
 
 import java.util.Map;
 import java.util.Set;
 
-public interface CockpitBrokerService {
-
+/**
+ * Created by macbookpro on 15/10/10.
+ */
+public interface CockpitBrokerMQService {
     /**
      * try to get broker list
      * @param defaultMQAdminExt
@@ -30,11 +31,4 @@ public interface CockpitBrokerService {
     Set<String> getAllNames(DefaultMQAdminExt defaultMQAdminExt);
 
     boolean removeAllTopic(String broker);
-
-    Broker get(long brokerId, String brokerAddress);
-
-    boolean hasConsumerGroup(long brokerId, long consumerGroupId);
-
-
-    void createConsumerGroup(long brokerId, long consumerGroupId);
 }

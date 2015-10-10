@@ -10,7 +10,8 @@ import com.google.common.base.Preconditions;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
 import org.slf4j.Logger;
@@ -40,7 +41,10 @@ public class ConsumerGroupScheduler {
     private CockpitConsumerGroupDBService cockpitConsumerGroupDBService;
 
     @Autowired
-    private CockpitBrokerService cockpitBrokerService;
+    private CockpitBrokerDBService cockpitBrokerDBService;
+
+    @Autowired
+    private CockpitBrokerMQService cockpitBrokerMQService;
 
     /**
      * update consumer group to cluster
@@ -53,7 +57,7 @@ public class ConsumerGroupScheduler {
         try {
             defaultMQAdminExt.start();
 
-            Set<String> brokerAddresses = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
+            Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
 
             for (String brokerAddress : brokerAddresses) {
                 syncConsumerGroupByBroker(defaultMQAdminExt, brokerAddress);
@@ -70,7 +74,7 @@ public class ConsumerGroupScheduler {
         Preconditions.checkNotNull(defaultMQAdminExt, "DefaultMQAdminExt");
         Preconditions.checkNotNull(brokerAddress, "BrokerAddress");
 
-        Broker broker = cockpitBrokerService.get(0, brokerAddress);
+        Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
         if (null == broker) {
             logger.error("Broker Sync may has error. Detecting a non-existing broker");
             return;
@@ -93,10 +97,10 @@ public class ConsumerGroupScheduler {
                 cockpitConsumerGroupDBService.insert(consumerGroup, 1);
             }
 
-            if (cockpitBrokerService.hasConsumerGroup(broker.getId(), consumerGroup.getId())) {
+            if (cockpitBrokerDBService.hasConsumerGroup(broker.getId(), consumerGroup.getId())) {
                 cockpitConsumerGroupDBService.refresh(broker.getId(), consumerGroup.getId());
             } else {
-                cockpitBrokerService.createConsumerGroup(broker.getId(), consumerGroup.getId());
+                cockpitBrokerDBService.createConsumerGroup(broker.getId(), consumerGroup.getId());
             }
         }
     }

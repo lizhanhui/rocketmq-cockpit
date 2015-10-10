@@ -3,10 +3,10 @@ package com.ndpmedia.rocketmq.cockpit.scheduler.command;
 import com.alibaba.rocketmq.remoting.RPCHook;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.command.SubCommand;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitBrokerServiceImpl;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -19,7 +19,11 @@ public class ConsumerGroupSyncUpCommand implements SubCommand {
 
     private Set<String> brokerList = new HashSet<>();
 
-    private CockpitBrokerService cockpitBrokerService = new CockpitBrokerServiceImpl();
+    @Autowired
+    private CockpitBrokerDBService cockpitBrokerDBService;
+
+    @Autowired
+    private CockpitBrokerMQService cockpitBrokerMQService;
 
     @Autowired
     private CockpitConsumerGroupDBService cockpitConsumerGroupDBService;
@@ -76,6 +80,6 @@ public class ConsumerGroupSyncUpCommand implements SubCommand {
     }
 
     private void doList(DefaultMQAdminExt defaultMQAdminExt) {
-        brokerList.addAll(cockpitBrokerService.getALLBrokers(defaultMQAdminExt));
+        brokerList.addAll(cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt));
     }
 }

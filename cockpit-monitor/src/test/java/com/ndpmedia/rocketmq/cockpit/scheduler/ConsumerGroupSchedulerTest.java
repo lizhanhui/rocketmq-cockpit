@@ -1,6 +1,5 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -13,13 +12,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @ContextConfiguration(locations = "classpath:applicationContextCommon.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
-public class BrokerSchedulerTest {
+public class ConsumerGroupSchedulerTest {
 
     @Autowired
-    private BrokerScheduler brokerScheduler;
-
-    @Autowired
-    private CockpitBrokerDBService cockpitBrokerDBService;
+    private ConsumerGroupScheduler consumerGroupScheduler;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -32,30 +28,21 @@ public class BrokerSchedulerTest {
     }
 
     @Test
-    public void testSetup() {
-        Assert.assertNotNull(brokerScheduler);
-    }
-
-    private void clean() {
-        jdbcTemplate.execute("DELETE FROM broker");
+    public void testSetUp() {
+        Assert.assertNotNull(consumerGroupScheduler);
     }
 
     @Test
-    public void testCheckBrokerStatus() {
-        for (int i = 0; i < 3; i++) {
-            brokerScheduler.checkBrokerStatus();
-            Assert.assertFalse(cockpitBrokerDBService.list(null, null, 0, 0).isEmpty());
-            try {
-                Thread.sleep(10 * 1000);
-            } catch (InterruptedException e) {
-                // Ignore.
-            }
-        }
+    public void testSyncConsumerGroupStatus() throws Exception {
+        consumerGroupScheduler.syncConsumerGroupStatus();
     }
+
 
     @After
     public void tearDown() {
-        clean();
+        jdbcTemplate.execute("DELETE FROM broker_consumer_group_xref");
+        jdbcTemplate.execute("DELETE FROM project_consumer_group_xref");
+        jdbcTemplate.execute("DELETE FROM consumer_group");
+        jdbcTemplate.execute("DELETE FROM broker");
     }
-
 }
