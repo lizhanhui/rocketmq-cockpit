@@ -136,4 +136,14 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     public void refresh(long brokerId, long topicId) {
         topicMapper.refresh(brokerId, topicId);
     }
+
+    @Override
+    public boolean isDCAllowed(long topicId, long dcId) {
+        return topicMapper.isDCAllowed(topicId, dcId);
+    }
+
+    @Override
+    public void addDCAllowed(long topicId, long dcId, Status status) {
+        topicMapper.insertDCAllowed(topicId, dcId, status);
+    }
 }

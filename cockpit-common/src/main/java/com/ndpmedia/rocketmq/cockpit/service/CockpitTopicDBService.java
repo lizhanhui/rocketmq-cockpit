@@ -59,4 +59,8 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
     List<Long> getProjectIDs(long topicId, String topic);
 
     void refresh(long brokerId, long topicId);
+
+    boolean isDCAllowed(long topicId, long dcId);
+
+    void addDCAllowed(long topicId, long dcId, Status status);
 }

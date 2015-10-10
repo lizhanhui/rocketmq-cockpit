@@ -18,6 +18,11 @@
         VALUES (#{topicId}, #{projectId})
     </insert>
 
+    <insert id="insertDCAllowed">
+        INSERT INTO topic_dc_xref(topic_id, dc_id, status)
+        VALUES (#{topicId}, #{dcId}, #{status.ordinal})
+    </insert>
+
     <select id="getProjects" resultType="long">
         SELECT DISTINCT xref.project_id
         FROM project_topic_xref AS xref
@@ -227,4 +232,13 @@
             AND b.dc = #{dcId}
         </if>
     </select>
+
+    <select id="isDCAllowed" resultType="java.lang.Boolean">
+        SELECT COUNT(1) > 0
+        FROM topic_dc_xref
+        WHERE topic_id = #{topicId}
+        AND dc_id = #{dcId}
+    </select>
+
+
 </mapper>

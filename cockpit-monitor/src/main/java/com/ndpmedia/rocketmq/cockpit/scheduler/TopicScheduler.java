@@ -98,6 +98,9 @@ public class TopicScheduler {
                             topicEntity.setWriteQueueNum(queueData.getWriteQueueNums());
                             topicEntity.setPermission(queueData.getPerm());
                             cockpitTopicDBService.insertTopicBrokerInfo(topicEntity, broker.getId());
+                            if (!cockpitTopicDBService.isDCAllowed(topicEntity.getId(), broker.getDc())) {
+                                cockpitTopicDBService.addDCAllowed(topicEntity.getId(), broker.getDc(), Status.ACTIVE);
+                            }
                         } else if (null != broker) {
                             cockpitTopicDBService.refresh(broker.getId(), topicEntity.getId());
                         }

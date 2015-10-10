@@ -1,6 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
 import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
+import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import com.ndpmedia.rocketmq.cockpit.model.TopicHosting;
@@ -42,6 +43,13 @@ public interface TopicMapper {
     List<TopicAvailability> queryTopicsAvailability();
 
     List<DataCenter> queryAllowedDC(long topicId);
+
+    boolean isDCAllowed(@Param("topicId") long topicId,
+                        @Param("dcId")long dcId);
+
+    void insertDCAllowed(@Param("topicId") long topicId,
+                         @Param("dcId")long dcId,
+                         @Param("status")Status status);
 
     List<TopicHosting> queryHosting(@Param("topicId") long topicId,
                                     @Param("topic") String topic,
