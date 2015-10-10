@@ -4,6 +4,7 @@ import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
+import com.google.common.base.Preconditions;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
@@ -18,7 +19,6 @@ import java.util.TreeSet;
 
 @Component
 public class BrokerScheduler {
-
     @Autowired
     private BrokerMapper brokerMapper;
 
@@ -58,6 +58,7 @@ public class BrokerScheduler {
                                 Broker broker = new Broker();
                                 broker.setClusterName(clusterName);
                                 broker.setBrokerName(brokerName);
+                                broker.setDc(parseDC(brokerName));
                                 broker.setBrokerId(brokerEntry.getKey().intValue());
                                 broker.setAddress(brokerEntry.getValue());
                                 broker.setCreateTime(new Date());
@@ -77,5 +78,22 @@ public class BrokerScheduler {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * A sample broker name is: DefaultCluster_1_broker1.
+     * @param brokerName Broker name.
+     * @return DC inferred from broker name.
+     */
+    private int parseDC(String brokerName) {
+        Preconditions.checkNotNull(brokerName);
+        Preconditions.checkArgument(!brokerName.trim().isEmpty());
+
+        String[] segments = brokerName.split("_");
+        if (segments.length < 3) {
+            return 0;
+        }
+
+        return Integer.parseInt(segments[1]);
     }
 }
