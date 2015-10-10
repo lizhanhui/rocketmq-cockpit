@@ -8,6 +8,8 @@ import com.google.common.base.Preconditions;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,9 @@ import java.util.TreeSet;
 
 @Component
 public class BrokerScheduler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrokerScheduler.class);
+
     @Autowired
     private BrokerMapper brokerMapper;
 
@@ -91,9 +96,9 @@ public class BrokerScheduler {
 
         String[] segments = brokerName.split("_");
         if (segments.length < 3) {
+            LOGGER.warn("Broker Name is not normalized. If it's developing environment, please ignore this warning; otherwise, please contact admin to fix this issue");
             return 0;
         }
-
         return Integer.parseInt(segments[1]);
     }
 }
