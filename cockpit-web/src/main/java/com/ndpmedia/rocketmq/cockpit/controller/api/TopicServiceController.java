@@ -4,7 +4,6 @@ import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
@@ -31,9 +30,6 @@ public class TopicServiceController {
 
     @Autowired
     private CockpitTopicMQService cockpitTopicMQService;
-
-    @Autowired
-    private CockpitBrokerService cockpitBrokerService;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody

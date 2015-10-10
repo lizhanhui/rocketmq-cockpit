@@ -6,20 +6,8 @@ INSERT INTO name_server(ip, port, create_time, update_time) VALUES ('54.173.209.
 INSERT INTO name_server(ip, port, create_time, update_time) VALUES ('172.30.50.54', 9876, NOW(), NOW());
 
 
--- Insert IP mapping.
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.5.36.11',	'54.94.189.195');
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.1.36.13',	'52.0.2.7');
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.1.36.10',	'54.173.39.198');
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.2.36.11',	'54.169.36.156');
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.3.36.10',	'54.67.33.141');
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.5.36.10',	'54.94.158.107');
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.3.36.11',	'54.67.112.198');
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.1.36.12',	'52.0.87.252');
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.1.36.11',	'54.173.209.191');
-INSERT INTO ip_mapping(inner_ip, public_ip) VALUES ('10.2.36.10',	'54.179.161.99');
-
-INSERT INTO cockpit_user(id, username, password, email, status_id) VALUES (1, 'root', '$2a$10$.b5O4pAsTd6CyptUbXrMtOjJH1qYlbcVzk8WDPvb8dWwAXpfKZHwS', "admin@rocketmq.com", 2);
-INSERT INTO cockpit_user(id, username, password, email, status_id) VALUES (2, 'xutao', '$2a$10$Q9W2Zh/h/viu/zSMT2CbL.Dnt5LLbDGDMo.N/xfc7m6TIUCbeLpvO', "robert@yeahmobi.com", 2);
+INSERT INTO cockpit_user(id, username, password, email, status_id) VALUES (1, 'root', '$2a$10$.b5O4pAsTd6CyptUbXrMtOjJH1qYlbcVzk8WDPvb8dWwAXpfKZHwS', "admin@rocketmq.com", 5);
+INSERT INTO cockpit_user(id, username, password, email, status_id) VALUES (2, 'xutao', '$2a$10$Q9W2Zh/h/viu/zSMT2CbL.Dnt5LLbDGDMo.N/xfc7m6TIUCbeLpvO', "robert@yeahmobi.com", 5);
 
 INSERT INTO cockpit_role(id, name) VALUES (1, "ROLE_USER");
 INSERT INTO cockpit_role(id, name) VALUES (2, "ROLE_ADMIN");

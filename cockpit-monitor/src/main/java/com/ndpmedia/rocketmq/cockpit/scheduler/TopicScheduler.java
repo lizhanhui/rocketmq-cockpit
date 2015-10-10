@@ -9,9 +9,7 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
-import com.ndpmedia.rocketmq.cockpit.scheduler.command.TopicSyncDownCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.slf4j.Logger;
@@ -35,9 +33,6 @@ public class TopicScheduler {
     private Logger logger = LoggerFactory.getLogger(TopicScheduler.class);
 
     @Autowired
-    private TopicSyncDownCommand topicSyncDownCommand;
-
-    @Autowired
     private CockpitTopicDBService cockpitTopicDBService;
 
     @Autowired
@@ -45,9 +40,6 @@ public class TopicScheduler {
 
     @Autowired
     private CockpitBrokerDBService cockpitBrokerDBService;
-
-    @Autowired
-    private CockpitBrokerMQService cockpitBrokerMQService;
 
     /**
      * check topic status every 5 minutes
@@ -114,7 +106,7 @@ public class TopicScheduler {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to sync topic", e);
         } finally {
             defaultMQAdminExt.shutdown();
         }
