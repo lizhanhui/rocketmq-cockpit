@@ -7,6 +7,7 @@ import com.alibaba.rocketmq.common.protocol.route.QueueData;
 import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
+import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.scheduler.command.TopicSyncDownCommand;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
@@ -61,18 +62,12 @@ public class TopicScheduler {
             TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
             if (null != topicList && !topicList.getTopicList().isEmpty()) {
                 for (String topic : topicList.getTopicList()) {
-
-                    // We skip retry and deletion topics.
-                    if (topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX)
-                            || topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
-                        continue;
-                    }
-
                     TopicRouteData topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
                     Topic topicEntity = cockpitTopicDBService.getTopic(topic);
                     if (null == topicEntity) {
                         topicEntity = new Topic();
                         topicEntity.setTopic(topic);
+                        topicEntity.setStatus(Status.ACTIVE);
                         topicEntity.setCreateTime(new Date());
                         topicEntity.setUpdateTime(new Date());
                         topicEntity.setClusterName(getClusterName(topicRouteData.getBrokerDatas()));

@@ -216,5 +216,5 @@ CREATE TABLE IF NOT EXISTS broker_stat (
 
 CREATE INDEX idx_token ON login(token) USING HASH;
 
-
+ALTER TABLE topic ADD CONSTRAINT uniq_cluster_topic UNIQUE(cluster_name, topic);
 
