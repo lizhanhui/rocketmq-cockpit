@@ -1,6 +1,5 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,6 +12,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = "classpath:applicationContextCommon.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ConsumerGroupSchedulerTest {
+
+    @Autowired
+    private BrokerScheduler brokerScheduler;
 
     @Autowired
     private ConsumerGroupScheduler consumerGroupScheduler;
@@ -34,15 +36,16 @@ public class ConsumerGroupSchedulerTest {
 
     @Test
     public void testSyncConsumerGroupStatus() throws Exception {
+        brokerScheduler.checkBrokerStatus();
         consumerGroupScheduler.syncConsumerGroupStatus();
     }
 
 
-    @After
-    public void tearDown() {
-        jdbcTemplate.execute("DELETE FROM broker_consumer_group_xref");
-        jdbcTemplate.execute("DELETE FROM project_consumer_group_xref");
-        jdbcTemplate.execute("DELETE FROM consumer_group");
-        jdbcTemplate.execute("DELETE FROM broker");
-    }
+//    @After
+//    public void tearDown() {
+//        jdbcTemplate.execute("DELETE FROM broker_consumer_group_xref");
+//        jdbcTemplate.execute("DELETE FROM project_consumer_group_xref");
+//        jdbcTemplate.execute("DELETE FROM consumer_group");
+//        jdbcTemplate.execute("DELETE FROM broker");
+//    }
 }
