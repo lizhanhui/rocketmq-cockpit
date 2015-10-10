@@ -1,5 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,15 +38,23 @@ public class ConsumerGroupSchedulerTest {
     @Test
     public void testSyncConsumerGroupStatus() throws Exception {
         brokerScheduler.checkBrokerStatus();
-        consumerGroupScheduler.syncConsumerGroupStatus();
+        for (int i = 0; i < 3; i++) {
+
+            try {
+                consumerGroupScheduler.syncConsumerGroupStatus();
+                Thread.sleep(5 * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
-//    @After
-//    public void tearDown() {
-//        jdbcTemplate.execute("DELETE FROM broker_consumer_group_xref");
-//        jdbcTemplate.execute("DELETE FROM project_consumer_group_xref");
-//        jdbcTemplate.execute("DELETE FROM consumer_group");
-//        jdbcTemplate.execute("DELETE FROM broker");
-//    }
+    @After
+    public void tearDown() {
+        jdbcTemplate.execute("DELETE FROM broker_consumer_group_xref");
+        jdbcTemplate.execute("DELETE FROM project_consumer_group_xref");
+        jdbcTemplate.execute("DELETE FROM consumer_group");
+        jdbcTemplate.execute("DELETE FROM broker");
+    }
 }
