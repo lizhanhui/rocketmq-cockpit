@@ -61,6 +61,13 @@ public class TopicScheduler {
             TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
             if (null != topicList && !topicList.getTopicList().isEmpty()) {
                 for (String topic : topicList.getTopicList()) {
+
+                    // We skip retry and deletion topics.
+                    if (topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX)
+                            || topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
+                        continue;
+                    }
+
                     TopicRouteData topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
                     Topic topicEntity = cockpitTopicDBService.getTopic(topic);
                     if (null == topicEntity) {
@@ -82,6 +89,9 @@ public class TopicScheduler {
                                 for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
                                     if (entry.getKey() == MixAll.MASTER_ID) {
                                         broker = cockpitBrokerDBService.get(0, entry.getValue());
+                                        if (null != broker) {
+                                            break;
+                                        }
                                     }
                                 }
 

@@ -10,7 +10,7 @@
     <insert id="insertTopicBrokerInfo">
         INSERT INTO topic_broker_xref(broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, create_time, update_time)
         VALUES (#{brokerId}, #{topic.id}, #{topic.permission}, #{topic.readQueueNum}, #{topic.writeQueueNum},
-                #{topic.status, typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"}, #{topic.createTime}, #{topic.updateTime})
+                #{topic.status.ordinal}, #{topic.createTime}, #{topic.updateTime})
     </insert>
 
     <insert id="connectProject">
