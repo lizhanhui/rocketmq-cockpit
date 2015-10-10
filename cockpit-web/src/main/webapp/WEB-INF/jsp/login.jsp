@@ -61,21 +61,17 @@
         </tr>
         <tr>
             <td colspan='2'>
-                <div class="chknumber">
+
                 <label for="kaptcha">verification code：</label>
 
                 <input name="kaptcha" type="text" id="kaptcha" maxlength="20" class="chknumber_input">
                 <img src="cockpit/captcha-image" width="170" height="40" id="kaptchaImage" style="margin-bottom: -3px"  alt="Captcha">
                 <script type="text/javascript">
-                    $(function () {
-                        $('#kaptchaImage').click(function () {//生成验证码
-                            $(this).hide().attr('src', 'cockpit/captcha-image?' + Math.floor(Math.random() * 100)).fadeIn();
-                        })
-
-                    });
-
+                     document.getElementById("kaptchaImage").onclick = function() {
+                        document.getElementById("kaptchaImage").src = "cockpit/captcha-image?"  + Math.floor(Math.random() * 100);
+                    };
                 </script>
-                </div>
+
             </td>
         </tr>
         <tr>
