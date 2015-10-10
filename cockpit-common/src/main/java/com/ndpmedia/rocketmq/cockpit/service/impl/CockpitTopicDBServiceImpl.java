@@ -70,6 +70,20 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     @Transactional
     @Override
     public void insert(long projectId, Topic topic, long brokerId) {
+        if (!exists(topic.getTopic())) {
+            insert(topic);
+        }
+
+        topicMapper.insertTopicBrokerInfo(topic, brokerId);
+
+        topicMapper.connectProject(topic.getId(), projectId);
+    }
+
+    @Override
+    public void insert(Topic topic) {
+        if (exists(topic.getTopic())) {
+            return;
+        }
 
         if (!PERMISSIONS.contains(topic.getPermission())) {
             topic.setPermission(PERMISSION_READ | PERMISSION_WRITE);
@@ -84,8 +98,21 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
         }
 
         topicMapper.insert(topic);
+    }
+
+    @Override
+    public void insertTopicBrokerInfo(Topic topic, long brokerId) {
         topicMapper.insertTopicBrokerInfo(topic, brokerId);
-        topicMapper.connectProject(topic.getId(), projectId);
+    }
+
+    @Override
+    public void refreshTopicBrokerInfo(long topicId, long brokerId) {
+        topicMapper.refresh(brokerId, topicId);
+    }
+
+    @Override
+    public void insertTopicProjectInfo(long topicId, long projectId) {
+        topicMapper.connectProject(topicId, projectId);
     }
 
     @Transactional

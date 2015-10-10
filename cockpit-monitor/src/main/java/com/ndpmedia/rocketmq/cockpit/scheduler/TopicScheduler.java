@@ -1,7 +1,9 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
+import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.protocol.body.TopicList;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
+import com.alibaba.rocketmq.common.protocol.route.QueueData;
 import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
@@ -17,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,15 +49,6 @@ public class TopicScheduler {
     private CockpitBrokerMQService cockpitBrokerMQService;
 
     /**
-     * schedule:check topic and topic route from cluster and broker.
-     * period:one hour(12:24 of an hour)
-     */
-    @Scheduled(cron = "24 12 * * * *")
-    public void downloadTopic() {
-        topicSyncDownCommand.execute(null, null, null);
-    }
-
-    /**
      * check topic status every 5 minutes
      */
     @Scheduled(fixedRate = 300000)
@@ -70,19 +65,44 @@ public class TopicScheduler {
                     Topic topicEntity = cockpitTopicDBService.getTopic(topic);
                     if (null == topicEntity) {
                         topicEntity = new Topic();
+                        topicEntity.setTopic(topic);
+                        topicEntity.setCreateTime(new Date());
+                        topicEntity.setUpdateTime(new Date());
+                        topicEntity.setClusterName(getClusterName(topicRouteData.getBrokerDatas()));
+                        cockpitTopicDBService.insert(topicEntity);
 
-
+                        // Add it to default project for now.
+                        cockpitTopicDBService.insertTopicProjectInfo(topicEntity.getId(), 1);
                     }
 
-                    for (BrokerData brokerData : topicRouteData.getBrokerDatas()) {
-                        for (Map.Entry<Long, String> next : brokerData.getBrokerAddrs().entrySet()) {
-                            if (next.getKey() == 0) {
-                                String brokerAddress = next.getValue();
-                                Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
-                                if (null != broker) {
-                                    // cockpitTopicDBService.refresh(broker.getId(), );
+                    for (QueueData queueData: topicRouteData.getQueueDatas()) {
+                        Broker broker = null;
+                        for (BrokerData brokerData : topicRouteData.getBrokerDatas()) {
+                            if (brokerData.getBrokerName().equals(queueData.getBrokerName())) {
+                                for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
+                                    if (entry.getKey() == MixAll.MASTER_ID) {
+                                        broker = cockpitBrokerDBService.get(0, entry.getValue());
+                                    }
+                                }
+
+                                if (null == broker) {
+                                    for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
+                                        broker = cockpitBrokerDBService.get(0, entry.getValue());
+                                        if (null != broker) {
+                                            break;
+                                        }
+                                    }
                                 }
                             }
+                        }
+
+                        if (null != broker && !cockpitBrokerDBService.hasTopic(broker.getId(), topicEntity.getId())) {
+                            topicEntity.setReadQueueNum(queueData.getReadQueueNums());
+                            topicEntity.setWriteQueueNum(queueData.getWriteQueueNums());
+                            topicEntity.setPermission(queueData.getPerm());
+                            cockpitTopicDBService.insertTopicBrokerInfo(topicEntity, broker.getId());
+                        } else if (null != broker) {
+                            cockpitTopicDBService.refresh(broker.getId(), topicEntity.getId());
                         }
                     }
                 }
@@ -93,5 +113,18 @@ public class TopicScheduler {
         } finally {
             defaultMQAdminExt.shutdown();
         }
+    }
+
+    private String getClusterName(List<BrokerData> brokerDataList) {
+        for (BrokerData brokerData : brokerDataList) {
+            for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
+                if (entry.getKey() == MixAll.MASTER_ID) {
+                    String brokerAddress = entry.getValue();
+                    Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
+                    return broker.getClusterName();
+                }
+            }
+        }
+        throw new RuntimeException("Unable to figure out cluster name by broker address");
     }
 }

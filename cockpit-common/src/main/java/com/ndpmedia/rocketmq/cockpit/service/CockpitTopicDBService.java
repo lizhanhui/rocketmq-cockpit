@@ -39,6 +39,14 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
      */
     void insert(long projectId, Topic topic, long brokerId);
 
+    void insert(Topic topic);
+
+    void insertTopicBrokerInfo(Topic topic, long brokerId);
+
+    void refreshTopicBrokerInfo(long topicId, long brokerId);
+
+    void insertTopicProjectInfo(long topicId, long projectId);
+
     /**
      * delete topic and remove topic-project relationship from database
      * @param topicId Topic id

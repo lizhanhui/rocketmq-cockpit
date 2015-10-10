@@ -11,6 +11,8 @@ public interface CockpitBrokerDBService {
 
     boolean hasConsumerGroup(long brokerId, long consumerGroupId);
 
+    boolean hasTopic(long brokerId, long topicId);
+
     List<Broker> list(String clusterName, String brokerName, int brokerId, int dc);
 
     void createConsumerGroup(long brokerId, long consumerGroupId);

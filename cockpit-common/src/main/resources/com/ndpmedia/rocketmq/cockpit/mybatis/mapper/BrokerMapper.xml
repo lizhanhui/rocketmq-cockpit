@@ -107,4 +107,11 @@
             AND address = #{address}
         </if>
     </select>
+
+    <select id="hasTopic" resultType="java.lang.Boolean">
+        SELECT COUNT(1) > 0
+        FROM topic_broker_xref
+        WHERE broker_id = #{brokerId}
+        AND topic_id = #{topicId}
+    </select>
 </mapper>

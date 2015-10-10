@@ -37,4 +37,6 @@ public interface BrokerMapper {
     void createTopic(@Param("brokerId") long brokerId,
                      @Param("topicId") long topicId);
 
+    boolean hasTopic(@Param("brokerId")long brokerId,
+                     @Param("topicId")long topicId);
 }

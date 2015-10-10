@@ -19,6 +19,10 @@ public class CockpitBrokerDBServiceImpl implements CockpitBrokerDBService {
         return brokerMapper.hasConsumerGroup(brokerId, consumerGroupId);
     }
 
+    @Override
+    public boolean hasTopic(long brokerId, long topicId) {
+        return brokerMapper.hasTopic(brokerId, topicId);
+    }
 
     @Override
     public void createConsumerGroup(long brokerId, long consumerGroupId) {
