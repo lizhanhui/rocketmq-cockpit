@@ -29,7 +29,7 @@
 			}
 		</script>
 	</head>
-	<body onload='document.f.j_username.focus();'>
+	<body onload='document.f.j_username.focus();' style="background-color:#EEFfeE">
 	<h3 align="center" style="padding-top:200px">Login with Username and Password</h3>
 
 	<form name='f' action='j_spring_security_check' method='POST'>
@@ -43,7 +43,7 @@
             msg = errSMSG.toString();
         }
     %>
-    <table align="center" width="240px" height="120px"  style="background-color:#cafcc0">
+    <table align="center" valign="middle" style="background-color:#ccffcc">
         <tr>
             <td colspan='2'><span style="color:red"><%=msg%></span></td>
         </tr>
@@ -60,7 +60,7 @@
             <td><input type="checkbox" id="j_remember-me" name="remember-me"></td>
         </tr>
         <tr>
-            <td colspan='2'>
+            <td colspan='2' align="center">
 
                 <label for="kaptcha">verification code：</label>
 

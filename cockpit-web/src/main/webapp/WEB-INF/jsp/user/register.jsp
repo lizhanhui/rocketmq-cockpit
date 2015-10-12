@@ -10,7 +10,7 @@
     <script src="js/onloading.js" type="application/javascript"></script>
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid" valign="middle" align="center" style="padding-top:240px">
         <table>
             <tr>
                <td>Team</td>
