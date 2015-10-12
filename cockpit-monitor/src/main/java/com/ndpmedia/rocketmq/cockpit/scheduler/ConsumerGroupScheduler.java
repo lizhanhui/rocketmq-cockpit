@@ -51,7 +51,7 @@ public class ConsumerGroupScheduler {
      * period:one hour(20:24 of an hour)
      */
     @Scheduled(cron = "24 20 * * * *")
-    public void syncConsumerGroupStatus() {
+    public void syncDownConsumerGroups() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
@@ -60,16 +60,16 @@ public class ConsumerGroupScheduler {
             Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
 
             for (String brokerAddress : brokerAddresses) {
-                syncConsumerGroupByBroker(defaultMQAdminExt, brokerAddress);
+                syncDownConsumerGroupsByBroker(defaultMQAdminExt, brokerAddress);
             }
         } catch (Exception e) {
-            logger.error("Failed to syncConsumerGroupStatus", e);
+            logger.error("Failed to syncDownConsumerGroups", e);
         } finally {
             defaultMQAdminExt.shutdown();
         }
     }
 
-    private void syncConsumerGroupByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress)
+    private void syncDownConsumerGroupsByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress)
             throws InterruptedException, RemotingException, MQClientException, MQBrokerException {
         Preconditions.checkNotNull(defaultMQAdminExt, "DefaultMQAdminExt");
         Preconditions.checkNotNull(brokerAddress, "BrokerAddress");

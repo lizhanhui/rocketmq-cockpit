@@ -45,7 +45,7 @@ public class TopicScheduler {
      * check topic status every 5 minutes
      */
     @Scheduled(fixedRate = 300000)
-    public void checkTopicStatus() {
+    public void syncDownTopics() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {

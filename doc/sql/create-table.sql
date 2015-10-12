@@ -208,3 +208,4 @@ CREATE INDEX idx_token ON login(token) USING HASH;
 
 ALTER TABLE topic ADD CONSTRAINT uniq_cluster_topic UNIQUE(cluster_name, topic);
 
+ALTER TABLE consumer_group ADD CONSTRAINT  uniq_cluster_consumer_group UNIQUE (cluster_name, group_name);

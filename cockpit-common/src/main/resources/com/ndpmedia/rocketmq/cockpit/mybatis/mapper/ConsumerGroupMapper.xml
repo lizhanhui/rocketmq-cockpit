@@ -164,4 +164,15 @@
             AND b.dc = #{dcId}
         </if>
     </select>
+
+    <select id="listByTopic" resultMap="consumerGroupMap">
+        SELECT cg.id, b.cluster_name, which_broker_when_consume_slowly, consume_from_broker_id, group_name,
+            consume_enable, consume_broadcast_enable, retry_max_times, retry_queue_num, consume_from_min_enable,
+            status_id, cg.create_time, cg.update_time
+        FROM topic_consumer_group_xref AS tcgx
+        LEFT JOIN consumer_group AS cg ON tcgx.consumer_group_id = cg.id
+        LEFT JOIN broker_consumer_group_xref AS bcgx ON bcgx.consumer_group_id = cg.id
+        LEFT JOIN broker AS b on b.id = bcgx.broker_id
+        WHERE topic_id = #{topicId}
+    </select>
 </mapper>

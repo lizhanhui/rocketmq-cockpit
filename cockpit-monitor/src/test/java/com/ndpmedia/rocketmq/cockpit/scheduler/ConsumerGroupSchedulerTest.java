@@ -37,11 +37,11 @@ public class ConsumerGroupSchedulerTest {
 
     @Test
     public void testSyncConsumerGroupStatus() throws Exception {
-        brokerScheduler.checkBrokerStatus();
+        brokerScheduler.syncBrokerStatus();
         for (int i = 0; i < 3; i++) {
 
             try {
-                consumerGroupScheduler.syncConsumerGroupStatus();
+                consumerGroupScheduler.syncDownConsumerGroups();
                 Thread.sleep(5 * 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();

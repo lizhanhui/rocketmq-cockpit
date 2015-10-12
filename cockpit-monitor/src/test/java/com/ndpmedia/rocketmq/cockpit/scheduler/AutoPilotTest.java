@@ -15,6 +15,15 @@ public class AutoPilotTest {
     @Autowired
     private AutoPilot autoPilot;
 
+    @Autowired
+    private ConsumerGroupScheduler consumerGroupScheduler;
+
+    @Autowired
+    private TopicScheduler topicScheduler;
+
+    @Autowired
+    private BrokerScheduler brokerScheduler;
+
     @BeforeClass
     public static void setUp() {
         System.setProperty("enable_ssl", "true");
@@ -29,6 +38,9 @@ public class AutoPilotTest {
 
     @Test
     public void testAutoPilot() throws Exception {
+        brokerScheduler.syncBrokerStatus();
+        topicScheduler.syncDownTopics();
+        consumerGroupScheduler.syncDownConsumerGroups();
         autoPilot.autoPilot();
     }
 }

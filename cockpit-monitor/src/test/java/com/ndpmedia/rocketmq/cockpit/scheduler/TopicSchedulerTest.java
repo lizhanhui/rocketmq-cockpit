@@ -30,10 +30,10 @@ public class TopicSchedulerTest {
 
     @Test
     public void testCheckTopicStatus() throws Exception {
-        brokerScheduler.checkBrokerStatus();
+        brokerScheduler.syncBrokerStatus();
         for (int i = 0; i < 3; i++) {
             try {
-                topicScheduler.checkTopicStatus();
+                topicScheduler.syncDownTopics();
                 Thread.sleep(3 * 1000);
             } catch (Exception e) {
                 e.printStackTrace();

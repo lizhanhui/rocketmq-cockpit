@@ -8,11 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service("cockpitConsumerGroupDBService")
 public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDBService {
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
+
+    @Override
+    public List<ConsumerGroup> listByTopic(long topicId) {
+        return consumerGroupMapper.listByTopic(topicId);
+    }
 
     @Override
     public ConsumerGroup get(long consumerGroupId, String consumerGroupName) {

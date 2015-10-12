@@ -43,7 +43,7 @@ public class BrokerSchedulerTest {
     @Test
     public void testCheckBrokerStatus() {
         for (int i = 0; i < 3; i++) {
-            brokerScheduler.checkBrokerStatus();
+            brokerScheduler.syncBrokerStatus();
             Assert.assertFalse(cockpitBrokerDBService.list(null, null, 0, 0).isEmpty());
             try {
                 Thread.sleep(10 * 1000);
