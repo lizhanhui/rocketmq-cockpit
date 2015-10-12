@@ -43,7 +43,7 @@
             msg = errSMSG.toString();
         }
     %>
-    <table align="center" width="240px" height="120px"  style="background-color:#cafcc0">
+    <table align="center" valign="middle" width="240px" height="120px"  style="background-color:#cafcc0">
         <tr>
             <td colspan='2'><span style="color:red"><%=msg%></span></td>
         </tr>
@@ -60,7 +60,7 @@
             <td><input type="checkbox" id="j_remember-me" name="remember-me"></td>
         </tr>
         <tr>
-            <td colspan='2'>
+            <td colspan='2' align="center">
 
                 <label for="kaptcha">verification code：</label>
 
