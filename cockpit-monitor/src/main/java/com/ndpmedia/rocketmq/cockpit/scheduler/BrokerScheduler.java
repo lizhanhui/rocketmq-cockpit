@@ -34,7 +34,7 @@ public class BrokerScheduler {
         try {
             defaultMQAdminExt.start();
         } catch (MQClientException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to start defaultMQAdminExt", e);
         }
     }
 
@@ -81,7 +81,7 @@ public class BrokerScheduler {
             }
 
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to update broker status", e);
         }
     }
 
@@ -97,7 +97,7 @@ public class BrokerScheduler {
         String[] segments = brokerName.split("_");
         if (segments.length < 3) {
             LOGGER.warn("Broker Name is not normalized. If it's developing environment, please ignore this warning; otherwise, please contact admin to fix this issue");
-            return 0;
+            return 100;
         }
         return Integer.parseInt(segments[1]);
     }
