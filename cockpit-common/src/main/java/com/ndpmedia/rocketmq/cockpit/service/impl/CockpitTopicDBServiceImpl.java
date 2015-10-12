@@ -28,8 +28,13 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     private TopicMapper topicMapper;
 
     @Override
-    public List<Topic> getTopics(Status status) {
-        return topicMapper.list(0, status.getId(), null, null);
+    public List<Topic> getTopics(Status... statuses) {
+        int[] statusIds = new int[statuses.length];
+        int i = 0;
+        for (Status s : statuses) {
+            statusIds[i++] = s.ordinal();
+        }
+        return topicMapper.list(0, statusIds, null, null);
     }
 
     @Override
@@ -130,11 +135,6 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     @Override
     public List<Long> getProjectIDs(long topicId, String topic) {
         return topicMapper.getProjects(topicId, topic);
-    }
-
-    @Override
-    public void refresh(long brokerId, long topicId) {
-        topicMapper.refresh(brokerId, topicId);
     }
 
     @Override

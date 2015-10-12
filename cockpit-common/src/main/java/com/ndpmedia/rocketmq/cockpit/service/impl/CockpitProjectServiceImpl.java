@@ -69,6 +69,6 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
 
     @Override
     public List<Topic> getTopics(long projectId) {
-        return topicMapper.list(projectId, 0, null, null);
+        return topicMapper.list(projectId, null, null, null);
     }
 }

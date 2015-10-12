@@ -1,4 +1,4 @@
-package com.ndpmedia.rocketmq.cockpit;
+package com.ndpmedia.rocketmq.cockpit.scheduler;
 
 import com.alibaba.rocketmq.client.exception.MQBrokerException;
 import com.alibaba.rocketmq.client.exception.MQClientException;
@@ -9,11 +9,14 @@ import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.BrokerLoad;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
+import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupMQServiceImpl;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicMQServiceImpl;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
@@ -35,6 +38,12 @@ public class AutoPilot {
 
     @Autowired
     private BrokerMapper brokerMapper;
+
+    @Autowired
+    private CockpitTopicMQService cockpitTopicMQService;
+
+    @Autowired
+    private CockpitTopicDBService cockpitTopicDBService;
 
     @Autowired
     private TopicMapper topicMapper;
@@ -128,6 +137,8 @@ public class AutoPilot {
         }
 
         // TODO for each topic-broker pair, make sure its associated consumer group is there.
+        List<Topic> topics = cockpitTopicDBService.getTopics(Status.ACTIVE, Status.APPROVED);
+
 
         if (null != adminExt) {
             adminExt.shutdown();

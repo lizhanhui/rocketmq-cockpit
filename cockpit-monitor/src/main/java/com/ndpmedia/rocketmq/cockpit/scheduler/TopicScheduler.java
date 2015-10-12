@@ -102,7 +102,7 @@ public class TopicScheduler {
                                 cockpitTopicDBService.addDCAllowed(topicEntity.getId(), broker.getDc(), Status.ACTIVE);
                             }
                         } else if (null != broker) {
-                            cockpitTopicDBService.refresh(broker.getId(), topicEntity.getId());
+                            cockpitTopicDBService.refreshTopicBrokerInfo(topicEntity.getId(), broker.getId());
                         }
                     }
                 }

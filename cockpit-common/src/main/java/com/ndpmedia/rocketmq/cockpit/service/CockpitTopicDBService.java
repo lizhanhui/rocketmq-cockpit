@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CockpitTopicDBService extends CockpitTopicBaseService {
 
-    List<Topic> getTopics(Status status);
+    List<Topic> getTopics(Status... statuses);
 
     /**
      * get topic list by topic name from database
@@ -57,8 +57,6 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
     boolean exists(String topic);
 
     List<Long> getProjectIDs(long topicId, String topic);
-
-    void refresh(long brokerId, long topicId);
 
     boolean isDCAllowed(long topicId, long dcId);
 

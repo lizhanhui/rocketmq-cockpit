@@ -25,7 +25,7 @@ public interface CockpitTopicMQService extends CockpitTopicBaseService {
      * @param adminExt connect to name server
      * @param topic topic name
      * @param masterOnly Indicate if we only fetch master broker addresses.
-     * @return brokers
+     * @return broker addresses.
      */
     Set<String> getTopicBrokers(MQAdminExt adminExt, String topic, boolean masterOnly) throws CockpitException;
 

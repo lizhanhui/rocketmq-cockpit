@@ -129,8 +129,9 @@
             AND xref.project_id = #{projectId}
         </if>
 
-        <if test="statusId > 0">
-            AND status_id = #{status}
+        <if test="statusIds != null">
+            AND status_id IN
+            <foreach collection="statusIds" separator="," open="(" close=")" item="status">#{status}</foreach>
         </if>
 
         <if test="broker != null">

@@ -29,12 +29,12 @@ public interface TopicMapper {
                  @Param("topicId") long topicId);
 
     /**
-     * List by project or status.
+     * List by project or statusIds.
      * @param projectId Project ID.
      * @return List of topics.
      */
     List<Topic> list(@Param("projectId") long projectId,
-                     @Param("status") long status,
+                     @Param("statusIds") int[] statusIds,
                      @Param("broker") String broker,
                      @Param("cluster") String cluster);
 
