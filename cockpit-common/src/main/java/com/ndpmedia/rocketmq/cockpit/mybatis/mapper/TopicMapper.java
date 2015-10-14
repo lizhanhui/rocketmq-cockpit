@@ -6,7 +6,6 @@ import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
-import com.ndpmedia.rocketmq.cockpit.model.TopicHosting;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import org.apache.ibatis.annotations.Param;
 
@@ -14,14 +13,13 @@ import java.util.List;
 
 public interface TopicMapper {
 
-    long insert(Topic topic);
+    long insert(TopicMetadata topicMetadata);
 
-    void insertTopicBrokerInfo(@Param("topic")Topic topic,
-                               @Param("brokerId") long brokerId);
+    void insertTopicBrokerInfo(@Param("topicBrokerInfo") TopicBrokerInfo topicBrokerInfo);
 
     void delete(long id);
 
-    void update(Topic topic);
+    void update(@Param("topicMetadata") TopicMetadata topicMetadata);
 
     void updateTopicBrokerInfo(@Param("topic") Topic topic,
                                @Param("brokerId") long brokerId);
@@ -30,9 +28,9 @@ public interface TopicMapper {
 
     TopicMetadata getMetadataByTopic(@Param("topic") String topic);
 
-    Topic get(@Param("id") long id);
+    TopicMetadata get(@Param("id") long id);
 
-    Topic getByTopic(@Param("topic")String topic);
+    TopicMetadata getByTopic(@Param("topic")String topic);
 
     void refresh(@Param("brokerId") long brokerId,
                  @Param("topicId") long topicId);
@@ -60,17 +58,9 @@ public interface TopicMapper {
                          @Param("dcId")long dcId,
                          @Param("status")Status status);
 
-    @Deprecated
-    List<TopicHosting> queryHosting(@Param("topicId") long topicId,
-                                    @Param("topic") String topic,
-                                    @Param("dcId") int dcId);
-
     List<TopicBrokerInfo> queryTopicBrokerInfo(@Param("topicId")long topicId,
                                                @Param("brokerId")long brokerId,
                                                @Param("dc") int dc);
-
-    @Deprecated
-    List<Long> queryTopicHostingBrokerIds(@Param("topicId") long topicId, @Param("dcId") long dcId);
 
     List<Long> queryAssociatedConsumerGroup(@Param("topicId") long topicId);
 

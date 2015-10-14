@@ -2,6 +2,8 @@ package com.ndpmedia.rocketmq.cockpit.service.impl;
 
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +40,14 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     }
 
     @Override
-    public Topic getTopic(String topic) {
+    public TopicMetadata getTopic(String topic) {
         return topicMapper.getByTopic(topic);
     }
 
     @Override
     public boolean activate(long id) {
         try{
-            Topic topic = topicMapper.get(id);
+            TopicMetadata topic = topicMapper.get(id);
             if (null != topic && topic.getStatus() != Status.ACTIVE) {
                 topic.setStatus(Status.ACTIVE);
                 topicMapper.update(topic);
@@ -60,7 +62,7 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     @Override
     public boolean deactivate(long id){
         try{
-            Topic topic = topicMapper.get(id);
+            TopicMetadata topic = topicMapper.get(id);
             if (null != topic && topic.getStatus() == Status.ACTIVE) {
                 topic.setStatus(Status.DELETED);
                 topicMapper.update(topic);
@@ -74,40 +76,26 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
 
     @Transactional
     @Override
-    public void insert(long projectId, Topic topic, long brokerId) {
-        if (!exists(topic.getTopic())) {
-            insert(topic);
-        }
+    public void insert(long projectId, TopicBrokerInfo topicBrokerInfo) {
+        insert(topicBrokerInfo.getTopicMetadata());
 
-        topicMapper.insertTopicBrokerInfo(topic, brokerId);
+        topicMapper.insertTopicBrokerInfo(topicBrokerInfo);
 
-        topicMapper.connectProject(topic.getId(), projectId);
+        topicMapper.connectProject(topicBrokerInfo.getTopicMetadata().getId(), projectId);
     }
 
     @Override
-    public void insert(Topic topic) {
-        if (exists(topic.getTopic())) {
+    public void insert(TopicMetadata topicMetadata) {
+        if (exists(topicMetadata.getTopic())) {
             return;
         }
 
-        if (!PERMISSIONS.contains(topic.getPermission())) {
-            topic.setPermission(PERMISSION_READ | PERMISSION_WRITE);
-        }
-
-        if (topic.getReadQueueNum() <= 0) {
-            topic.setReadQueueNum(Topic.DEFAULT_READ_QUEUE_NUM);
-        }
-
-        if (topic.getWriteQueueNum() <= 0) {
-            topic.setWriteQueueNum(Topic.DEFAULT_WRITE_QUEUE_NUM);
-        }
-
-        topicMapper.insert(topic);
+        topicMapper.insert(topicMetadata);
     }
 
     @Override
-    public void insertTopicBrokerInfo(Topic topic, long brokerId) {
-        topicMapper.insertTopicBrokerInfo(topic, brokerId);
+    public void insertTopicBrokerInfo(TopicBrokerInfo topicBrokerInfo) {
+        topicMapper.insertTopicBrokerInfo(topicBrokerInfo);
     }
 
     @Override

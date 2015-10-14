@@ -2,6 +2,8 @@ package com.ndpmedia.rocketmq.cockpit.service;
 
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 
 import java.util.List;
 
@@ -14,7 +16,7 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
      * @param topic topic name
      * @return topic list
      */
-    Topic getTopic(String topic);
+    TopicMetadata getTopic(String topic);
 
     /**
      * update topic status to active on database
@@ -33,15 +35,14 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
 
     /**
      * add topic to database by project
-     * @param topic topic
+     * @param topicBrokerInfo topicBrokerInfo
      * @param projectId ID of the project this topic will be added to.
-     * @param brokerId
      */
-    void insert(long projectId, Topic topic, long brokerId);
+    void insert(long projectId, TopicBrokerInfo topicBrokerInfo);
 
-    void insert(Topic topic);
+    void insert(TopicMetadata topicMetadata);
 
-    void insertTopicBrokerInfo(Topic topic, long brokerId);
+    void insertTopicBrokerInfo(TopicBrokerInfo topicBrokerInfo);
 
     void refreshTopicBrokerInfo(long topicId, long brokerId);
 

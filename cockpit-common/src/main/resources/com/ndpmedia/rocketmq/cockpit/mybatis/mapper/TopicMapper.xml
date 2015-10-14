@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper">
 
-    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.Topic" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO topic (id, topic, cluster_name, `order`, create_time, update_time)
-        VALUES (NULL, #{topic}, #{clusterName},  #{order}, #{createTime}, #{updateTime})
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO topic (id, topic, cluster_name, `order`, status, create_time, update_time)
+        VALUES (NULL, #{topic}, #{clusterName}, #{order}, #{status.ordinal}, #{createTime}, #{updateTime})
     </insert>
 
     <insert id="insertTopicBrokerInfo">
         INSERT INTO topic_broker_xref(broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, create_time, update_time)
-        VALUES (#{brokerId}, #{topic.id}, #{topic.permission}, #{topic.readQueueNum}, #{topic.writeQueueNum},
-                #{topic.status.ordinal}, #{topic.createTime}, #{topic.updateTime})
+        VALUES (#{topicBrokerInfo.broker.id}, #{topicBrokerInfo.topicMetadata.id}, #{topicBrokerInfo.permission}, #{topicBrokerInfo.readQueueNum}, #{topicBrokerInfo.writeQueueNum},
+                #{topicBrokerInfo.status.ordinal}, #{topicBrokerInfo.createTime}, #{topicBrokerInfo.updateTime})
     </insert>
 
     <insert id="connectProject">
@@ -167,68 +167,10 @@
         WHERE xref.topic_id = #{topicId}
     </select>
 
-    <select id="queryTopicHostingBrokerIds" resultType="long">
-        SELECT xref.broker_id
-        FROM topic_broker_xref AS xref
-             JOIN broker AS b ON xref.broker_id = b.id
-        WHERE xref.topic_id = #{brokerId}
-              AND b.dc = #{dcId}
-              AND b.broker_id = 0
-    </select>
-
     <select id="queryAssociatedConsumerGroup" resultType="long">
         SELECT consumer_group_id
         FROM topic_consumer_group_xref
         WHERE topic_id = #{topicId}
-    </select>
-
-    <resultMap id="TopicHostingResultMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicHosting">
-        <association property="broker" javaType="com.ndpmedia.rocketmq.cockpit.model.Broker">
-            <id column="id" property="id" />
-            <result column="cluster_name" property="clusterName" />
-            <result column="broker_name" property="brokerName" />
-            <result column="broker_id" property="brokerId" />
-            <result column="address" property="address" />
-            <result column="version" property="version" />
-            <result column="dc" property="dc" />
-            <result column="create_time" property="createTime" />
-            <result column="update_time" property="updateTime" />
-        </association>
-
-        <association property="topicInfo" javaType="com.ndpmedia.rocketmq.cockpit.model.TopicInfo">
-            <result column="topicId" property="topicId" />
-            <result column="permission" property="permission" />
-            <result column="write_queue_num" property="writeQueueNum" />
-            <result column="read_queue_num" property="readQueueNum" />
-            <result column="status_id" property="status"
-                    typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
-                    javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
-            <result column="topic_info_create_time" property="createTime" />
-            <result column="topic_info_update_time" property="updateTime" />
-            <result column="sync_time" property="syncTime" />
-        </association>
-    </resultMap>
-
-    <select id="queryHosting" resultMap="TopicHostingResultMap">
-        SELECT b.id, b.cluster_name, broker_name, b.broker_id, address, version, dc, b.create_time, b.update_time
-             , xref.topic_id AS topicId, xref.permission, xref.write_queue_num, xref.read_queue_num, xref.status_id, xref.create_time AS topic_info_create_time, xref.update_time AS topic_info_update_time, xref.sync_time
-        FROM broker AS b
-        JOIN topic_broker_xref AS xref ON b.id = xref.broker_id
-        <if test="topic != null">
-        JOIN topic AS t ON t.id = xref.topic_id
-        </if>
-        WHERE 1 = 1
-        <if test="topicId > 0">
-            AND xref.topic_id = #{topicId}
-        </if>
-
-        <if test="topic != null">
-            AND t.topic = #{topic}
-        </if>
-
-        <if test="dcId > 0">
-            AND b.dc = #{dcId}
-        </if>
     </select>
 
     <select id="isDCAllowed" resultType="java.lang.Boolean">

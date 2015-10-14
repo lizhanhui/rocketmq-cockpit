@@ -1,8 +1,8 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
+import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.Chair;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import org.junit.Assert;
@@ -23,6 +23,9 @@ public class TopicMapperTest {
 
     @Autowired
     private TopicMapper topicMapper;
+
+    @Autowired
+    private BrokerMapper brokerMapper;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -53,21 +56,53 @@ public class TopicMapperTest {
 
     @Test
     public void testInsert() {
-        Topic topic = new Topic();
-        topic.setTopic("Test_Topic_Unit");
-        topic.setClusterName("DefaultCluster");
-        topic.setCreateTime(new Date());
-        topic.setOrder(true);
-        topic.setUpdateTime(new Date());
-        topic.setStatus(Status.DRAFT);
-        topicMapper.insert(topic);
+        TopicMetadata topicMetadata = new TopicMetadata();
+        topicMetadata.setTopic("Test_Topic_Unit");
+        topicMetadata.setClusterName("DefaultCluster");
+        topicMetadata.setCreateTime(new Date());
+        topicMetadata.setOrder(true);
+        topicMetadata.setUpdateTime(new Date());
+        topicMetadata.setStatus(Status.DRAFT);
+        topicMapper.insert(topicMetadata);
 
-        Assert.assertTrue(topic.getId() > 0);
+        Assert.assertTrue(topicMetadata.getId() > 0);
 
         List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT COUNT(1) FROM topic WHERE topic = ? AND cluster_name = ? AND `order` IS TRUE ", "Test_Topic_Unit", "DefaultCluster");
         Assert.assertTrue(!list.isEmpty());
 
         jdbcTemplate.execute("DELETE FROM topic WHERE topic = 'Test_Topic_Unit'");
+    }
+
+    @Test
+    public void testInsertTopicBrokerInfo() {
+
+        TopicMetadata topicMetadata = new TopicMetadata();
+        topicMetadata.setTopic("Test_Topic_Unit");
+        topicMetadata.setClusterName("DefaultCluster");
+        topicMetadata.setCreateTime(new Date());
+        topicMetadata.setOrder(true);
+        topicMetadata.setUpdateTime(new Date());
+        topicMetadata.setStatus(Status.DRAFT);
+        topicMapper.insert(topicMetadata);
+
+
+        List<Broker> brokers = brokerMapper.list(null, null, 0, 0, null);
+
+        TopicBrokerInfo topicBrokerInfo = new TopicBrokerInfo();
+        topicBrokerInfo.setBroker(brokers.get(0));
+        topicBrokerInfo.setTopicMetadata(topicMetadata);
+        topicBrokerInfo.setCreateTime(new Date());
+        topicBrokerInfo.setUpdateTime(new Date());
+        topicBrokerInfo.setPermission(6);
+        topicBrokerInfo.setStatus(Status.ACTIVE);
+        topicBrokerInfo.setReadQueueNum(16);
+        topicBrokerInfo.setWriteQueueNum(16);
+        topicBrokerInfo.setSyncTime(new Date());
+        topicMapper.insertTopicBrokerInfo(topicBrokerInfo);
+
+        List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT * FROM topic_broker_xref WHERE topic_id = ? AND broker_id = ?", topicMetadata.getId(), brokers.get(0).getId());
+        Assert.assertFalse(result.isEmpty());
+        jdbcTemplate.update("DELETE FROM topic_broker_xref WHERE topic_id = ? AND broker_id = ?", topicMetadata.getId(), brokers.get(0).getId());
     }
 
 
