@@ -8,7 +8,8 @@ import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
@@ -55,18 +56,20 @@ public class TopicScheduler {
             if (null != topicList && !topicList.getTopicList().isEmpty()) {
                 for (String topic : topicList.getTopicList()) {
                     TopicRouteData topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
-                    Topic topicEntity = cockpitTopicDBService.getTopic(topic);
-                    if (null == topicEntity) {
-                        topicEntity = new Topic();
-                        topicEntity.setTopic(topic);
-                        topicEntity.setStatus(Status.ACTIVE);
-                        topicEntity.setCreateTime(new Date());
-                        topicEntity.setUpdateTime(new Date());
-                        topicEntity.setClusterName(getClusterName(topicRouteData.getBrokerDatas()));
-                        cockpitTopicDBService.insert(topicEntity);
+
+                    // For now, we only handle DefaultCluster.
+                    TopicMetadata topicMetadata = cockpitTopicDBService.getTopic(Constants.DEFAULT_CLUSTER, topic);
+                    if (null == topicMetadata) {
+                        topicMetadata = new TopicMetadata();
+                        topicMetadata.setTopic(topic);
+                        topicMetadata.setStatus(Status.ACTIVE);
+                        topicMetadata.setCreateTime(new Date());
+                        topicMetadata.setUpdateTime(new Date());
+                        topicMetadata.setClusterName(getClusterName(topicRouteData.getBrokerDatas()));
+                        cockpitTopicDBService.insert(topicMetadata);
 
                         // Add it to default project for now.
-                        cockpitTopicDBService.insertTopicProjectInfo(topicEntity.getId(), 1);
+                        cockpitTopicDBService.insertTopicProjectInfo(topicMetadata.getId(), 1);
                     }
 
                     for (QueueData queueData: topicRouteData.getQueueDatas()) {
@@ -93,16 +96,21 @@ public class TopicScheduler {
                             }
                         }
 
-                        if (null != broker && !cockpitBrokerDBService.hasTopic(broker.getId(), topicEntity.getId())) {
-                            topicEntity.setReadQueueNum(queueData.getReadQueueNums());
-                            topicEntity.setWriteQueueNum(queueData.getWriteQueueNums());
-                            topicEntity.setPermission(queueData.getPerm());
-                            cockpitTopicDBService.insertTopicBrokerInfo(topicEntity, broker.getId());
-                            if (!cockpitTopicDBService.isDCAllowed(topicEntity.getId(), broker.getDc())) {
-                                cockpitTopicDBService.addDCAllowed(topicEntity.getId(), broker.getDc(), Status.ACTIVE);
+                        if (null != broker && !cockpitBrokerDBService.hasTopic(broker.getId(), topicMetadata.getId())) {
+                            TopicBrokerInfo topicBrokerInfo = new TopicBrokerInfo();
+                            topicBrokerInfo.setBroker(broker);
+                            topicBrokerInfo.setStatus(Status.ACTIVE);
+                            topicBrokerInfo.setTopicMetadata(topicMetadata);
+                            topicBrokerInfo.setReadQueueNum(queueData.getReadQueueNums());
+                            topicBrokerInfo.setWriteQueueNum(queueData.getWriteQueueNums());
+                            topicBrokerInfo.setPermission(queueData.getPerm());
+
+                            cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
+                            if (!cockpitTopicDBService.isDCAllowed(topicMetadata.getId(), broker.getDc())) {
+                                cockpitTopicDBService.addDCAllowed(topicMetadata.getId(), broker.getDc(), Status.ACTIVE);
                             }
                         } else if (null != broker) {
-                            cockpitTopicDBService.refreshTopicBrokerInfo(topicEntity.getId(), broker.getId());
+                            cockpitTopicDBService.refreshTopicBrokerInfo(topicMetadata.getId(), broker.getId());
                         }
                     }
                 }

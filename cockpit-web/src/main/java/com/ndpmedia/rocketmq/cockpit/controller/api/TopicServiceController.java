@@ -3,6 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.controller.api;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
@@ -36,7 +37,7 @@ public class TopicServiceController {
     public Map<String, Object> list(HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        List<Topic> topics = topicMapper.list(0, null, null, null);
+        List<TopicMetadata> topics = topicMapper.list(0, null, null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", topics.size());
@@ -50,19 +51,19 @@ public class TopicServiceController {
     public Map<String, Object> detailList(HttpServletRequest request, @PathVariable("topic") String topic) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        Topic topicEntity = topicMapper.getByTopic(topic);
+        TopicMetadata topicMetadata = topicMapper.getMetadataByTopic(topic);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", 1);
         result.put("iTotalDisplayRecords", 1);
-        result.put("aaData", topicEntity);
+        result.put("aaData", topicMetadata);
         return result;
     }
 
     @RequestMapping(value = "/{topic}", method = RequestMethod.GET)
     @ResponseBody
-    public Topic lookUp(@PathVariable("topic") String topic) {
-        return topicMapper.getByTopic(topic);
+    public TopicMetadata lookUp(@PathVariable("topic") String topic) {
+        return topicMapper.getMetadataByTopic(topic);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
@@ -95,7 +96,7 @@ public class TopicServiceController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    public void update(@RequestBody Topic topic) {
+    public void update(@RequestBody TopicMetadata topic) {
         topic.setUpdateTime(new Date());
         topicMapper.update(topic);
     }

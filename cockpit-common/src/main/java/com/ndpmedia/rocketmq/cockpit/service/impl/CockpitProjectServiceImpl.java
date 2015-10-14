@@ -2,7 +2,7 @@ package com.ndpmedia.rocketmq.cockpit.service.impl;
 
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ProjectMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
@@ -68,7 +68,7 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
     }
 
     @Override
-    public List<Topic> getTopics(long projectId) {
-        return topicMapper.list(projectId, null, null, null);
+    public List<TopicMetadata> getTopics(long projectId) {
+        return topicMapper.list(projectId, null, null);
     }
 }

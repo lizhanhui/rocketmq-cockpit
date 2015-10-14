@@ -15,9 +15,9 @@ import com.ndpmedia.rocketmq.cockpit.model.BrokerLoad;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
@@ -163,13 +163,12 @@ public class AutoPilot {
 
         Map<String, Set<String>> brokerAddressConsumerGroupCache = new HashMap<>();
 
-        List<Topic> topics = cockpitTopicDBService.getTopics(Status.ACTIVE, Status.APPROVED);
-        for (Topic topic : topics) {
+        List<TopicMetadata> topicMetadataList = cockpitTopicDBService.getTopics(Status.ACTIVE, Status.APPROVED);
+        for (TopicMetadata topicMetadata : topicMetadataList) {
             try {
-                TopicRouteData topicRouteData = adminExt.examineTopicRouteInfo(topic.getTopic());
-
+                TopicRouteData topicRouteData = adminExt.examineTopicRouteInfo(topicMetadata.getTopic());
                 // fetch associated consumer groups from DB.
-                List<ConsumerGroup> associatedConsumerGroups = cockpitConsumerGroupDBService.listByTopic(topic.getId());
+                List<ConsumerGroup> associatedConsumerGroups = cockpitConsumerGroupDBService.listByTopic(topicMetadata.getId());
 
                 List<BrokerData> brokerDataList = topicRouteData.getBrokerDatas();
                 for (BrokerData brokerData : brokerDataList) {
@@ -208,7 +207,7 @@ public class AutoPilot {
                     }
                 }
             } catch (RemotingException | MQClientException | InterruptedException e) {
-                LOGGER.error("Failed to fetch topic route data: {}", topic.getTopic());
+                LOGGER.error("Failed to fetch topicMetadata route data: {}", topicMetadata.getTopic());
             }
 
         }

@@ -15,23 +15,25 @@ public interface TopicMapper {
 
     long insert(TopicMetadata topicMetadata);
 
-    void insertTopicBrokerInfo(@Param("topicBrokerInfo") TopicBrokerInfo topicBrokerInfo);
+    void insertTopicBrokerInfo(TopicBrokerInfo topicBrokerInfo);
 
     void delete(long id);
 
-    void update(@Param("topicMetadata") TopicMetadata topicMetadata);
+    void update(TopicMetadata topicMetadata);
 
     void updateTopicBrokerInfo(@Param("topic") Topic topic,
                                @Param("brokerId") long brokerId);
 
     TopicMetadata getMetadata(@Param("topicId") long topicId);
 
-    TopicMetadata getMetadataByTopic(@Param("topic") String topic);
+    TopicMetadata getMetadataByTopic(@Param("clusterName") String clusterName,
+                                     @Param("topic") String topic);
 
-    TopicMetadata get(@Param("id") long id);
-
-    TopicMetadata getByTopic(@Param("topic")String topic);
-
+    /**
+     * Refresh sync_time column to current timestamp.
+     * @param brokerId Broker ID.
+     * @param topicId Topic ID.
+     */
     void refresh(@Param("brokerId") long brokerId,
                  @Param("topicId") long topicId);
 
@@ -40,10 +42,9 @@ public interface TopicMapper {
      * @param projectId Project ID.
      * @return List of topics.
      */
-    List<Topic> list(@Param("projectId") long projectId,
-                     @Param("statusIds") int[] statusIds,
-                     @Param("broker") String broker,
-                     @Param("cluster") String cluster);
+    List<TopicMetadata> list(@Param("projectId") long projectId,
+                             @Param("statusIds") int[] statusIds,
+                             @Param("cluster") String cluster);
 
     List<Long> getProjects(long topicId, String topic);
 

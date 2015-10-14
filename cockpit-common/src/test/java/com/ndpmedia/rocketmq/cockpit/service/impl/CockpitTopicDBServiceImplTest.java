@@ -1,7 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class CockpitTopicDBServiceImplTest {
 
     @Test
     public void testGetTopics() throws Exception {
-        List<Topic> topics = cockpitTopicDBService.getTopics(Status.ACTIVE, Status.APPROVED);
+        List<TopicMetadata> topics = cockpitTopicDBService.getTopics(Status.ACTIVE, Status.APPROVED);
         Assert.assertFalse(topics.isEmpty());
     }
 }

@@ -3,7 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.controller.api;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitProjectService;
@@ -80,7 +80,7 @@ public class CockpitProjectController {
 
     @RequestMapping(value = "/{projectId}/topics", method = RequestMethod.POST)
     @ResponseBody
-    public List<Topic> getTopics(@PathVariable("projectId") long projectId){
+    public List<TopicMetadata> getTopics(@PathVariable("projectId") long projectId){
         return cockpitProjectService.getTopics(projectId);
     }
 }

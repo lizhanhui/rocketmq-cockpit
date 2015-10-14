@@ -1,7 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
@@ -30,24 +29,24 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     private TopicMapper topicMapper;
 
     @Override
-    public List<Topic> getTopics(Status... statuses) {
+    public List<TopicMetadata> getTopics(Status... statuses) {
         int[] statusIds = new int[statuses.length];
         int i = 0;
         for (Status s : statuses) {
             statusIds[i++] = s.ordinal();
         }
-        return topicMapper.list(0, statusIds, null, null);
+        return topicMapper.list(0, statusIds, null);
     }
 
     @Override
-    public TopicMetadata getTopic(String topic) {
-        return topicMapper.getByTopic(topic);
+    public TopicMetadata getTopic(String clusterName, String topic) {
+        return topicMapper.getMetadataByTopic(clusterName, topic);
     }
 
     @Override
     public boolean activate(long id) {
         try{
-            TopicMetadata topic = topicMapper.get(id);
+            TopicMetadata topic = topicMapper.getMetadata(id);
             if (null != topic && topic.getStatus() != Status.ACTIVE) {
                 topic.setStatus(Status.ACTIVE);
                 topicMapper.update(topic);
@@ -62,7 +61,7 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     @Override
     public boolean deactivate(long id){
         try{
-            TopicMetadata topic = topicMapper.get(id);
+            TopicMetadata topic = topicMapper.getMetadata(id);
             if (null != topic && topic.getStatus() == Status.ACTIVE) {
                 topic.setStatus(Status.DELETED);
                 topicMapper.update(topic);
@@ -86,7 +85,7 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
 
     @Override
     public void insert(TopicMetadata topicMetadata) {
-        if (exists(topicMetadata.getTopic())) {
+        if (exists(topicMetadata.getClusterName(), topicMetadata.getTopic())) {
             return;
         }
 
@@ -116,8 +115,8 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     }
 
     @Override
-    public boolean exists(String topic) {
-        return topicMapper.getByTopic(topic) != null;
+    public boolean exists(String clusterName, String topic) {
+        return topicMapper.getMetadataByTopic(null, topic) != null;
     }
 
     @Override

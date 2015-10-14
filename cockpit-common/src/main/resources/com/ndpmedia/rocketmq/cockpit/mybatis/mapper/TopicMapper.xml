@@ -9,8 +9,7 @@
 
     <insert id="insertTopicBrokerInfo">
         INSERT INTO topic_broker_xref(broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, create_time, update_time)
-        VALUES (#{topicBrokerInfo.broker.id}, #{topicBrokerInfo.topicMetadata.id}, #{topicBrokerInfo.permission}, #{topicBrokerInfo.readQueueNum}, #{topicBrokerInfo.writeQueueNum},
-                #{topicBrokerInfo.status.ordinal}, #{topicBrokerInfo.createTime}, #{topicBrokerInfo.updateTime})
+        VALUES (#{broker.id}, #{topicMetadata.id}, #{permission}, #{readQueueNum}, #{writeQueueNum}, #{status.ordinal}, #{createTime}, #{updateTime})
     </insert>
 
     <insert id="connectProject">
@@ -51,7 +50,7 @@
         </if>
     </delete>
 
-    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.Topic">
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata">
         UPDATE topic
         SET topic = #{topic},
             cluster_name = #{clusterName},
@@ -74,8 +73,7 @@
 
     <update id="refresh">
         UPDATE topic_broker_xref
-        SET update_time = CURRENT_TIMESTAMP,
-            sync_time = CURRENT_TIMESTAMP
+        SET sync_time = CURRENT_TIMESTAMP
         WHERE broker_id = #{brokerId}
         AND topic_id = #{topicId}
     </update>
@@ -86,53 +84,32 @@
         WHERE id = #{id}
     </delete>
 
-    <resultMap id="topicMap" type="com.ndpmedia.rocketmq.cockpit.model.Topic">
+    <resultMap id="topicMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata">
         <id column="id" property="id" />
         <result column="topic" property="topic" />
         <result column="cluster_name" property="clusterName" />
-        <result column="permission" property="permission" />
-        <result column="write_queue_num" property="writeQueueNum" />
-        <result column="read_queue_num" property="readQueueNum" />
         <result column="`order`" property="order" />
-        <result column="status_id" property="status"
+        <result column="status" property="status"
                 typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
                 javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
 
-    <select id="get" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, `order`, status_id, t.create_time, t.update_time
-        FROM topic AS t
-        JOIN topic_broker_xref AS xref ON t.id = xref.topic_id
-        WHERE 1 = 1
-        <if test="id > 0">
-            AND id = #{id}
-        </if>
-    </select>
-
     <select id="list" resultMap="topicMap">
-        SELECT t.id, t.topic, tbx.permission, tbx.write_queue_num, tbx.read_queue_num,  t.`order`, tbx.create_time, tbx.update_time
+        SELECT t.id, t.topic,  t.`order`, t.status, t.create_time, t.update_time
         FROM topic AS t
-        JOIN topic_broker_xref AS tbx ON t.id = tbx.topic_id
         <if test="projectId > 0">
-            JOIN project_topic_xref AS xref ON t.id = xref.topic_id
-        </if>
-        <if test="broker != null">
-            JOIN broker AS b ON b.id = tbx.broker_id
+            JOIN project_topic_xref AS ptx ON t.id = ptx.topic_id
         </if>
         WHERE 1 = 1
         <if test="projectId > 0">
-            AND xref.project_id = #{projectId}
+            AND ptx.project_id = #{projectId}
         </if>
 
         <if test="statusIds != null">
-            AND status_id IN
+            AND t.status IN
             <foreach collection="statusIds" separator="," open="(" close=")" item="status">#{status}</foreach>
-        </if>
-
-        <if test="broker != null">
-            AND b.address = #{broker}
         </if>
 
         <if test="cluster != null">
@@ -205,6 +182,11 @@
         SELECT id, topic, cluster_name, `order`, status, create_time, update_time
         FROM topic
         WHERE 1 = 1
+
+        <if test="clusterName != null">
+            AND cluster_name = #{clusterName}
+        </if>
+
         <if test="topic != null">
             AND topic = #{topic}
         </if>
@@ -249,16 +231,6 @@
 
         <if test="dc > 0">
             AND b.dc = #{dc}
-        </if>
-    </select>
-
-    <select id="getByTopic" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, `order`, status_id, t.create_time, t.update_time
-        FROM topic AS t
-        JOIN topic_broker_xref AS xref ON t.id = xref.topic_id
-        WHERE 1 = 1
-        <if test="topic != null">
-            AND topic = #{topic}
         </if>
     </select>
 

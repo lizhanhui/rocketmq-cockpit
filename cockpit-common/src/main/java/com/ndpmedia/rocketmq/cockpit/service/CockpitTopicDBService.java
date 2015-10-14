@@ -1,7 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.service;
 
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 
@@ -9,14 +8,15 @@ import java.util.List;
 
 public interface CockpitTopicDBService extends CockpitTopicBaseService {
 
-    List<Topic> getTopics(Status... statuses);
+    List<TopicMetadata> getTopics(Status... statuses);
 
     /**
      * get topic list by topic name from database
      * @param topic topic name
+     * @param clusterName Cluster Name.
      * @return topic list
      */
-    TopicMetadata getTopic(String topic);
+    TopicMetadata getTopic(String clusterName, String topic);
 
     /**
      * update topic status to active on database
@@ -55,7 +55,7 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
      */
     void remove(long topicId, long projectId);
 
-    boolean exists(String topic);
+    boolean exists(String clusterName, String topic);
 
     List<Long> getProjectIDs(long topicId, String topic);
 

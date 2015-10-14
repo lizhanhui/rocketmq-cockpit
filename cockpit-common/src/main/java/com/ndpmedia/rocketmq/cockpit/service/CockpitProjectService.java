@@ -2,7 +2,7 @@ package com.ndpmedia.rocketmq.cockpit.service;
 
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 
 import java.util.List;
 
@@ -35,6 +35,6 @@ public interface CockpitProjectService {
 
     List<ConsumerGroup> getConsumerGroups(long projectId);
 
-    List<Topic> getTopics(long projectId);
+    List<TopicMetadata> getTopics(long projectId);
 
 }

@@ -102,7 +102,31 @@ public class TopicMapperTest {
 
         List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT * FROM topic_broker_xref WHERE topic_id = ? AND broker_id = ?", topicMetadata.getId(), brokers.get(0).getId());
         Assert.assertFalse(result.isEmpty());
+        jdbcTemplate.update("DELETE FROM topic WHERE id = ?", topicMetadata.getId());
         jdbcTemplate.update("DELETE FROM topic_broker_xref WHERE topic_id = ? AND broker_id = ?", topicMetadata.getId(), brokers.get(0).getId());
+    }
+
+
+    @Test
+    public void testUpdate() {
+        TopicMetadata topicMetadata = new TopicMetadata();
+        topicMetadata.setTopic("Test_Topic_Unit");
+        topicMetadata.setClusterName("DefaultCluster");
+        topicMetadata.setCreateTime(new Date());
+        topicMetadata.setOrder(true);
+        topicMetadata.setUpdateTime(new Date());
+        topicMetadata.setStatus(Status.DRAFT);
+        topicMapper.insert(topicMetadata);
+
+        topicMetadata.setTopic("Test_Topic_Unit-1");
+
+        topicMapper.update(topicMetadata);
+
+        topicMetadata = topicMapper.getMetadata(topicMetadata.getId());
+        Assert.assertEquals("Test_Topic_Unit-1", topicMetadata.getTopic());
+
+        jdbcTemplate.update("DELETE FROM topic WHERE id = ?", topicMetadata.getId());
+
     }
 
 
