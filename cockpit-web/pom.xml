@@ -9,7 +9,7 @@
         <version>3.2.2.R2</version>
     </parent>
     <artifactId>cockpit-web</artifactId>
-    <name>${artifactId} ${project.version}</name>
+    <name>${project.artifactId} ${project.version}</name>
 
     <packaging>war</packaging>
 

@@ -39,13 +39,13 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
 
     @Override
     public Topic getTopic(String topic) {
-        return topicMapper.get(-1, topic);
+        return topicMapper.getByTopic(topic);
     }
 
     @Override
     public boolean activate(long id) {
         try{
-            Topic topic = topicMapper.get(id, null);
+            Topic topic = topicMapper.get(id);
             if (null != topic && topic.getStatus() != Status.ACTIVE) {
                 topic.setStatus(Status.ACTIVE);
                 topicMapper.update(topic);
@@ -60,7 +60,7 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     @Override
     public boolean deactivate(long id){
         try{
-            Topic topic = topicMapper.get(id, null);
+            Topic topic = topicMapper.get(id);
             if (null != topic && topic.getStatus() == Status.ACTIVE) {
                 topic.setStatus(Status.DELETED);
                 topicMapper.update(topic);
@@ -129,7 +129,7 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
 
     @Override
     public boolean exists(String topic) {
-        return topicMapper.get(0, topic) != null;
+        return topicMapper.getByTopic(topic) != null;
     }
 
     @Override

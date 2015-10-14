@@ -1,7 +1,10 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
+import com.ndpmedia.rocketmq.cockpit.model.Chair;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +33,23 @@ public class TopicMapperTest {
         Assert.assertNotNull(jdbcTemplate);
     }
 
+    @Test
+    public void testGetTopicMetadata() {
+        long id = 10000;
+        boolean deleteOnExit = false;
+        if (jdbcTemplate.queryForList("SELECT * FROM topic WHERE id = ?", id).isEmpty()) {
+            jdbcTemplate.update("INSERT INTO topic(id, topic, cluster_name, `order`, create_time, update_time, status) VALUES (?, ?, ?, ?, ?, ?, ?)", id, "Test_TOPIC_" + id, "DefaultCluster", true, new Date(), new Date(), 1);
+            deleteOnExit = true;
+        }
+
+        TopicMetadata topicMetadata = topicMapper.getMetadata(id);
+
+         Assert.assertNotNull(topicMetadata);
+
+        if (deleteOnExit) {
+            jdbcTemplate.update("DELETE FROM topic WHERE id = ?", id);
+        }
+    }
 
     @Test
     public void testInsert() {
@@ -51,5 +71,19 @@ public class TopicMapperTest {
     }
 
 
+    @Test
+    public void testQueryTopicBrokerInfo() {
+        List<TopicBrokerInfo> topicBrokerInfoList = topicMapper.queryTopicBrokerInfo(2102, 0);
+        for (TopicBrokerInfo topicBrokerInfo : topicBrokerInfoList) {
+            System.out.println(topicBrokerInfo.getStatus().getText());
+        }
+    }
+
+
+    @Test
+    public void testChair() {
+        Chair chair = topicMapper.getChair(1);
+        System.out.println(chair.getDesk().getName());
+    }
 
 }

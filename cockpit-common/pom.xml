@@ -9,7 +9,7 @@
         <version>3.2.2.R2</version>
     </parent>
     <artifactId>cockpit-common</artifactId>
-    <name>${artifactId} ${project.version}</name>
+    <name>${project.artifactId} ${project.version}</name>
     <packaging>jar</packaging>
 
     <profiles>
@@ -19,7 +19,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <jdbc.url>jdbc:mysql://localhost:3306/cockpit2</jdbc.url>
+                <jdbc.url>jdbc:mysql://localhost:3306/cockpit2?zeroDateTimeBehavior=convertToNull</jdbc.url>
                 <jdbc.userName>root</jdbc.userName>
                 <jdbc.password>password</jdbc.password>
             </properties>

@@ -109,9 +109,6 @@
         <if test="id > 0">
             AND id = #{id}
         </if>
-        <if test="topic != null">
-            AND topic = #{topic}
-        </if>
     </select>
 
     <select id="list" resultMap="topicMap">
@@ -239,6 +236,100 @@
         FROM topic_dc_xref
         WHERE topic_id = #{topicId}
         AND dc_id = #{dcId}
+    </select>
+
+
+    <resultMap id="topicMetadataResultMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata">
+        <id column="id" property="id" />
+        <result column="topic" property="topic" />
+        <result column="cluster_name" property="clusterName" />
+        <result column="`order`" property="order" />
+        <result column="status" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <select id="getMetadata" parameterType="long" resultMap="topicMetadataResultMap">
+        SELECT id, topic, cluster_name, `order`, status, create_time, update_time
+        FROM topic
+        WHERE 1 = 1
+        AND id = #{topicId}
+    </select>
+
+
+    <select id="getMetadataByTopic" resultMap="topicMetadataResultMap">
+        SELECT id, topic, cluster_name, `order`, status, create_time, update_time
+        FROM topic
+        WHERE 1 = 1
+        <if test="topic != null">
+            AND topic = #{topic}
+        </if>
+    </select>
+
+    <resultMap id="topicBrokerInfoResultMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo">
+        <result column="permission" property="permission" />
+
+        <result column="status_id" property="status"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+
+        <result column="write_queue_num" property="writeQueueNum" />
+        <result column="read_queue_num" property="readQueueNum" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="sync_time" property="syncTime" />
+        <association property="broker"
+                     column="broker_id"
+                     foreignColumn="id"
+                     javaType="com.ndpmedia.rocketmq.cockpit.model.Broker"
+                     select="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper.get" />
+        <association property="topicMetadata"
+                     column="topic_id"
+                     javaType="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata"
+                     select="getMetadata" />
+    </resultMap>
+
+    <select id="queryTopicBrokerInfo" resultMap="topicBrokerInfoResultMap">
+        SELECT broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, create_time, update_time, sync_time
+        FROM topic_broker_xref
+        WHERE 1 = 1
+
+        <if test="brokerId > 0">
+            AND broker_id = #{brokerId}
+        </if>
+
+        <if test="topicId > 0">
+            AND topic_id = #{topicId}
+        </if>
+    </select>
+
+    <select id="getByTopic" resultMap="topicMap">
+        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, `order`, status_id, t.create_time, t.update_time
+        FROM topic AS t
+        JOIN topic_broker_xref AS xref ON t.id = xref.topic_id
+        WHERE 1 = 1
+        <if test="topic != null">
+            AND topic = #{topic}
+        </if>
+    </select>
+
+    <resultMap id="chairResultMap" type="com.ndpmedia.rocketmq.cockpit.model.Chair">
+
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <association property="desk"
+                     column="desk_id"
+                     foreignColumn="id"
+                     javaType="com.ndpmedia.rocketmq.cockpit.model.Desk"
+                     select="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.DeskMapper.getDesk" />
+    </resultMap>
+
+    <select id="getChair" resultMap="chairResultMap">
+        SELECT id, name, desk_id
+        FROM chair
+        WHERE id = #{chairId}
     </select>
 
 

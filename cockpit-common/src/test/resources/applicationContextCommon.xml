@@ -21,7 +21,7 @@
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
         <property name="DriverClassName" value="com.mysql.jdbc.Driver" />
         <!-- JDBC连接串 -->
-        <property name="url" value="jdbc:mysql://localhost:3306/cockpit2" />
+        <property name="url" value="jdbc:mysql://localhost:3306/cockpit2?zeroDateTimeBehavior=convertToNull" />
         <!-- 数据库用户名称 -->
         <property name="username" value="root" />
         <!-- 数据库密码 -->

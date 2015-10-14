@@ -1,10 +1,13 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
+import com.ndpmedia.rocketmq.cockpit.model.Chair;
 import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicHosting;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -23,7 +26,13 @@ public interface TopicMapper {
     void updateTopicBrokerInfo(@Param("topic") Topic topic,
                                @Param("brokerId") long brokerId);
 
-    Topic get(@Param("id") long id, @Param("topic") String topic);
+    TopicMetadata getMetadata(@Param("topicId") long topicId);
+
+    TopicMetadata getMetadataByTopic(@Param("topic") String topic);
+
+    Topic get(@Param("id") long id);
+
+    Topic getByTopic(@Param("topic")String topic);
 
     void refresh(@Param("brokerId") long brokerId,
                  @Param("topicId") long topicId);
@@ -51,9 +60,13 @@ public interface TopicMapper {
                          @Param("dcId")long dcId,
                          @Param("status")Status status);
 
+    @Deprecated
     List<TopicHosting> queryHosting(@Param("topicId") long topicId,
                                     @Param("topic") String topic,
                                     @Param("dcId") int dcId);
+
+    List<TopicBrokerInfo> queryTopicBrokerInfo(@Param("topicId")long topicId,
+                                               @Param("brokerId")long brokerId);
 
     List<Long> queryTopicHostingBrokerIds(@Param("topicId") long topicId, @Param("dcId") long dcId);
 
@@ -62,4 +75,6 @@ public interface TopicMapper {
     void connectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
 
     void disconnectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
+
+    Chair getChair(@Param("chairId") long id);
 }

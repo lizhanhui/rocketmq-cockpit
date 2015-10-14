@@ -16,7 +16,9 @@ public interface BrokerMapper {
     void refresh(@Param("brokerId") Long brokerId,
                  @Param("brokerAddress") String brokerAddress);
 
-    Broker get(@Param("brokerId") long brokerId, @Param("address") String address);
+    Broker get(@Param("brokerId") long brokerId);
+
+    Broker getBrokerByAddress(@Param("address") String address);
 
     List<Broker> list(@Param("clusterName") String clusterName,
                       @Param("brokerName") String brokerName,

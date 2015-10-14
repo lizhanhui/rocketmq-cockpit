@@ -36,7 +36,7 @@ public class TopicServiceController {
     public Map<String, Object> list(HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        List<Topic> topics = topicMapper.list(0, 0, null, null);
+        List<Topic> topics = topicMapper.list(0, null, null, null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", topics.size());
@@ -50,7 +50,7 @@ public class TopicServiceController {
     public Map<String, Object> detailList(HttpServletRequest request, @PathVariable("topic") String topic) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        Topic topicEntity = topicMapper.get(0, topic);
+        Topic topicEntity = topicMapper.getByTopic(topic);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", 1);
@@ -62,7 +62,7 @@ public class TopicServiceController {
     @RequestMapping(value = "/{topic}", method = RequestMethod.GET)
     @ResponseBody
     public Topic lookUp(@PathVariable("topic") String topic) {
-        return topicMapper.get(0, topic);
+        return topicMapper.getByTopic(topic);
     }
 
     @RequestMapping(method = RequestMethod.PUT)

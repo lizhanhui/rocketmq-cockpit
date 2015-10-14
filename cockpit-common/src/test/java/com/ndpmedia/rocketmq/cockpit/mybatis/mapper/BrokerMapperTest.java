@@ -2,6 +2,7 @@ package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,16 @@ public class BrokerMapperTest {
         jdbcTemplate.update("DELETE FROM broker WHERE id = ?", brokerId);
     }
 
+    @Before
+    public void cleanBrokerTable() {
+        jdbcTemplate.execute("DELETE FROM broker");
+    }
+
     @Test
     public void testGet() throws Exception {
         long brokerId = 10000;
         insertBroker(brokerId);
-        Broker broker = brokerMapper.get(brokerId, null);
+        Broker broker = brokerMapper.get(brokerId);
 
         Assert.assertNotNull(broker);
         Assert.assertEquals("DefaultCluster", broker.getClusterName());
@@ -55,7 +61,7 @@ public class BrokerMapperTest {
         Assert.assertEquals(1, broker.getDc());
 
 
-        broker = brokerMapper.get(0, "localhost:10911");
+        broker = brokerMapper.getBrokerByAddress("localhost:10911");
         Assert.assertNotNull(broker);
         Assert.assertEquals("DefaultCluster", broker.getClusterName());
         Assert.assertEquals("test-broker", broker.getBrokerName());

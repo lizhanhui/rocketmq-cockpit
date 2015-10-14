@@ -31,7 +31,14 @@ public class CockpitBrokerDBServiceImpl implements CockpitBrokerDBService {
 
     @Override
     public Broker get(long brokerId, String brokerAddress) {
-        return brokerMapper.get(brokerId, brokerAddress);
+
+        if (brokerId > 0) {
+            return brokerMapper.get(brokerId);
+        } else if (null != brokerAddress) {
+            return brokerMapper.getBrokerByAddress(brokerAddress);
+        }
+
+        return null;
     }
 
     @Override

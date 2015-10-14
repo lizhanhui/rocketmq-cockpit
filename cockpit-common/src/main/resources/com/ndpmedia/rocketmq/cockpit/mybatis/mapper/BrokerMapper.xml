@@ -98,14 +98,7 @@
         SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
             address, version, dc, update_time AS updateTime
         FROM broker
-        WHERE 1 = 1
-        <if test="brokerId > 0">
-            AND id = #{brokerId}
-        </if>
-
-        <if test="address != null">
-            AND address = #{address}
-        </if>
+        WHERE id = #{brokerId}
     </select>
 
     <select id="hasTopic" resultType="java.lang.Boolean">
@@ -113,5 +106,15 @@
         FROM topic_broker_xref
         WHERE broker_id = #{brokerId}
         AND topic_id = #{topicId}
+    </select>
+
+    <select id="getBrokerByAddress" resultType="com.ndpmedia.rocketmq.cockpit.model.Broker">
+        SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
+        address, version, dc, update_time AS updateTime
+        FROM broker
+        WHERE 1 = 1
+        <if test="address != null">
+            AND address = #{address}
+        </if>
     </select>
 </mapper>
