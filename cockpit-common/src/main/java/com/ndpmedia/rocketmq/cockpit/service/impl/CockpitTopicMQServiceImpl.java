@@ -12,6 +12,7 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.admin.MQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.slf4j.Logger;
@@ -222,6 +223,14 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
         topicConfig.setWriteQueueNums(topic.getWriteQueueNum());
         topicConfig.setReadQueueNums(topic.getReadQueueNum());
         topicConfig.setTopicName(topic.getTopic());
+        return topicConfig;
+    }
+
+    public static TopicConfig wrapTopicToTopicConfig(TopicBrokerInfo topicBrokerInfo) {
+        TopicConfig topicConfig = new TopicConfig();
+        topicConfig.setWriteQueueNums(topicBrokerInfo.getWriteQueueNum());
+        topicConfig.setReadQueueNums(topicBrokerInfo.getReadQueueNum());
+        topicConfig.setTopicName(topicBrokerInfo.getTopicMetadata().getTopic());
         return topicConfig;
     }
 }

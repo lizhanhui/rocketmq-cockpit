@@ -167,7 +167,7 @@
         WHERE xref.topic_id = #{topicId}
     </select>
 
-    <select id="queryTopicHostingBrokerIds" resultType="java.lang.Long">
+    <select id="queryTopicHostingBrokerIds" resultType="long">
         SELECT xref.broker_id
         FROM topic_broker_xref AS xref
              JOIN broker AS b ON xref.broker_id = b.id
@@ -176,7 +176,7 @@
               AND b.broker_id = 0
     </select>
 
-    <select id="queryAssociatedConsumerGroup" resultType="java.lang.Long">
+    <select id="queryAssociatedConsumerGroup" resultType="long">
         SELECT consumer_group_id
         FROM topic_consumer_group_xref
         WHERE topic_id = #{topicId}
@@ -292,16 +292,21 @@
     </resultMap>
 
     <select id="queryTopicBrokerInfo" resultMap="topicBrokerInfoResultMap">
-        SELECT broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, create_time, update_time, sync_time
-        FROM topic_broker_xref
+        SELECT tbx.broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, tbx.create_time, tbx.update_time, sync_time
+        FROM topic_broker_xref AS tbx
+        LEFT JOIN broker AS b ON tbx.broker_id = b.id
         WHERE 1 = 1
 
         <if test="brokerId > 0">
-            AND broker_id = #{brokerId}
+            AND tbx.broker_id = #{brokerId}
         </if>
 
         <if test="topicId > 0">
             AND topic_id = #{topicId}
+        </if>
+
+        <if test="dc > 0">
+            AND b.dc = #{dc}
         </if>
     </select>
 

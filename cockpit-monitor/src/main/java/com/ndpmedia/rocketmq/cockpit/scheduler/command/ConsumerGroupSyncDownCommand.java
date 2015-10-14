@@ -123,7 +123,7 @@ public class ConsumerGroupSyncDownCommand implements SubCommand {
             }
 
             for (String brokerAddress : brokers) {
-                Broker broker = brokerMapper.get(0, brokerAddress);
+                Broker broker = brokerMapper.getBrokerByAddress(brokerAddress);
                 if (!brokerMapper.hasConsumerGroup(broker.getId(), existingConsumerGroup.getId())) {
                     brokerMapper.createConsumerGroup(broker.getId(), existingConsumerGroup.getId());
                 }

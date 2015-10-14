@@ -66,8 +66,10 @@ public interface TopicMapper {
                                     @Param("dcId") int dcId);
 
     List<TopicBrokerInfo> queryTopicBrokerInfo(@Param("topicId")long topicId,
-                                               @Param("brokerId")long brokerId);
+                                               @Param("brokerId")long brokerId,
+                                               @Param("dc") int dc);
 
+    @Deprecated
     List<Long> queryTopicHostingBrokerIds(@Param("topicId") long topicId, @Param("dcId") long dcId);
 
     List<Long> queryAssociatedConsumerGroup(@Param("topicId") long topicId);
@@ -76,5 +78,11 @@ public interface TopicMapper {
 
     void disconnectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
 
+    /**
+     * Method to test mybatis.
+     *
+     * @param id chair ID.
+     * @return {@link Chair} instance.
+     */
     Chair getChair(@Param("chairId") long id);
 }

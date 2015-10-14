@@ -17,6 +17,7 @@ import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
@@ -111,7 +112,13 @@ public class AutoPilot {
                     }
 
                     // Find candidate brokers to create topic on.
-                    List<Long> currentHostingBrokers = topicMapper.queryTopicHostingBrokerIds(topicAvailability.getTopicId(), topicAvailability.getDcId());
+                    List<Long> currentHostingBrokers = new ArrayList<>();
+
+                    List<TopicBrokerInfo> topicBrokerInfoList = topicMapper.queryTopicBrokerInfo(topicAvailability.getTopicId(), 0, topicAvailability.getDcId());
+                    for (TopicBrokerInfo topicBrokerInfo : topicBrokerInfoList) {
+                        currentHostingBrokers.add(topicBrokerInfo.getBroker().getId());
+                    }
+
                     List<BrokerLoad> brokerLoadList = brokerMapper.queryBrokerLoad(topicAvailability.getDcId(), 0);
                     List<Long> candidateBrokers = new ArrayList<>();
                     for (BrokerLoad brokerLoad : brokerLoadList) {
@@ -124,20 +131,23 @@ public class AutoPilot {
                     }
 
                     List<Long> consumerGroupIds = topicMapper.queryAssociatedConsumerGroup(topicAvailability.getTopicId());
-                    Topic topic = topicMapper.get(topicAvailability.getTopicId(), null);
-
                     for (Long brokerId : candidateBrokers) {
                         for (Long consumerGroupId : consumerGroupIds) {
                             if (!brokerMapper.hasConsumerGroup(brokerId, consumerGroupId)) {
-                                Broker broker = brokerMapper.get(brokerId, null);
+                                Broker broker = brokerMapper.get(brokerId);
                                 ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId, null);
                                 try {
                                     // For each topic, create associated consumer group on the target, matched brokers.
-                                    adminExt.createAndUpdateSubscriptionGroupConfig(broker.getAddress(), CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup));
+                                    adminExt.createAndUpdateSubscriptionGroupConfig(broker.getAddress(),
+                                            CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup));
                                     brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
 
+                                    TopicBrokerInfo topicBrokerInfo = topicMapper
+                                            .queryTopicBrokerInfo(topicAvailability.getTopicId(), brokerId, 0).get(0);
+
                                     // Create topic on matched brokers or update topic read/write queue number.
-                                    adminExt.createAndUpdateTopicConfig(broker.getAddress(), CockpitTopicMQServiceImpl.wrapTopicToTopicConfig(topic));
+                                    adminExt.createAndUpdateTopicConfig(broker.getAddress(),
+                                            CockpitTopicMQServiceImpl.wrapTopicToTopicConfig(topicBrokerInfo));
                                     brokerMapper.createTopic(brokerId, topicAvailability.getTopicId());
                                 } catch (RemotingException | MQBrokerException | InterruptedException | MQClientException e) {
                                     LOGGER.error("Failed to create consumer group {} on broker {}", consumerGroup.getGroupName(), broker.getAddress());

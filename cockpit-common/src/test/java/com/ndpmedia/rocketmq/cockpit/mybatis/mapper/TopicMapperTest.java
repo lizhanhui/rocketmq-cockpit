@@ -73,7 +73,7 @@ public class TopicMapperTest {
 
     @Test
     public void testQueryTopicBrokerInfo() {
-        List<TopicBrokerInfo> topicBrokerInfoList = topicMapper.queryTopicBrokerInfo(2102, 0);
+        List<TopicBrokerInfo> topicBrokerInfoList = topicMapper.queryTopicBrokerInfo(2102, 0, 0);
         for (TopicBrokerInfo topicBrokerInfo : topicBrokerInfoList) {
             System.out.println(topicBrokerInfo.getStatus().getText());
         }
