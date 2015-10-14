@@ -62,13 +62,13 @@
 
     <update id="updateTopicBrokerInfo">
         UPDATE topic_broker_xref
-        SET permission = #{topic.permission},
-            write_queue_num = #{topic.writeQueueNum},
-            read_queue_num = #{topic.readQueueNum},
-            status_id = #{topic.status, typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"},
+        SET permission = #{permission},
+            write_queue_num = #{writeQueueNum},
+            read_queue_num = #{readQueueNum},
+            status_id = #{status.ordinal},
             update_time = CURRENT_TIMESTAMP
-        WHERE broker_id = #{brokerId}
-        AND topic_id = #{topic.id}
+        WHERE broker_id = #{broker.id}
+        AND topic_id = #{topicMetadata.id}
     </update>
 
     <update id="refresh">

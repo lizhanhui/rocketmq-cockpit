@@ -3,7 +3,6 @@ package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 import com.ndpmedia.rocketmq.cockpit.model.Chair;
 import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
@@ -21,8 +20,7 @@ public interface TopicMapper {
 
     void update(TopicMetadata topicMetadata);
 
-    void updateTopicBrokerInfo(@Param("topic") Topic topic,
-                               @Param("brokerId") long brokerId);
+    void updateTopicBrokerInfo(TopicBrokerInfo topicBrokerInfo);
 
     TopicMetadata getMetadata(@Param("topicId") long topicId);
 
