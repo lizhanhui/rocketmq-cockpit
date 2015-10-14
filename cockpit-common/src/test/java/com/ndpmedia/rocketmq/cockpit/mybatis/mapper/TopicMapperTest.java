@@ -56,6 +56,7 @@ public class TopicMapperTest {
 
     @Test
     public void testInsert() {
+        jdbcTemplate.update("DELETE FROM topic WHERE topic = ? AND cluster_name = ?", "Test_Topic_Unit", "DefaultCluster");
         TopicMetadata topicMetadata = new TopicMetadata();
         topicMetadata.setTopic("Test_Topic_Unit");
         topicMetadata.setClusterName("DefaultCluster");
@@ -75,7 +76,7 @@ public class TopicMapperTest {
 
     @Test
     public void testInsertTopicBrokerInfo() {
-
+        jdbcTemplate.update("DELETE FROM topic WHERE topic = ? AND cluster_name = ?", "Test_Topic_Unit", "DefaultCluster");
         TopicMetadata topicMetadata = new TopicMetadata();
         topicMetadata.setTopic("Test_Topic_Unit");
         topicMetadata.setClusterName("DefaultCluster");
@@ -87,6 +88,12 @@ public class TopicMapperTest {
 
 
         List<Broker> brokers = brokerMapper.list(null, null, 0, 0, null);
+
+        if (brokers.isEmpty()) {
+            jdbcTemplate.update("INSERT INTO broker(id, cluster_name, broker_name, broker_id, address, version, dc, create_time, update_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                    , 1000, "DefaultCluster", "testbroker", 0, "localhost:10911", "3.2.2", 5, new Date(), new Date());
+            brokers = brokerMapper.list(null, null, 0, 0, null);
+        }
 
         TopicBrokerInfo topicBrokerInfo = new TopicBrokerInfo();
         topicBrokerInfo.setBroker(brokers.get(0));
@@ -106,9 +113,10 @@ public class TopicMapperTest {
         jdbcTemplate.update("DELETE FROM topic_broker_xref WHERE topic_id = ? AND broker_id = ?", topicMetadata.getId(), brokers.get(0).getId());
     }
 
-
     @Test
     public void testUpdate() {
+        jdbcTemplate.update("DELETE FROM topic WHERE topic = ? AND cluster_name = ?", "Test_Topic_Unit", "DefaultCluster");
+        jdbcTemplate.update("DELETE FROM topic WHERE topic = ? AND cluster_name = ?", "Test_Topic_Unit-1", "DefaultCluster");
         TopicMetadata topicMetadata = new TopicMetadata();
         topicMetadata.setTopic("Test_Topic_Unit");
         topicMetadata.setClusterName("DefaultCluster");
