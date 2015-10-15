@@ -3,6 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.Chair;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
+import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import org.junit.Assert;
@@ -143,6 +144,16 @@ public class TopicMapperTest {
         List<TopicBrokerInfo> topicBrokerInfoList = topicMapper.queryTopicBrokerInfo(2102, 0, 0);
         for (TopicBrokerInfo topicBrokerInfo : topicBrokerInfoList) {
             System.out.println(topicBrokerInfo.getStatus().getText());
+        }
+    }
+
+
+    @Test
+    public void testQueryTopicsAvailability() {
+        List<TopicAvailability> topicAvailabilities = topicMapper.queryTopicsAvailability(Status.ACTIVE, Status.APPROVED);
+        for (TopicAvailability topicAvailability : topicAvailabilities) {
+            TopicMetadata topicMetadata = topicMapper.getMetadata(topicAvailability.getTopicId());
+            System.out.println(topicMetadata.getTopic());
         }
     }
 
