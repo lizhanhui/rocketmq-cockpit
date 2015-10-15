@@ -135,7 +135,7 @@ public class AutoPilot {
                         for (Long consumerGroupId : consumerGroupIds) {
                             if (!brokerMapper.hasConsumerGroup(brokerId, consumerGroupId)) {
                                 Broker broker = brokerMapper.get(brokerId);
-                                ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId, null);
+                                ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId);
                                 try {
                                     // For each topic, create associated consumer group on the target, matched brokers.
                                     adminExt.createAndUpdateSubscriptionGroupConfig(broker.getAddress(),
