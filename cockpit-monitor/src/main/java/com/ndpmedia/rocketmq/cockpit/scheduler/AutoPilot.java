@@ -14,13 +14,16 @@ import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.BrokerLoad;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
+import com.ndpmedia.rocketmq.cockpit.model.Level;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
+import com.ndpmedia.rocketmq.cockpit.model.Warning;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
@@ -34,6 +37,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +68,9 @@ public class AutoPilot {
 
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
+
+    @Autowired
+    private WarningMapper warningMapper;
 
     private MQAdminExt adminExt;
 
@@ -106,8 +113,18 @@ public class AutoPilot {
                     if (topicAvailability.getAvailability() >= brokers.size()) {
                         // We do not have more brokers.
                         // TODO warning and notify to add more broker in this data center.
-                        LOGGER.warn("Availability of topic: {} in DC: {} is {}, but we have no more brokers in this DC",
-                                topicAvailability.getTopicId(), topicAvailability.getDcId(), topicAvailability.getAvailability());
+                        String msgTemplate = "Availability of topic: %s in DC: %s is %s, but we have no more brokers in this DC";
+                        String msg = String.format(msgTemplate, topicAvailability.getTopicId(), topicAvailability.getDcId(), topicAvailability.getAvailability());
+                        LOGGER.warn(msg);
+
+                        // Add a warning
+                        Warning warning = new Warning();
+                        warning.setLevel(Level.WARN);
+                        warning.setStatus(Status.ACTIVE);
+                        warning.setCreateTime(new Date());
+                        warning.setMsg(msg);
+                        warningMapper.create(warning);
+
                         continue;
                     }
 
@@ -159,8 +176,7 @@ public class AutoPilot {
             }
         }
 
-        // TODO for each topic-broker pair, make sure its associated consumer group is there.
-
+        // for each topic-broker pair, make sure its associated consumer group is there.
         Map<String, Set<String>> brokerAddressConsumerGroupCache = new HashMap<>();
 
         List<TopicMetadata> topicMetadataList = cockpitTopicDBService.getTopics(Status.ACTIVE, Status.APPROVED);
@@ -187,7 +203,8 @@ public class AutoPilot {
                                     consumerGroups.add(subscriptionGroupConfig.getGroupName());
                                 }
                             } catch (MQBrokerException e) {
-                                e.printStackTrace();
+                                LOGGER.error("Failed to get subscription group info from broker: {}", brokerAddress.getValue());
+                                LOGGER.error("", e);
                             }
                             brokerAddressConsumerGroupCache.put(brokerAddress.getValue(), consumerGroups);
                         }
