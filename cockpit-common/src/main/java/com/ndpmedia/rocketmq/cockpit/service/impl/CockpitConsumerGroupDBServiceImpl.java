@@ -23,16 +23,20 @@ public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDB
 
     @Override
     public ConsumerGroup get(long consumerGroupId, String consumerGroupName) {
-        if (consumerGroupId <=0 && null == consumerGroupName) {
-            throw new IllegalArgumentException("Either consumer group ID or Name should be present");
+        if (consumerGroupId > 0) {
+            return consumerGroupMapper.get(consumerGroupId);
         }
 
-        return consumerGroupMapper.get(consumerGroupId, consumerGroupName);
+        if (null != consumerGroupName) {
+            return consumerGroupMapper.getByName(consumerGroupName);
+        }
+
+        throw new IllegalArgumentException("Either consumer group ID or Name should be present");
     }
 
     @Override
     public void activate(long consumerGroupId) {
-        ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId, null);
+        ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId);
         if (null != consumerGroup && consumerGroup.getStatus() != Status.ACTIVE) {
             consumerGroup.setStatus(Status.ACTIVE);
             consumerGroupMapper.update(consumerGroup);

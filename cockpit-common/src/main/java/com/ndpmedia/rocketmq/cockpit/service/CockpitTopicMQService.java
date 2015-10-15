@@ -3,7 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.service;
 import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.tools.admin.MQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 
 import java.util.Set;
 
@@ -40,16 +40,16 @@ public interface CockpitTopicMQService extends CockpitTopicBaseService {
 
     /**
      * create or update topic on cluster or broker
-     * @param topic topic
+     * @param topicMetadata topic
      * @return result
      */
-    boolean createOrUpdateTopic(MQAdminExt adminExt, Topic topic) throws CockpitException;
+    boolean createOrUpdateTopic(MQAdminExt adminExt, TopicMetadata topicMetadata) throws CockpitException;
 
     /**
      * delete topic on cluster or broker
-     * @param topic topic
+     * @param topicMetadata topic
      * @return result
      */
-    boolean deleteTopic(MQAdminExt adminExt, Topic topic) throws CockpitException;
+    boolean deleteTopic(MQAdminExt adminExt, TopicMetadata topicMetadata) throws CockpitException;
 
 }

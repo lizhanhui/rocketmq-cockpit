@@ -1,7 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.controller.manage;
 
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,14 +19,14 @@ public class TopicManageController {
 
     @RequestMapping(method = {RequestMethod.POST, RequestMethod.PUT})
     @ResponseBody
-    public boolean update(@RequestBody Topic topic) throws CockpitException {
-        return cockpitTopicMQService.createOrUpdateTopic(null, topic);
+    public boolean update(@RequestBody TopicMetadata topicMetadata) throws CockpitException {
+        return cockpitTopicMQService.createOrUpdateTopic(null, topicMetadata);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseBody
-    public boolean delete(@RequestBody Topic topic) throws CockpitException {
-        return cockpitTopicMQService.deleteTopic(null, topic);
+    public boolean delete(@RequestBody TopicMetadata topicMetadata) throws CockpitException {
+        return cockpitTopicMQService.deleteTopic(null, topicMetadata);
     }
 
 }

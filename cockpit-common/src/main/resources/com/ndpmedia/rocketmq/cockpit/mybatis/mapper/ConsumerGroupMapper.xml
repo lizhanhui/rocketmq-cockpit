@@ -106,17 +106,23 @@
         </if>
     </select>
 
+    <select id="listByProject" resultMap="consumerGroupMap">
+        SELECT cg.id, cg.cluster_name, cg.which_broker_when_consume_slowly, cg.group_name, cg.consume_enable, cg.consume_broadcast_enable, cg.retry_max_times, cg.retry_queue_num, cg.consume_from_min_enable, cg.status_id, cg.create_time, cg.update_time
+        FROM consumer_group AS cg
+        JOIN project_consumer_group_xref AS pcgx ON pcgx.consumer_group_id = cg.id
+        WHERE pcgx.project_id = #{projectId}
+    </select>
+
     <select id="get" resultMap="consumerGroupMap">
         SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
         FROM consumer_group
-        WHERE 1 = 1
-        <if test="id > 0">
-            AND id = #{id}
-        </if>
+        WHERE id = #{id}
+    </select>
 
-        <if test="groupName != null">
-            AND group_name = #{groupName}
-        </if>
+    <select id="getByName" resultType="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
+        SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
+        FROM consumer_group
+        WHERE group_name = #{groupName}
     </select>
 
     <resultMap id="consumerGroupHostingResultMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting">
@@ -175,4 +181,5 @@
         LEFT JOIN broker AS b on b.id = bcgx.broker_id
         WHERE topic_id = #{topicId}
     </select>
+
 </mapper>

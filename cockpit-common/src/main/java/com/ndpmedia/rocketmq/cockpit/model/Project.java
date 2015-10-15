@@ -10,7 +10,7 @@ public class Project {
     private String description;
     private long teamId;
 
-    private List<Topic> topics = new ArrayList<>();
+    private List<TopicMetadata> topics = new ArrayList<>();
 
     private List<ConsumerGroup> consumerGroups = new ArrayList<>();
 
@@ -46,11 +46,11 @@ public class Project {
         this.teamId = teamId;
     }
 
-    public List<Topic> getTopics() {
+    public List<TopicMetadata> getTopics() {
         return topics;
     }
 
-    public void setTopics(List<Topic> topics) {
+    public void setTopics(List<TopicMetadata> topics) {
         this.topics = topics;
     }
 

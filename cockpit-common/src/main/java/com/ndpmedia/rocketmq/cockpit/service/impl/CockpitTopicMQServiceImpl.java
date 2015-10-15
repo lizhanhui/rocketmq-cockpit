@@ -11,8 +11,8 @@ import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.admin.MQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.slf4j.Logger;
@@ -209,21 +209,13 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
     }
 
     @Override
-    public boolean createOrUpdateTopic(MQAdminExt adminExt, Topic topic) throws CockpitException {
+    public boolean createOrUpdateTopic(MQAdminExt adminExt, TopicMetadata topicMetadata) throws CockpitException {
         throw new CockpitException("Not Implemented");
     }
 
     @Override
-    public boolean deleteTopic(MQAdminExt adminExt, Topic topic) throws CockpitException {
+    public boolean deleteTopic(MQAdminExt adminExt, TopicMetadata topic) throws CockpitException {
         throw new CockpitException("Not Implemented");
-    }
-
-    public static TopicConfig wrapTopicToTopicConfig(Topic topic) {
-        TopicConfig topicConfig = new TopicConfig();
-        topicConfig.setWriteQueueNums(topic.getWriteQueueNum());
-        topicConfig.setReadQueueNums(topic.getReadQueueNum());
-        topicConfig.setTopicName(topic.getTopic());
-        return topicConfig;
     }
 
     public static TopicConfig wrapTopicToTopicConfig(TopicBrokerInfo topicBrokerInfo) {

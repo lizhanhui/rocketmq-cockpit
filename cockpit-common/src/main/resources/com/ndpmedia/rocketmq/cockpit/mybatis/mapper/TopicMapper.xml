@@ -251,5 +251,11 @@
         WHERE id = #{chairId}
     </select>
 
+    <select id="listByProject" resultMap="topicMetadataResultMap">
+        SELECT t.id, t.topic, t.cluster_name, t.`order`, t.status, t.create_time, t.update_time
+        FROM topic AS t
+        JOIN project_topic_xref AS ptx ON ptx.topic_id = t.id
+        WHERE ptx.project_id = #{projectId}
+    </select>
 
 </mapper>

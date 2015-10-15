@@ -2,7 +2,6 @@ package com.ndpmedia.rocketmq.cockpit.controller.api;
 
 import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
@@ -51,7 +50,7 @@ public class TopicServiceController {
     public Map<String, Object> detailList(HttpServletRequest request, @PathVariable("topic") String topic) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        TopicMetadata topicMetadata = topicMapper.getMetadataByTopic(topic);
+        TopicMetadata topicMetadata = topicMapper.getMetadataByTopic("DefaultCluster", topic);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", 1);
@@ -63,12 +62,12 @@ public class TopicServiceController {
     @RequestMapping(value = "/{topic}", method = RequestMethod.GET)
     @ResponseBody
     public TopicMetadata lookUp(@PathVariable("topic") String topic) {
-        return topicMapper.getMetadataByTopic(topic);
+        return topicMapper.getMetadataByTopic("DefaultCluster", topic);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
     @ResponseBody
-    public Topic add(@RequestBody Topic topic, long projectId, HttpServletRequest request) {
+    public TopicMetadata add(@RequestBody TopicMetadata topicMetadata, long projectId, HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
 //        if (null == topic.getBrokerAddress() || topic.getBrokerAddress().isEmpty()) {
 //            DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();

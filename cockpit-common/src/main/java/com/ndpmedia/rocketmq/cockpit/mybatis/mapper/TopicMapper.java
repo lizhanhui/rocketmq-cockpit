@@ -27,6 +27,8 @@ public interface TopicMapper {
     TopicMetadata getMetadataByTopic(@Param("clusterName") String clusterName,
                                      @Param("topic") String topic);
 
+    List<TopicMetadata> listByProject(long projectId);
+
     /**
      * Refresh sync_time column to current timestamp.
      * @param brokerId Broker ID.
