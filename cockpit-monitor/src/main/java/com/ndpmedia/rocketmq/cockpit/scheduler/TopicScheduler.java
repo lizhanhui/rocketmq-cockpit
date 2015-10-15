@@ -55,6 +55,13 @@ public class TopicScheduler {
             TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
             if (null != topicList && !topicList.getTopicList().isEmpty()) {
                 for (String topic : topicList.getTopicList()) {
+
+                    // We do not need to manage System topics.
+                    if (topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX)
+                            || topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
+                        continue;
+                    }
+
                     TopicRouteData topicRouteData = defaultMQAdminExt.examineTopicRouteInfo(topic);
 
                     // For now, we only handle DefaultCluster.
