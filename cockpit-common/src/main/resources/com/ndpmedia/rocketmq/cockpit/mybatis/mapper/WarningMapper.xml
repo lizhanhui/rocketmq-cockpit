@@ -3,8 +3,8 @@
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper">
 
     <insert id="create" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
-        INSERT INTO warning(id, msg, create_time, status)
-        VALUES (NULL, #{msg}, #{createTime}, #{status.ordinal})
+        INSERT INTO warning(id, msg, create_time, status, level)
+        VALUES (NULL, #{msg}, #{createTime}, #{status.ordinal}, #{level.ordinal})
     </insert>
 
     <update id="mark">
@@ -20,21 +20,30 @@
         <result column="status" property="status"
                 typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
                 javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+
+        <result column="level" property="level"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Level" />
     </resultMap>
 
     <select id="get" resultMap="warningResultMap">
-        SELECT id, msg, create_time, status
+        SELECT id, msg, create_time, status, level
         FROM warning
         WHERE id = #{id}
     </select>
 
     <select id="list" resultMap="warningResultMap">
-        SELECT id, msg, create_time, status
+        SELECT id, msg, create_time, status, level
         FROM warning
         WHERE 1 = 1
         <if test="statuses != null">
            AND status IN
             <foreach collection="statuses" open="(" separator="," close=")" item="status">#{status.ordinal}</foreach>
+        </if>
+
+        <if test="levels != null">
+            AND level IN
+            <foreach collection="levels" open="(" separator="," close=")" item="level">#{level.ordinal}</foreach>
         </if>
     </select>
 </mapper>

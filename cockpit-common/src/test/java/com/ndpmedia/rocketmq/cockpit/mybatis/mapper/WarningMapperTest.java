@@ -44,7 +44,7 @@ public class WarningMapperTest {
 
 
     private void insertWarning(long id, String text) {
-        jdbcTemplate.update("INSERT INTO warning(id, msg, create_time, status) VALUES (?, ?, CURRENT_TIMESTAMP, 5)", id, text);
+        jdbcTemplate.update("INSERT INTO warning(id, msg, create_time, status, level) VALUES (?, ?, CURRENT_TIMESTAMP, 5, 1)", id, text);
     }
 
     private void deleteWarning(long id) {
@@ -66,7 +66,7 @@ public class WarningMapperTest {
         insertWarning(100, "Test 100");
         insertWarning(101, "Test 101");
 
-        List<Warning> warningList = warningMapper.list(Status.ACTIVE);
+        List<Warning> warningList = warningMapper.list(null, Status.ACTIVE);
 
         Assert.assertEquals(2, warningList.size());
 

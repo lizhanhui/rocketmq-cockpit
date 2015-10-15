@@ -25,3 +25,9 @@ INSERT INTO team(id, name) VALUES (1, "TP");
 INSERT INTO team(id, name) VALUES (2, "Facebook");
 INSERT INTO team(id, name) VALUES (3, "AFF Network");
 INSERT INTO project(id, name, description, team_id) VALUES (1, 'Default', 'Default Project to host orphans', 1);
+
+INSERT INTO warn_level_lu(id, name, info) VALUES (1, 'Info', "Information");
+INSERT INTO warn_level_lu(id, name, info) VALUES (2, 'Warn', "Warning");
+INSERT INTO warn_level_lu(id, name, info) VALUES (3, 'Error', "Error");
+INSERT INTO warn_level_lu(id, name, info) VALUES (4, 'Critical', "Critial");
+INSERT INTO warn_level_lu(id, name, info) VALUES (5, 'Fatal', "Fatal");

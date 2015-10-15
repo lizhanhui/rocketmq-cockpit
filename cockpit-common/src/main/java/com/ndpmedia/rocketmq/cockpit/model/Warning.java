@@ -6,6 +6,7 @@ public class Warning {
     private long id;
     private String msg;
     private Status status;
+    private Level level;
     private Date createTime;
 
     public long getId() {
@@ -30,6 +31,14 @@ public class Warning {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
     }
 
     public Date getCreateTime() {

@@ -48,7 +48,13 @@ public interface TopicMapper {
 
     List<Long> getProjects(long topicId, String topic);
 
-    List<TopicAvailability> queryTopicsAvailability();
+    /**
+     * This method queries topic availabilities.
+     *
+     * @param statuses Topic statuses considered.
+     * @return List of {@link TopicAvailability}
+     */
+    List<TopicAvailability> queryTopicsAvailability(@Param("statuses") Status... statuses);
 
     List<DataCenter> queryAllowedDC(long topicId);
 

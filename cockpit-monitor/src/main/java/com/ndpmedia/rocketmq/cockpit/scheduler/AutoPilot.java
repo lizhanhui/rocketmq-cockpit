@@ -81,7 +81,7 @@ public class AutoPilot {
             return;
         }
 
-        List<TopicAvailability> topicAvailabilityList = topicMapper.queryTopicsAvailability();
+        List<TopicAvailability> topicAvailabilityList = topicMapper.queryTopicsAvailability(Status.APPROVED, Status.ACTIVE);
 
         if (null != topicAvailabilityList && !topicAvailabilityList.isEmpty()) {
             for (TopicAvailability topicAvailability : topicAvailabilityList) {

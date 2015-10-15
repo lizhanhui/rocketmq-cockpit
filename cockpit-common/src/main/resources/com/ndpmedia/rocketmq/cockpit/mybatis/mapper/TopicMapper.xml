@@ -122,9 +122,14 @@
         , tdx.dc_id AS dcId
         , COUNT(b.id) AS availability
         FROM topic_dc_xref AS tdx
-        LEFT JOIN topic_broker_xref AS tbx ON tdx.topic_id = tbx.topic_id
-        LEFT JOIN broker AS b ON b.id = tbx.broker_id AND b.dc = tdx.dc_id
+            LEFT JOIN topic_broker_xref AS tbx ON tdx.topic_id = tbx.topic_id
+            LEFT JOIN broker AS b ON b.id = tbx.broker_id AND b.dc = tdx.dc_id
+            JOIN topic AS t ON tdx.topic_id = t.id
         WHERE b.broker_id = 0
+            <if test="statuses != null">
+                AND t.status IN
+                <foreach collection="statuses" open="(" separator="," close=")" item="status">#{status.ordinal}</foreach>
+            </if>
         GROUP BY tdx.dc_id, tdx.topic_id
         ORDER BY availability ASC
     </select>
