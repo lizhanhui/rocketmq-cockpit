@@ -66,24 +66,23 @@
     </select>
 
     <select id="queryBrokerLoad" resultType="com.ndpmedia.rocketmq.cockpit.model.BrokerLoad">
-        SELECT broker.dc AS dcId
-             , broker.id AS brokerId
+        SELECT b.dc AS dcId
+             , b.id AS brokerId
              , IFNULL(SUM(tbx.read_queue_num ), 0) AS readQueueNum
              , IFNULL(SUM(tbx.write_queue_num), 0) AS writeQueueNum
         FROM broker AS b
-            LEFT JOIN topic_broker_xref AS tbx ON broker.id = tbx.broker_id
-            LEFT JOIN topic AS t ON tbx.topic_id = topic.id
-            JOIN broker AS b ON b.id = tbx.broker_id
+            LEFT JOIN topic_broker_xref AS tbx ON b.id = tbx.broker_id
+            LEFT JOIN topic AS t ON tbx.topic_id = t.id
         WHERE 1 = 1
-        <if test="dc > 0">
-            AND broker.dc = #{dcId}
+        <if test="dcId > 0">
+            AND b.dc = #{dcId}
         </if>
 
         <if test="brokerId != null">
             AND b.broker_id = #{brokerId}
         </if>
 
-        GROUP BY broker.dc, broker.id
+        GROUP BY b.dc, b.id
         ORDER BY write_queue_num, read_queue_num ASC
     </select>
 
