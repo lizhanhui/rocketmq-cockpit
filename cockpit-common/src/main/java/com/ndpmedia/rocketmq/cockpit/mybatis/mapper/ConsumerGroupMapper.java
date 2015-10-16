@@ -4,6 +4,7 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ConsumerGroupMapper {
@@ -34,7 +35,8 @@ public interface ConsumerGroupMapper {
     List<ConsumerGroupHosting> queryHosting(@Param("consumerGroupId") long consumerGroupId,
                                             @Param("status") int status,
                                             @Param("brokerId") Integer brokerId,
-                                            @Param("dcId") long dcId);
+                                            @Param("dcId") long dcId,
+                                            @Param("syncTimeDeadline") Date syncTimeDeadline);
 
     void disconnectProject(@Param(value = "consumerGroupId") long consumerGroupId,
                            @Param(value = "projectId") long projectId);

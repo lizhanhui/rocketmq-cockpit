@@ -33,7 +33,7 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
         try {
             defaultMQAdminExt.start();
             SubscriptionGroupConfig subscriptionGroupConfig = wrap(consumerGroup);
-            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), Status.ACTIVE.getId(), 0, 0);
+            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), Status.ACTIVE.getId(), 0, 0, null);
             if (null != consumerGroupHostingList && !consumerGroupHostingList.isEmpty()) {
                 for (ConsumerGroupHosting hosting : consumerGroupHostingList) {
                     defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(hosting.getBroker().getAddress(), subscriptionGroupConfig);
@@ -62,7 +62,7 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
         defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
-            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), Status.ACTIVE.getId(), 0, 0);
+            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), Status.ACTIVE.getId(), 0, 0, null);
             if (null != consumerGroupHostingList && !consumerGroupHostingList.isEmpty()) {
                 for (ConsumerGroupHosting hosting : consumerGroupHostingList) {
                     defaultMQAdminExt.deleteSubscriptionGroup(hosting.getBroker().getAddress(), consumerGroup.getGroupName());
