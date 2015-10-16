@@ -3,6 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.scheduler;
 import com.alibaba.rocketmq.client.exception.MQBrokerException;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.MixAll;
+import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.common.protocol.body.SubscriptionGroupWrapper;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
@@ -124,13 +125,11 @@ public class AutoPilot {
                         warning.setCreateTime(new Date());
                         warning.setMsg(msg);
                         warningMapper.create(warning);
-
                         continue;
                     }
 
                     // Find candidate brokers to create topic on.
                     List<Long> currentHostingBrokers = new ArrayList<>();
-
                     List<TopicBrokerInfo> topicBrokerInfoList = topicMapper.queryTopicBrokerInfo(topicAvailability.getTopicId(), 0, topicAvailability.getDcId());
                     for (TopicBrokerInfo topicBrokerInfo : topicBrokerInfoList) {
                         currentHostingBrokers.add(topicBrokerInfo.getBroker().getId());
@@ -148,10 +147,24 @@ public class AutoPilot {
                     }
 
                     List<Long> consumerGroupIds = topicMapper.queryAssociatedConsumerGroup(topicAvailability.getTopicId());
+
+                    if (consumerGroupIds.isEmpty()) {
+                        Warning warning = new Warning();
+                        warning.setLevel(Level.CRITICAL);
+                        warning.setCreateTime(new Date());
+                        warning.setStatus(Status.ACTIVE);
+                        warning.setMsg(String.format("Trying to create topic[ID: %s] but it does not have associated consumer groups. ", topicAvailability.getTopicId()));
+                        warningMapper.create(warning);
+
+                        // Will NOT create topic without associated consumer groups.
+                        continue;
+                    }
+
                     for (Long brokerId : candidateBrokers) {
+                        Broker broker = brokerMapper.get(brokerId);
                         for (Long consumerGroupId : consumerGroupIds) {
+                            // ensure broker has all consumer groups which are associated with topic under creation.
                             if (!brokerMapper.hasConsumerGroup(brokerId, consumerGroupId)) {
-                                Broker broker = brokerMapper.get(brokerId);
                                 ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId);
                                 try {
                                     // For each topic, create associated consumer group on the target, matched brokers.
@@ -159,17 +172,41 @@ public class AutoPilot {
                                             CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup));
                                     brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
 
-                                    TopicBrokerInfo topicBrokerInfo = topicMapper
-                                            .queryTopicBrokerInfo(topicAvailability.getTopicId(), brokerId, 0).get(0);
-
-                                    // Create topic on matched brokers or update topic read/write queue number.
-                                    adminExt.createAndUpdateTopicConfig(broker.getAddress(),
-                                            CockpitTopicMQServiceImpl.wrapTopicToTopicConfig(topicBrokerInfo));
-                                    brokerMapper.createTopic(brokerId, topicAvailability.getTopicId());
                                 } catch (RemotingException | MQBrokerException | InterruptedException | MQClientException e) {
                                     LOGGER.error("Failed to create consumer group {} on broker {}", consumerGroup.getGroupName(), broker.getAddress());
                                 }
                             }
+                        }
+
+                        // create topic on broker.
+                        List<TopicBrokerInfo> existingTopicBrokerInfo = null;
+                        try {
+                            existingTopicBrokerInfo = topicMapper.queryTopicBrokerInfo(topicAvailability.getTopicId(), brokerId, 0);
+                            TopicBrokerInfo topicBrokerInfo = null;
+                            if (existingTopicBrokerInfo.isEmpty()) {
+                                topicBrokerInfo = new TopicBrokerInfo();
+                                topicBrokerInfo.setBroker(broker);
+                                topicBrokerInfo.setTopicMetadata(topicMapper.getMetadata(topicAvailability.getTopicId()));
+                                topicBrokerInfo.setCreateTime(new Date());
+                                topicBrokerInfo.setUpdateTime(new Date());
+                                topicBrokerInfo.setSyncTime(new Date());
+                                topicBrokerInfo.setPermission(6);
+                                topicBrokerInfo.setReadQueueNum(TopicConfig.DefaultReadQueueNums);
+                                topicBrokerInfo.setWriteQueueNum(TopicConfig.DefaultWriteQueueNums);
+                                topicBrokerInfo.setStatus(Status.ACTIVE);
+                            } else {
+                                assert existingTopicBrokerInfo.size() == 1;
+                                topicBrokerInfo = existingTopicBrokerInfo.get(0);
+                            }
+
+                            // Create topic on matched brokers or update topic read/write queue number.
+                            adminExt.createAndUpdateTopicConfig(broker.getAddress(),
+                                    CockpitTopicMQServiceImpl.wrapTopicToTopicConfig(topicBrokerInfo));
+                            if (existingTopicBrokerInfo.isEmpty()) {
+                                topicMapper.insertTopicBrokerInfo(topicBrokerInfo);
+                            }
+                        } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                 }

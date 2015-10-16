@@ -220,9 +220,19 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
 
     public static TopicConfig wrapTopicToTopicConfig(TopicBrokerInfo topicBrokerInfo) {
         TopicConfig topicConfig = new TopicConfig();
+
         topicConfig.setWriteQueueNums(topicBrokerInfo.getWriteQueueNum());
+        if (topicConfig.getWriteQueueNums() <= 0) {
+            topicConfig.setWriteQueueNums(TopicConfig.DefaultWriteQueueNums);
+        }
+
         topicConfig.setReadQueueNums(topicBrokerInfo.getReadQueueNum());
+        if (topicConfig.getReadQueueNums() <= 0) {
+            topicConfig.setReadQueueNums(TopicConfig.DefaultReadQueueNums);
+        }
+
         topicConfig.setTopicName(topicBrokerInfo.getTopicMetadata().getTopic());
+
         return topicConfig;
     }
 }

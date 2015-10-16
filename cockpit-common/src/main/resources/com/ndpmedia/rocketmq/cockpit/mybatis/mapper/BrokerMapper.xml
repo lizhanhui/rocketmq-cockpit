@@ -12,11 +12,6 @@
         VALUES (#{brokerId}, #{consumerGroupId}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     </insert>
 
-    <insert id="createTopic">
-        INSERT INTO topic_broker_xref(broker_id, topic_id)
-        VALUES (#{brokerId}, #{brokerId})
-    </insert>
-
     <update id="refresh" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         UPDATE broker
         SET update_time = CURRENT_TIMESTAMP

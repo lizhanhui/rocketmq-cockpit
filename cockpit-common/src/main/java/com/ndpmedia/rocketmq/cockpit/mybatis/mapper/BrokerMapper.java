@@ -36,9 +36,6 @@ public interface BrokerMapper {
     void createConsumerGroup(@Param("brokerId") long brokerId,
                              @Param("consumerGroupId") long consumerGroupId);
 
-    void createTopic(@Param("brokerId") long brokerId,
-                     @Param("topicId") long topicId);
-
     boolean hasTopic(@Param("brokerId")long brokerId,
                      @Param("topicId")long topicId);
 }
