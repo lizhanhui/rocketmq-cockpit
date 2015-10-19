@@ -40,7 +40,7 @@ public class AutoPilotTest {
     public void testAutoPilot() throws Exception {
         brokerScheduler.syncBrokerStatus();
         topicScheduler.syncDownTopics();
-        consumerGroupScheduler.syncDownConsumerGroups();
+        consumerGroupScheduler.synchronizeConsumerGroups();
         autoPilot.autoPilot();
     }
 }

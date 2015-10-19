@@ -60,20 +60,20 @@ public class ConsumerGroupScheduler {
      * period:one hour(20:24 of an hour)
      */
     @Scheduled(cron = "24 20 * * * *")
-    public void syncDownConsumerGroups() {
+    public void synchronizeConsumerGroups() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
-
             Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
 
             for (String brokerAddress : brokerAddresses) {
                 syncDownConsumerGroupsByBroker(defaultMQAdminExt, brokerAddress);
-                syncConsumerGroupsByBroker(defaultMQAdminExt, brokerAddress);
+                syncUpConsumerGroupsByBroker(defaultMQAdminExt, brokerAddress);
             }
+
         } catch (Exception e) {
-            logger.error("Failed to syncDownConsumerGroups", e);
+            logger.error("Failed to synchronizeConsumerGroups", e);
         } finally {
             defaultMQAdminExt.shutdown();
         }
@@ -115,7 +115,7 @@ public class ConsumerGroupScheduler {
         }
     }
 
-    private void syncConsumerGroupsByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress) {
+    private void syncUpConsumerGroupsByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress) {
         Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
         List<ConsumerGroupHosting> endangeredConsumerGroupHostingList = cockpitConsumerGroupDBService.listEndangeredConsumerGroupsByBroker(broker.getId());
         for (ConsumerGroupHosting hosting : endangeredConsumerGroupHostingList) {

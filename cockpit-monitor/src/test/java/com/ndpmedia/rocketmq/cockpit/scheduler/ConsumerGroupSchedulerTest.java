@@ -1,6 +1,5 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,7 +40,7 @@ public class ConsumerGroupSchedulerTest {
         for (int i = 0; i < 3; i++) {
 
             try {
-                consumerGroupScheduler.syncDownConsumerGroups();
+                consumerGroupScheduler.synchronizeConsumerGroups();
                 Thread.sleep(5 * 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -50,7 +49,7 @@ public class ConsumerGroupSchedulerTest {
     }
 
 
-    @After
+    // @After
     public void tearDown() {
         jdbcTemplate.execute("DELETE FROM broker_consumer_group_xref");
         jdbcTemplate.execute("DELETE FROM project_consumer_group_xref");

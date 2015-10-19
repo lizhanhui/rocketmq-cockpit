@@ -1,5 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
+import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.protocol.body.TopicList;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
@@ -42,16 +43,27 @@ public class TopicScheduler {
     @Autowired
     private CockpitBrokerDBService cockpitBrokerDBService;
 
+
     /**
-     * check topic status every 5 minutes
+     * synchronize topics every 5 minutes
      */
     @Scheduled(fixedRate = 300000)
-    public void syncDownTopics() {
+    public void synchronizeTopics() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
+            syncDownTopics(defaultMQAdminExt);
+            syncUpTopics(defaultMQAdminExt);
+        } catch (MQClientException e) {
+            logger.error("Failed to synchronize topics", e);
+        } finally {
+            defaultMQAdminExt.shutdown();
+        }
+    }
 
+    public void syncDownTopics(DefaultMQAdminExt defaultMQAdminExt) {
+        try {
             TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
             if (null != topicList && !topicList.getTopicList().isEmpty()) {
                 for (String topic : topicList.getTopicList()) {
@@ -125,9 +137,11 @@ public class TopicScheduler {
 
         } catch (Exception e) {
             logger.error("Failed to sync topic", e);
-        } finally {
-            defaultMQAdminExt.shutdown();
         }
+    }
+
+    private void syncUpTopics(DefaultMQAdminExt defaultMQAdminExt) {
+
     }
 
     private String getClusterName(List<BrokerData> brokerDataList) {
