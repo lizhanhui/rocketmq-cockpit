@@ -75,7 +75,7 @@ public class ConsumerGroupMapperTest {
 
     @Test
     public void testQueryHosting() throws Exception {
-        List<ConsumerGroupHosting> hostingList = consumerGroupMapper.queryHosting(0, 0, 0, 100, null);
+        List<ConsumerGroupHosting> hostingList = consumerGroupMapper.queryHosting(0, null, 0, 100, null);
     }
 
     @Test
@@ -86,5 +86,10 @@ public class ConsumerGroupMapperTest {
     @Test
     public void testConnectProject() throws Exception {
 
+    }
+
+    @Test
+    public void testQueryEndangeredHosting() {
+        List<ConsumerGroupHosting> endangeredConsumerGroupHostingList = consumerGroupMapper.queryEndangeredHosting(0);
     }
 }

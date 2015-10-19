@@ -1,6 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
+import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
@@ -61,5 +62,10 @@ public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDB
     @Override
     public void refresh(long brokerId, long consumerGroupId) {
         consumerGroupMapper.refresh(brokerId, consumerGroupId);
+    }
+
+    @Override
+    public List<ConsumerGroupHosting> listEndangeredConsumerGroupsByBroker(long brokerId) {
+        return consumerGroupMapper.queryEndangeredHosting(brokerId);
     }
 }

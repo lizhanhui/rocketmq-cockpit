@@ -1,6 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.service;
 
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
+import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
 
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface CockpitConsumerGroupDBService {
     void delete(long consumerGroupId);
 
     void refresh(long brokerId, long consumerGroupId);
+
+    List<ConsumerGroupHosting> listEndangeredConsumerGroupsByBroker(long brokerId);
 }

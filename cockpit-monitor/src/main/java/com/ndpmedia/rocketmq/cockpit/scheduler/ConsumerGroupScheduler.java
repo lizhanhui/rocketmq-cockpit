@@ -9,11 +9,15 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.google.common.base.Preconditions;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
+import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
+import com.ndpmedia.rocketmq.cockpit.model.Level;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
+import com.ndpmedia.rocketmq.cockpit.model.Warning;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupMQServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -61,6 +66,7 @@ public class ConsumerGroupScheduler {
 
             for (String brokerAddress : brokerAddresses) {
                 syncDownConsumerGroupsByBroker(defaultMQAdminExt, brokerAddress);
+                syncConsumerGroupsByBroker(defaultMQAdminExt, brokerAddress);
             }
         } catch (Exception e) {
             logger.error("Failed to syncDownConsumerGroups", e);
@@ -101,6 +107,24 @@ public class ConsumerGroupScheduler {
                 cockpitConsumerGroupDBService.refresh(broker.getId(), consumerGroup.getId());
             } else {
                 cockpitBrokerDBService.createConsumerGroup(broker.getId(), consumerGroup.getId());
+            }
+        }
+    }
+
+    private void syncConsumerGroupsByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress) {
+        Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
+        List<ConsumerGroupHosting> endangeredConsumerGroupHostingList = cockpitConsumerGroupDBService.listEndangeredConsumerGroupsByBroker(broker.getId());
+        for (ConsumerGroupHosting hosting : endangeredConsumerGroupHostingList) {
+            SubscriptionGroupConfig subscriptionGroupConfig = CockpitConsumerGroupMQServiceImpl.wrap(hosting.getConsumerGroup());
+            try {
+                defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress, subscriptionGroupConfig);
+            } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
+                logger.error("Failed to create subscription group", e);
+                Warning warning = new Warning();
+                warning.setCreateTime(new Date());
+                warning.setStatus(Status.ACTIVE);
+                warning.setLevel(Level.CRITICAL);
+                warning.setMsg("Failed to create consumer group " + hosting.getConsumerGroup().getGroupName() + " on broker " +  brokerAddress);
             }
         }
     }

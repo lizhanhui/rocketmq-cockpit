@@ -3,8 +3,8 @@
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper">
 
     <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO consumer_group (id, cluster_name, group_name, consume_enable, consume_broadcast_enable, update_time, retry_queue_num)
-        VALUES (NULL, #{clusterName}, #{groupName}, #{consumeEnable}, #{consumeBroadcastEnable}, #{updateTime}, #{retryQueueNum})
+        INSERT INTO consumer_group (id, cluster_name, group_name, consume_enable, consume_broadcast_enable, status_id, update_time, retry_queue_num)
+        VALUES (NULL, #{clusterName}, #{groupName}, #{consumeEnable}, #{consumeBroadcastEnable}, #{status.ordinal}, #{updateTime}, #{retryQueueNum})
     </insert>
 
     <insert id="connectProject">
@@ -163,10 +163,14 @@
         FROM broker_consumer_group_xref AS bcgx
         JOIN broker AS b ON b.id = bcgx.broker_id
         JOIN consumer_group AS cg ON cg.id = bcgx.consumer_group_id
-        WHERE 1 = 1
-            AND b.broker_id = 0 -- only master node
+        WHERE b.broker_id = 0 -- only master node
         <if test="consumerGroupId > 0">
             AND cg.id = #{consumerGroupId}
+        </if>
+
+        <if test="statuses != null">
+            AND cg.status_id IN
+            <foreach collection="statuses" open="(" separator="," close=")" item="status">#{status}</foreach>
         </if>
 
         <if test="null != brokerId">
@@ -191,6 +195,40 @@
         LEFT JOIN broker_consumer_group_xref AS bcgx ON bcgx.consumer_group_id = cg.id
         LEFT JOIN broker AS b on b.id = bcgx.broker_id
         WHERE topic_id = #{topicId}
+    </select>
+
+
+    <resultMap id="consumerGroupHostingResultMap2" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting">
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="sync_time" property="syncTime" />
+
+        <association property="broker"
+                     column="bid"
+                     foreignColumn="id"
+                     javaType="com.ndpmedia.rocketmq.cockpit.model.Broker"
+                     select="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper.get" />
+
+        <association property="consumerGroup"
+                     column="cid"
+                     foreignColumn="id"
+                     javaType="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup"
+                     select="get" />
+    </resultMap>
+
+    <select id="queryEndangeredHosting" resultMap="consumerGroupHostingResultMap2">
+        <![CDATA[
+            SELECT b.id AS bid, cg.id AS cid, bcgx.create_time, bcgx.update_time, bcgx.sync_time
+            FROM consumer_group AS cg
+            LEFT JOIN broker_consumer_group_xref AS bcgx ON bcgx.consumer_group_id = cg.id
+            LEFT JOIN broker AS b ON b.id = bcgx.broker_id
+            WHERE cg.status_id IN (3, 5)
+            AND (bcgx.sync_time IS NULL OR bcgx.sync_time < CURRENT_TIMESTAMP - INTERVAL 300 SECOND)
+            AND (b.broker_id = 0 OR b.broker_id IS NULL)
+        ]]>
+        <if test="brokerId > 0">
+            AND b.id = #{brokerId}
+        </if>
     </select>
 
 </mapper>

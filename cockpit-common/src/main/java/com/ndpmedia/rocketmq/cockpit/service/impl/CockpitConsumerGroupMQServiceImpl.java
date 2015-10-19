@@ -33,7 +33,7 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
         try {
             defaultMQAdminExt.start();
             SubscriptionGroupConfig subscriptionGroupConfig = wrap(consumerGroup);
-            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), Status.ACTIVE.getId(), 0, 0, null);
+            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), new int[] {Status.ACTIVE.getId()}, 0, 0, null);
             if (null != consumerGroupHostingList && !consumerGroupHostingList.isEmpty()) {
                 for (ConsumerGroupHosting hosting : consumerGroupHostingList) {
                     defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(hosting.getBroker().getAddress(), subscriptionGroupConfig);
@@ -62,7 +62,7 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
         defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
-            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), Status.ACTIVE.getId(), 0, 0, null);
+            List<ConsumerGroupHosting> consumerGroupHostingList = consumerGroupMapper.queryHosting(consumerGroup.getId(), new int[] {Status.ACTIVE.getId()}, 0, 0, null);
             if (null != consumerGroupHostingList && !consumerGroupHostingList.isEmpty()) {
                 for (ConsumerGroupHosting hosting : consumerGroupHostingList) {
                     defaultMQAdminExt.deleteSubscriptionGroup(hosting.getBroker().getAddress(), consumerGroup.getGroupName());
@@ -77,10 +77,10 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("DELETE CONSUMER GROUP ON BROKER FAILED!" + e);
             return false;
-        }finally {
+        } finally {
             defaultMQAdminExt.shutdown();
         }
 
@@ -110,9 +110,9 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
 
     @Override
     public SubscriptionGroupConfig getGroupConfig(DefaultMQAdminExt defaultMQAdminExt, String groupName) {
-        try{
+        try {
             ConsumerConnection consumerConnection = defaultMQAdminExt.examineConsumerConnectionInfo(groupName);
-            if (null != consumerConnection){
+            if (null != consumerConnection) {
                 for (Connection connection : consumerConnection.getConnectionSet()) {
                     String clientId = connection.getClientId();
                     if (null != clientId && !clientId.isEmpty()) {
@@ -123,7 +123,7 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("try to get SubscriptionGroupConfig failed! group :" + groupName + e);
         }
         return null;
@@ -141,6 +141,4 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
         subscriptionGroupConfig.setWhichBrokerWhenConsumeSlowly(consumerGroup.getWhichBrokerWhenConsumeSlowly());
         return subscriptionGroupConfig;
     }
-
-
 }

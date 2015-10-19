@@ -33,7 +33,7 @@ public interface ConsumerGroupMapper {
     void delete(long id);
 
     List<ConsumerGroupHosting> queryHosting(@Param("consumerGroupId") long consumerGroupId,
-                                            @Param("status") int status,
+                                            @Param("statuses") int[] status,
                                             @Param("brokerId") Integer brokerId,
                                             @Param("dcId") long dcId,
                                             @Param("syncTimeDeadline") Date syncTimeDeadline);
@@ -43,5 +43,8 @@ public interface ConsumerGroupMapper {
 
     void connectProject(@Param(value = "consumerGroupId") long consumerGroupId,
                         @Param(value = "projectId") long projectId);
+
+
+    List<ConsumerGroupHosting> queryEndangeredHosting(@Param("brokerId") long brokerId);
 
 }
