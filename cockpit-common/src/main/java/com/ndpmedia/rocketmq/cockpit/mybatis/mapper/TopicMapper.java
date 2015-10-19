@@ -75,6 +75,9 @@ public interface TopicMapper {
 
     void disconnectProject(@Param("topicId") long topicId, @Param("projectId") long projectId);
 
+
+    List<TopicBrokerInfo> queryEndangeredTopicsByBroker(@Param("brokerId") long brokerId);
+
     /**
      * Method to test mybatis.
      *

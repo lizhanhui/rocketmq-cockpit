@@ -159,6 +159,12 @@ public class TopicMapperTest {
 
 
     @Test
+    public void testQueryEndangeredTopicsByBroker() {
+        List<TopicBrokerInfo> topicBrokerInfoList = topicMapper.queryEndangeredTopicsByBroker(0);
+        System.out.println(topicBrokerInfoList.size());
+    }
+
+    @Test
     public void testChair() {
         Chair chair = topicMapper.getChair(1);
         System.out.println(chair.getDesk().getName());

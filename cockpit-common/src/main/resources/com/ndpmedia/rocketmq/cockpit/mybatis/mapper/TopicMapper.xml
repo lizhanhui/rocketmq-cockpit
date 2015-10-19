@@ -263,4 +263,19 @@
         WHERE ptx.project_id = #{projectId}
     </select>
 
+    <select id="queryEndangeredTopicsByBroker" resultMap="topicBrokerInfoResultMap">
+        <![CDATA[
+            SELECT tbx.broker_id, tbx.topic_id, tbx.permission, tbx.write_queue_num, tbx.read_queue_num, tbx.status_id, tbx.create_time, tbx.update_time, tbx.sync_time
+            FROM topic_broker_xref AS tbx
+            JOIN topic AS t ON t.id = tbx.topic_id
+            JOIN broker AS b ON b.id = tbx.broker_id
+            WHERE t.status IN (3, 5)
+            AND tbx.status_id IN (3, 5)
+            AND b.broker_id = 0
+            AND (tbx.sync_time IS NULL OR tbx.sync_time < CURRENT_TIMESTAMP - INTERVAL 300 SECOND);
+        ]]>
+           <if test="brokerId > 0">
+               AND b.id = #{brokerId}
+           </if>
+    </select>
 </mapper>

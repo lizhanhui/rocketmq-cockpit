@@ -133,4 +133,9 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     public void addDCAllowed(long topicId, long dcId, Status status) {
         topicMapper.insertDCAllowed(topicId, dcId, status);
     }
+
+    @Override
+    public List<TopicBrokerInfo> queryEndangeredTopicBrokerInfoList(long brokerId) {
+        return topicMapper.queryEndangeredTopicsByBroker(brokerId);
+    }
 }

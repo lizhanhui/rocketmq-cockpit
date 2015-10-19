@@ -1,19 +1,27 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
+import com.alibaba.rocketmq.client.exception.MQBrokerException;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.MixAll;
+import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.common.protocol.body.TopicList;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.common.protocol.route.QueueData;
 import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
+import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
+import com.ndpmedia.rocketmq.cockpit.model.Level;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
+import com.ndpmedia.rocketmq.cockpit.model.Warning;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
+import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicMQServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +31,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by robert on 2015/6/9.
@@ -43,6 +52,12 @@ public class TopicScheduler {
     @Autowired
     private CockpitBrokerDBService cockpitBrokerDBService;
 
+    @Autowired
+    private CockpitBrokerMQService cockpitBrokerMQService;
+
+    @Autowired
+    private WarningMapper warningMapper;
+
 
     /**
      * synchronize topics every 5 minutes
@@ -62,7 +77,7 @@ public class TopicScheduler {
         }
     }
 
-    public void syncDownTopics(DefaultMQAdminExt defaultMQAdminExt) {
+    private void syncDownTopics(DefaultMQAdminExt defaultMQAdminExt) {
         try {
             TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
             if (null != topicList && !topicList.getTopicList().isEmpty()) {
@@ -141,6 +156,28 @@ public class TopicScheduler {
     }
 
     private void syncUpTopics(DefaultMQAdminExt defaultMQAdminExt) {
+        Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
+        for (String brokerAddress : brokerAddresses) {
+            Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
+            List<TopicBrokerInfo> list =
+                    cockpitTopicDBService.queryEndangeredTopicBrokerInfoList(broker.getId());
+            for (TopicBrokerInfo topicBrokerInfo : list) {
+                TopicConfig topicConfig = CockpitTopicMQServiceImpl.wrapTopicToTopicConfig(topicBrokerInfo);
+                try {
+                    defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddress, topicConfig);
+                } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
+                    logger.error("Failed to create topic {} on broker {}", topicConfig.getTopicName(),
+                            brokerAddress);
+                    Warning warning = new Warning();
+                    warning.setCreateTime(new Date());
+                    warning.setLevel(Level.CRITICAL);
+                    warning.setStatus(Status.ACTIVE);
+                    warning.setMsg(String.format("Failed to create topic %s on broker %s", topicConfig.getTopicName(), brokerAddress));
+                    warningMapper.create(warning);
+                }
+            }
+
+        }
 
     }
 
