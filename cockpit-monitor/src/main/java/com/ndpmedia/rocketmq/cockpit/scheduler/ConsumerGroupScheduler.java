@@ -13,6 +13,7 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
 import com.ndpmedia.rocketmq.cockpit.model.Level;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Warning;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
@@ -50,6 +51,9 @@ public class ConsumerGroupScheduler {
 
     @Autowired
     private CockpitBrokerMQService cockpitBrokerMQService;
+
+    @Autowired
+    private WarningMapper warningMapper;
 
     /**
      * update consumer group to cluster
@@ -117,7 +121,11 @@ public class ConsumerGroupScheduler {
         for (ConsumerGroupHosting hosting : endangeredConsumerGroupHostingList) {
             SubscriptionGroupConfig subscriptionGroupConfig = CockpitConsumerGroupMQServiceImpl.wrap(hosting.getConsumerGroup());
             try {
+                logger.debug("About to create consumer group {} on broker {}",
+                        subscriptionGroupConfig.getGroupName(), brokerAddress);
                 defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress, subscriptionGroupConfig);
+                logger.info("Consumer Group {} has been created on broker {}",
+                        subscriptionGroupConfig.getGroupName(), brokerAddress);
             } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
                 logger.error("Failed to create subscription group", e);
                 Warning warning = new Warning();
@@ -125,6 +133,7 @@ public class ConsumerGroupScheduler {
                 warning.setStatus(Status.ACTIVE);
                 warning.setLevel(Level.CRITICAL);
                 warning.setMsg("Failed to create consumer group " + hosting.getConsumerGroup().getGroupName() + " on broker " +  brokerAddress);
+                warningMapper.create(warning);
             }
         }
     }
