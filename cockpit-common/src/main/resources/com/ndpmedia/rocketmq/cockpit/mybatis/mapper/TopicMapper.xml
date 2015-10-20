@@ -78,6 +78,20 @@
         AND topic_id = #{topicId}
     </update>
 
+    <update id="changeTopicDCStatus">
+      UPDATE topic_dc_xref
+      SET status = #{status.ordinal}
+      WHERE 1 = 1
+
+      <if test="dcId > 0">
+          AND dc_id = #{dcId}
+      </if>
+
+      <if test="topicId > 0">
+          AND topic_id = #{topicId}
+      </if>
+    </update>
+
     <delete id="delete" parameterType="long">
         DELETE
         FROM topic
@@ -160,8 +174,8 @@
         FROM topic_dc_xref
         WHERE topic_id = #{topicId}
         AND dc_id = #{dcId}
+        AND status IN (3, 5)
     </select>
-
 
     <resultMap id="topicMetadataResultMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata">
         <id column="id" property="id" />
@@ -272,7 +286,7 @@
             WHERE t.status IN (3, 5)
             AND tbx.status_id IN (3, 5)
             AND b.broker_id = 0
-            AND (tbx.sync_time IS NULL OR tbx.sync_time < CURRENT_TIMESTAMP - INTERVAL 300 SECOND)
+            AND (tbx.sync_time IS NULL OR tbx.sync_time < CURRENT_TIMESTAMP - INTERVAL 600 SECOND)
         ]]>
            <if test="brokerId > 0">
                AND b.id = #{brokerId}

@@ -147,9 +147,8 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
             }
 
             if (null != topicRouteData) {
-                List<BrokerData> brokerDatas = topicRouteData.getBrokerDatas();
-
-                for (BrokerData brokerData : brokerDatas) {
+                List<BrokerData> brokerDataList = topicRouteData.getBrokerDatas();
+                for (BrokerData brokerData : brokerDataList) {
                     for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
                         if (masterOnly) {
                             if (entry.getKey() != MixAll.MASTER_ID) {
@@ -215,6 +214,7 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
 
     @Override
     public boolean deleteTopic(MQAdminExt adminExt, TopicMetadata topic) throws CockpitException {
+
         throw new CockpitException("Not Implemented");
     }
 

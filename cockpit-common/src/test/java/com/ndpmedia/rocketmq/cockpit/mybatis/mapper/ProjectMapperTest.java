@@ -73,6 +73,7 @@ public class ProjectMapperTest {
 
     @Test
     public void testGet() throws Exception {
-
+        Project project = projectMapper.get(1);
+        Assert.assertNotNull(project);
     }
 }

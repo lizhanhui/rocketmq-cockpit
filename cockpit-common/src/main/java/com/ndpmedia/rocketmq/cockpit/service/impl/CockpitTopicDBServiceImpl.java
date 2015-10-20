@@ -107,16 +107,20 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
         topicMapper.connectProject(topicId, projectId);
     }
 
+
     @Transactional
     @Override
     public void remove(long topicId, long projectId) {
         topicMapper.disconnectProject(topicId, projectId);
         topicMapper.delete(topicId);
+        topicMapper.changeTopicDCStatus(topicId, 0, Status.DELETED);
     }
 
     @Override
     public boolean exists(String clusterName, String topic) {
-        return topicMapper.getMetadataByTopic(null, topic) != null;
+        TopicMetadata topicMetadata = topicMapper.getMetadataByTopic(clusterName, topic);
+        return null != topicMetadata
+                && topicMetadata.getStatus() != Status.DELETED;
     }
 
     @Override
