@@ -6,6 +6,9 @@ import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.google.common.base.Preconditions;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
+import com.ndpmedia.rocketmq.cockpit.model.Level;
+import com.ndpmedia.rocketmq.cockpit.model.Status;
+import com.ndpmedia.rocketmq.cockpit.model.Warning;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -27,22 +31,20 @@ public class BrokerScheduler {
     @Autowired
     private BrokerMapper brokerMapper;
 
-    private DefaultMQAdminExt defaultMQAdminExt;
-
-    public BrokerScheduler() {
+    /**
+     * Check broker status every 5 minutes.
+     */
+    @Scheduled(fixedRate = 300000)
+    public void synchronizeBrokers() {
+        DefaultMQAdminExt defaultMQAdminExt = null;
         defaultMQAdminExt = new DefaultMQAdminExt(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
         } catch (MQClientException e) {
             LOGGER.warn("Failed to start defaultMQAdminExt", e);
+            return;
         }
-    }
 
-    /**
-     * Check broker status every 5 minutes.
-     */
-    @Scheduled(fixedRate = 300000)
-    public void syncBrokerStatus() {
         try {
             ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
 
@@ -68,6 +70,7 @@ public class BrokerScheduler {
                                 broker.setAddress(brokerEntry.getValue());
                                 broker.setCreateTime(new Date());
                                 broker.setUpdateTime(new Date());
+                                broker.setSyncTime(new Date());
                                 if (!brokerMapper.exists(broker)) {
                                     brokerMapper.insert(broker);
                                 } else {
@@ -82,11 +85,16 @@ public class BrokerScheduler {
 
         } catch (Throwable e) {
             LOGGER.warn("Failed to update broker status", e);
+        } finally {
+            defaultMQAdminExt.shutdown();
         }
+
+        warnDeprecatedBrokers();
     }
 
     /**
      * A sample broker name is: DefaultCluster_1_broker1.
+     *
      * @param brokerName Broker name.
      * @return DC inferred from broker name.
      */
@@ -100,5 +108,16 @@ public class BrokerScheduler {
             return 100;
         }
         return Integer.parseInt(segments[1]);
+    }
+
+    private void warnDeprecatedBrokers() {
+        List<Broker> deprecatedBrokers = brokerMapper.queryDeprecatedBrokers(null, 0);
+        for (Broker broker : deprecatedBrokers) {
+            Warning warning = new Warning();
+            warning.setCreateTime(new Date());
+            warning.setLevel(Level.CRITICAL);
+            warning.setStatus(Status.ACTIVE);
+            warning.setMsg("Broker is not responding in the last 10 min: " + broker);
+        }
     }
 }

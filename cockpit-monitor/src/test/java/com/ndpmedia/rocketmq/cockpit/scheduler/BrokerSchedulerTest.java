@@ -41,9 +41,9 @@ public class BrokerSchedulerTest {
     }
 
     @Test
-    public void testCheckBrokerStatus() {
+    public void testSynchronizeBrokers() {
         for (int i = 0; i < 3; i++) {
-            brokerScheduler.syncBrokerStatus();
+            brokerScheduler.synchronizeBrokers();
             Assert.assertFalse(cockpitBrokerDBService.list(null, null, 0, 0).isEmpty());
             try {
                 Thread.sleep(10 * 1000);

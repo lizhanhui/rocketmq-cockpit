@@ -26,7 +26,7 @@ public class TopicSchedulerTest {
 
     @Test
     public void testCheckTopicStatus() throws Exception {
-        brokerScheduler.syncBrokerStatus();
+        brokerScheduler.synchronizeBrokers();
         for (int i = 0; i < 3; i++) {
             try {
                 topicScheduler.synchronizeTopics();

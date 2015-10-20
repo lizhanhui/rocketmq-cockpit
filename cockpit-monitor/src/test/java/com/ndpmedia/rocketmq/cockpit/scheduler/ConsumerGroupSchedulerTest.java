@@ -36,7 +36,7 @@ public class ConsumerGroupSchedulerTest {
 
     @Test
     public void testSyncConsumerGroupStatus() throws Exception {
-        brokerScheduler.syncBrokerStatus();
+        brokerScheduler.synchronizeBrokers();
         for (int i = 0; i < 3; i++) {
 
             try {
