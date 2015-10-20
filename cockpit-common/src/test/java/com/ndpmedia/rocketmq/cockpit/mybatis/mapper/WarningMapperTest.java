@@ -1,8 +1,10 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
+import com.ndpmedia.rocketmq.cockpit.model.Level;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Warning;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,11 @@ public class WarningMapperTest {
     private WarningMapper warningMapper;
 
 
+    @Before
+    public void cleanUpWarningTable() {
+        jdbcTemplate.execute("DELETE FROM warning");
+    }
+
     @Test
     public void testSetUp() {
         Assert.assertNotNull(jdbcTemplate);
@@ -37,6 +44,7 @@ public class WarningMapperTest {
         warning.setMsg("Test Warning");
         warning.setStatus(Status.ACTIVE);
         warning.setCreateTime(new Date());
+        warning.setLevel(Level.CRITICAL);
         warningMapper.create(warning);
         Assert.assertTrue(warning.getId() > 0);
         deleteWarning(warning.getId());
@@ -53,33 +61,33 @@ public class WarningMapperTest {
 
     @Test
     public void testGet() throws Exception {
-        insertWarning(100, "Test");
+        insertWarning(100000, "Test");
 
-        Warning warning = warningMapper.get(100);
+        Warning warning = warningMapper.get(100000);
         Assert.assertEquals("Test", warning.getMsg());
 
-        deleteWarning(100);
+        deleteWarning(100000);
     }
 
     @Test
     public void testList() throws Exception {
-        insertWarning(100, "Test 100");
-        insertWarning(101, "Test 101");
+        insertWarning(100000, "Test 100");
+        insertWarning(100001, "Test 101");
 
         List<Warning> warningList = warningMapper.list(null, Status.ACTIVE);
 
-        Assert.assertEquals(2, warningList.size());
+        Assert.assertTrue(warningList.size() >= 2);
 
-        deleteWarning(100);
-        deleteWarning(101);
+        deleteWarning(100000);
+        deleteWarning(100001);
     }
 
     @Test
     public void testMark() throws Exception {
-        insertWarning(100, "Test");
-        warningMapper.mark(100, Status.DELETED);
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT status FROM warning WHERE id = ?", 100);
+        insertWarning(100000, "Test");
+        warningMapper.mark(100000, Status.DELETED);
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT status FROM warning WHERE id = ?", 100000);
         Assert.assertEquals(Status.DELETED.ordinal(), list.get(0).get("status"));
-        deleteWarning(100);
+        deleteWarning(100000);
     }
 }
