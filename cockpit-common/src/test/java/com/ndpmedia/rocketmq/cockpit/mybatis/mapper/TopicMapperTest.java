@@ -1,7 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
-import com.ndpmedia.rocketmq.cockpit.model.Chair;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
@@ -162,12 +161,6 @@ public class TopicMapperTest {
     public void testQueryEndangeredTopicsByBroker() {
         List<TopicBrokerInfo> topicBrokerInfoList = topicMapper.queryEndangeredTopicsByBroker(0);
         System.out.println(topicBrokerInfoList.size());
-    }
-
-    @Test
-    public void testChair() {
-        Chair chair = topicMapper.getChair(1);
-        System.out.println(chair.getDesk().getName());
     }
 
 }

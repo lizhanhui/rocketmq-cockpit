@@ -73,16 +73,12 @@ public class AutoPilot {
     @Autowired
     private WarningMapper warningMapper;
 
-    private MQAdminExt adminExt;
-
-    public AutoPilot() {
-        adminExt = new DefaultMQAdminExt(Helper.getInstanceName());
-    }
 
     @Scheduled(fixedDelay = 30000)
     public void autoPilot() {
-
+        MQAdminExt adminExt = null;
         try {
+            adminExt = new DefaultMQAdminExt(Helper.getInstanceName());
             adminExt.start();
         } catch (MQClientException e) {
             LOGGER.error("Fatal Error: Failed to start admin tool", e);
@@ -206,7 +202,7 @@ public class AutoPilot {
                                 topicMapper.insertTopicBrokerInfo(topicBrokerInfo);
                             }
                         } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
-                            e.printStackTrace();
+                            LOGGER.error("Failed to create topic", e);
                         }
                     }
                 }

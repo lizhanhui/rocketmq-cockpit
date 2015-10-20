@@ -253,23 +253,6 @@
         </if>
     </select>
 
-    <resultMap id="chairResultMap" type="com.ndpmedia.rocketmq.cockpit.model.Chair">
-
-        <id column="id" property="id" />
-        <result column="name" property="name" />
-        <association property="desk"
-                     column="desk_id"
-                     foreignColumn="id"
-                     javaType="com.ndpmedia.rocketmq.cockpit.model.Desk"
-                     select="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.DeskMapper.getDesk" />
-    </resultMap>
-
-    <select id="getChair" resultMap="chairResultMap">
-        SELECT id, name, desk_id
-        FROM chair
-        WHERE id = #{chairId}
-    </select>
-
     <select id="listByProject" resultMap="topicMetadataResultMap">
         SELECT t.id, t.topic, t.cluster_name, t.`order`, t.status, t.create_time, t.update_time
         FROM topic AS t

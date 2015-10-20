@@ -1,6 +1,5 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
-import com.ndpmedia.rocketmq.cockpit.model.Chair;
 import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
@@ -81,12 +80,4 @@ public interface TopicMapper {
     void changeTopicDCStatus(@Param("topicId")long topicId,
                              @Param("dcId")long dcId,
                              @Param("status")Status status);
-
-    /**
-     * Method to test mybatis.
-     *
-     * @param id chair ID.
-     * @return {@link Chair} instance.
-     */
-    Chair getChair(@Param("chairId") long id);
 }
