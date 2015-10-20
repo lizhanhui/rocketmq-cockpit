@@ -235,7 +235,7 @@
     </resultMap>
 
     <select id="queryTopicBrokerInfo" resultMap="topicBrokerInfoResultMap">
-        SELECT tbx.broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, tbx.create_time, tbx.update_time, sync_time
+        SELECT tbx.broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, tbx.create_time, tbx.update_time, tbx.sync_time
         FROM topic_broker_xref AS tbx
         LEFT JOIN broker AS b ON tbx.broker_id = b.id
         WHERE 1 = 1
