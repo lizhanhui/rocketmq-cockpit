@@ -3,8 +3,8 @@
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper">
 
     <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
-        INSERT INTO broker(cluster_name, broker_name, broker_id, address, version, dc, create_time, update_time)
-        VALUES (#{clusterName}, #{brokerName}, #{brokerId}, #{address}, #{version}, #{dc}, #{createTime}, #{updateTime})
+        INSERT INTO broker(cluster_name, broker_name, broker_id, address, version, dc, create_time, update_time, sync_time)
+        VALUES (#{clusterName}, #{brokerName}, #{brokerId}, #{address}, #{version}, #{dc}, #{createTime}, #{updateTime}, #{syncTime})
     </insert>
 
     <insert id="createConsumerGroup">
@@ -14,14 +14,15 @@
 
     <update id="refresh" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         UPDATE broker
-        SET update_time = CURRENT_TIMESTAMP
+        SET sync_time = CURRENT_TIMESTAMP
         WHERE 1 = 1
+
         <if test="brokerAddress != null">
           AND address = #{brokerAddress}
         </if>
 
-        <if test="brokerId > 0">
-            AND id = #{brokerId}
+        <if test="id > 0">
+            AND id = #{id}
         </if>
     </update>
 
@@ -53,9 +54,9 @@
             AND dc = #{dc}
         </if>
 
-        <if test="updateTime != null">
+        <if test="syncTimeDeadline != null">
          <![CDATA[
-            AND update_time >= #{updateTime}
+            AND sync_time >= #{syncTimeDeadline}
          ]]>
         </if>
     </select>
@@ -90,9 +91,9 @@
 
     <select id="get" resultType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
-            address, version, dc, update_time AS updateTime
+            address, version, dc, update_time AS updateTime, sync_time AS syncTime
         FROM broker
-        WHERE id = #{brokerId}
+        WHERE id = #{id}
     </select>
 
     <select id="hasTopic" resultType="java.lang.Boolean">
@@ -104,11 +105,29 @@
 
     <select id="getBrokerByAddress" resultType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
-        address, version, dc, update_time AS updateTime
+        address, version, dc, update_time AS updateTime, sync_time AS syncTime
         FROM broker
         WHERE 1 = 1
         <if test="address != null">
             AND address = #{address}
         </if>
+    </select>
+
+    <select id="queryDeprecatedBrokers" resultType="com.ndpmedia.rocketmq.cockpit.model.Broker">
+        SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
+            address, version, dc, update_time AS updateTime, sync_time AS syncTime
+        FROM broker
+        WHERE 1 = 1
+        <if test="clusterName != null">
+            AND cluster_name = #{clusterName}
+        </if>
+
+        <if test="dc > 0">
+            AND dc = #{dc}
+        </if>
+
+        <![CDATA[
+            AND sync_time < CURRENT_TIMESTAMP - INTERVAL 600 SECOND
+        ]]>
     </select>
 </mapper>

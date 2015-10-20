@@ -13,10 +13,10 @@ public interface BrokerMapper {
 
     void insert(Broker broker);
 
-    void refresh(@Param("brokerId") Long brokerId,
+    void refresh(@Param("id") long id,
                  @Param("brokerAddress") String brokerAddress);
 
-    Broker get(@Param("brokerId") long brokerId);
+    Broker get(@Param("id") long id);
 
     Broker getBrokerByAddress(@Param("address") String address);
 
@@ -24,7 +24,10 @@ public interface BrokerMapper {
                       @Param("brokerName") String brokerName,
                       @Param("brokerId") int brokerId,
                       @Param("dc") int dc,
-                      @Param("updateTime") Date updateTime);
+                      @Param("syncTimeDeadline") Date syncTimeDeadline);
+
+    List<Broker> queryDeprecatedBrokers(@Param("clusterName") String clusterName,
+                                        @Param("dc") int dc);
 
     List<BrokerLoad> queryBrokerLoad(@Param("dcId") int dcId,
                                      @Param("brokerId") Integer brokerId);

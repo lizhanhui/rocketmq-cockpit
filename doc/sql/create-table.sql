@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS broker (
   dc INT NOT NULL REFERENCES data_center(id),
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time TIMESTAMP NOT NULL DEFAULT 0,
+  sync_time TIMESTAMP,
   CONSTRAINT uniq_cluster_name_id UNIQUE (cluster_name, broker_name, broker_id)
 ) ENGINE = INNODB;
 
@@ -224,3 +225,5 @@ CREATE INDEX idx_token ON login(token) USING HASH;
 ALTER TABLE topic ADD CONSTRAINT uniq_cluster_topic UNIQUE(cluster_name, topic);
 
 ALTER TABLE consumer_group ADD CONSTRAINT  uniq_cluster_consumer_group UNIQUE (cluster_name, group_name);
+
+ALTER TABLE broker ADD CONSTRAINT  uniq_cluster_broker_name_broker_id UNIQUE (cluster_name, broker_name, broker_id);

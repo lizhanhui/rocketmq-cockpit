@@ -21,6 +21,8 @@ public class Broker {
 
     private Date updateTime;
 
+    private Date syncTime;
+
     public long getId() {
         return id;
     }
@@ -91,6 +93,14 @@ public class Broker {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Date getSyncTime() {
+        return syncTime;
+    }
+
+    public void setSyncTime(Date syncTime) {
+        this.syncTime = syncTime;
     }
 
     @Override

@@ -105,4 +105,9 @@ public class BrokerMapperTest {
             deleteBroker(broker.getId());
         }
     }
+
+    @Test
+    public void testQueryDeprecatedBrokers() {
+        List<Broker> list = brokerMapper.queryDeprecatedBrokers(null, 0);
+    }
 }
