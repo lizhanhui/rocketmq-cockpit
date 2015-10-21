@@ -9,8 +9,10 @@ INSERT INTO name_server(ip, port, create_time, update_time) VALUES ('172.30.50.5
 INSERT INTO cockpit_user(id, username, password, email, status_id) VALUES (1, 'root', '$2a$10$.b5O4pAsTd6CyptUbXrMtOjJH1qYlbcVzk8WDPvb8dWwAXpfKZHwS', "admin@rocketmq.com", 5);
 INSERT INTO cockpit_user(id, username, password, email, status_id) VALUES (2, 'xutao', '$2a$10$Q9W2Zh/h/viu/zSMT2CbL.Dnt5LLbDGDMo.N/xfc7m6TIUCbeLpvO', "robert@yeahmobi.com", 5);
 
-INSERT INTO cockpit_role(id, name) VALUES (1, "ROLE_USER");
-INSERT INTO cockpit_role(id, name) VALUES (2, "ROLE_ADMIN");
+INSERT INTO cockpit_role(id, name) VALUES(1, 'ROLE_ADMIN');
+INSERT INTO cockpit_role(id, name) VALUES(2, 'ROLE_MANAGER');
+INSERT INTO cockpit_role(id, name) VALUES(3, 'ROLE_USER');
+INSERT INTO cockpit_role(id, name) VALUES(4, 'ROLE_WATCHER');
 
 INSERT INTO cockpit_user_role_xref(user_id, role_id) VALUES (1, 1);
 INSERT INTO cockpit_user_role_xref(user_id, role_id) VALUES (1, 2);
@@ -32,3 +34,5 @@ INSERT INTO consumer_group(group_name, broker_address, broker_id) VALUES ('C_GKT
 
 INSERT INTO name_server_kv(id, name_space, `key`, `value`, status_id) VALUES (NULL , "DC_SELECTOR", "DC_DISPATCH_STRATEGY", "BY_RATIO", 2);
 INSERT INTO name_server_kv(id, name_space, `key`, `value`, status_id) VALUES (NULL , "DC_SELECTOR", "DC_DISPATCH_RATIO", "1:0.25,2:0.3,3:0.25,5:0.2", 2);
+
+INSERT INTO project(id, name, description, team_id) VALUES (2, 'Test Project', 'Project Desc', 2);

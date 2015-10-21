@@ -47,6 +47,13 @@ public class ProjectMapperTest {
 
     }
 
+
+    @Test
+    public void testList2() {
+        List<Project> projects = projectMapper.list(0);
+        Assert.assertTrue(projects.size() >= 2);
+    }
+
     @Test
     public void testCreate() throws Exception {
         Project project = new Project();

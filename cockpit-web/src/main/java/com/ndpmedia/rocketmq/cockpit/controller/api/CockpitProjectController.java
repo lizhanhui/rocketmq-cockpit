@@ -1,6 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.controller.api;
 
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitRuntimeException;
+import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
@@ -43,8 +44,25 @@ public class CockpitProjectController {
     @ResponseBody
     public List<Project> list(HttpServletRequest request){
         CockpitUser cockpitUser = (CockpitUser) request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
+        if (isAdmin(cockpitUser)) {
+            // return all projects.
+            return cockpitProjectService.list(0);
+        }
+
         long teamId = cockpitUser.getTeam().getId();
         return cockpitProjectService.list(teamId);
+    }
+
+    private boolean isAdmin(CockpitUser user) {
+        List<CockpitRole> roles = user.getCockpitRoles();
+
+        for (CockpitRole role : roles) {
+            if (CockpitRole.ROLE_ADMIN.equals(role)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @RequestMapping(method = RequestMethod.PUT)
@@ -66,6 +84,11 @@ public class CockpitProjectController {
     @ResponseBody
     public Project get(@PathVariable("projectId") long projectId, HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser) request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
+
+        if (isAdmin(cockpitUser)) {
+            return cockpitProjectService.get(projectId);
+        }
+
         if (teamMapper.hasAccess(cockpitUser.getTeam().getId(), projectId, ResourceType.PROJECT)) {
             return cockpitProjectService.get(projectId);
         } else {
