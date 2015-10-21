@@ -12,7 +12,6 @@
         <module>cockpit-monitor</module>
         <module>cockpit-web</module>
         <module>cockpit-common</module>
-        <module>cockpit-api</module>
     </modules>
 
     <packaging>pom</packaging>
