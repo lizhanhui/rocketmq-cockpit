@@ -14,6 +14,7 @@ import java.io.IOException;
  * when the access is denied.
  */
 public class RocketMQUserAccessDeniedHandler implements AccessDeniedHandler, LoginConstant {
+
     private String accessDeniedURL;
 
     @Override

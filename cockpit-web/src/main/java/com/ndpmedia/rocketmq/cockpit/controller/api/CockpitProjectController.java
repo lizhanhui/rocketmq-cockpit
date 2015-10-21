@@ -1,10 +1,13 @@
 package com.ndpmedia.rocketmq.cockpit.controller.api;
 
+import com.ndpmedia.rocketmq.cockpit.exception.CockpitRuntimeException;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
+import com.ndpmedia.rocketmq.cockpit.model.ResourceType;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TeamMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitProjectService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
@@ -32,6 +35,9 @@ public class CockpitProjectController {
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
 
+    @Autowired
+    private TeamMapper teamMapper;
+
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
@@ -54,6 +60,17 @@ public class CockpitProjectController {
             return false;
         }
         return true;
+    }
+
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
+    @ResponseBody
+    public Project get(@PathVariable("projectId") long projectId, HttpServletRequest request) {
+        CockpitUser cockpitUser = (CockpitUser) request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
+        if (teamMapper.hasAccess(cockpitUser.getTeam().getId(), projectId, ResourceType.PROJECT)) {
+            return cockpitProjectService.get(projectId);
+        } else {
+            throw new CockpitRuntimeException("Access Denied");
+        }
     }
 
     @RequestMapping(value = "/{projectId}/{consumerGroupId}/{topicId}", method = RequestMethod.PUT)

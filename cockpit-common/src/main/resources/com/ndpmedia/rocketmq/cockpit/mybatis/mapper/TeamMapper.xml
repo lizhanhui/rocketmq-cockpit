@@ -79,4 +79,12 @@
         FROM team
         WHERE name = #{name}
     </select>
+
+    <select id="hasAccess" resultType="java.lang.Boolean">
+        SELECT COUNT(1) > 1
+        FROM resource_permission
+        WHERE resource_id = #{resourceId}
+        AND team_id = #{teamId}
+        AND resource_type_id = #{resourceType.ordinal}
+    </select>
 </mapper>

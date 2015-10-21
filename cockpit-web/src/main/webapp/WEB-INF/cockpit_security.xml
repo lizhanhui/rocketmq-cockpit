@@ -67,18 +67,23 @@
         </security:authentication-provider>
     </security:authentication-manager>
 
-    <bean id="userDetailService" class="com.ndpmedia.rocketmq.authentication.RocketMQUserDetailsService" />
+    <bean id="userDetailService"
+          class="com.ndpmedia.rocketmq.authentication.RocketMQUserDetailsService" />
 
-    <bean id="rocketMQLoginFilter" class="com.ndpmedia.rocketmq.authentication.RocketMQLoginFilter" />
-    <bean id="rocketMQUserLoginSuccessHandler" class="com.ndpmedia.rocketmq.authentication.RocketMQUserLoginSuccessHandler" />
+    <bean id="rocketMQLoginFilter"
+          class="com.ndpmedia.rocketmq.authentication.RocketMQLoginFilter" />
+    <bean id="rocketMQUserLoginSuccessHandler"
+          class="com.ndpmedia.rocketmq.authentication.RocketMQUserLoginSuccessHandler" />
 
-    <bean id="accessDeniedHandler" class="com.ndpmedia.rocketmq.authentication.RocketMQUserAccessDeniedHandler" >
+    <bean id="accessDeniedHandler"
+          class="com.ndpmedia.rocketmq.authentication.RocketMQUserAccessDeniedHandler" >
         <property name="accessDeniedURL" value="error/403.jsp" />
     </bean>
 
     <bean id="rocketMQUserLoginFailedHandler"
           class="com.ndpmedia.rocketmq.authentication.RocketMQUserLoginFailedHandler" />
 
-    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+    <bean id="passwordEncoder"
+          class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
 
 </beans>

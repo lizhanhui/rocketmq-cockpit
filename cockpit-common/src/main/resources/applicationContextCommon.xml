@@ -21,11 +21,11 @@
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
         <property name="DriverClassName" value="com.mysql.jdbc.Driver" />
         <!-- JDBC连接串 -->
-        <property name="url" value="${jdbc.url}" />
+        <property name="url" value="jdbc:mysql://localhost:3306/cockpit2?zeroDateTimeBehavior=convertToNull" />
         <!-- 数据库用户名称 -->
-        <property name="username" value="${jdbc.userName}" />
+        <property name="username" value="root" />
         <!-- 数据库密码 -->
-        <property name="password" value="${jdbc.password}" />
+        <property name="password" value="password" />
         <!-- 连接池最大使用连接数量 -->
         <property name="maxActive" value="20" />
         <!-- 初始化大小 -->

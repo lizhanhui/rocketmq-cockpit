@@ -12,6 +12,7 @@
         <module>cockpit-monitor</module>
         <module>cockpit-web</module>
         <module>cockpit-common</module>
+        <module>cockpit-api</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -22,8 +23,9 @@
         <java_target_version>1.7</java_target_version>
         <file_encoding>UTF-8</file_encoding>
 
-        <spring.version>3.2.5.RELEASE</spring.version>
-        <cxf.version>3.0.2</cxf.version>
+        <spring.version>4.2.2.RELEASE</spring.version>
+        <spring.security.version>4.0.2.RELEASE</spring.security.version>
+        <cxf.version>3.1.3</cxf.version>
         <guava.version>18.0</guava.version>
         <rocketmq.version>3.2.2.R3-SNAPSHOT</rocketmq.version>
     </properties>
@@ -115,13 +117,13 @@
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-web</artifactId>
-                <version>${spring.version}</version>
+                <version>${spring.security.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-config</artifactId>
-                <version>${spring.version}</version>
+                <version>${spring.security.version}</version>
             </dependency>
 
             <dependency>

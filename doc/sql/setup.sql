@@ -31,3 +31,5 @@ INSERT INTO warn_level_lu(id, name, info) VALUES (2, 'Warn', "Warning");
 INSERT INTO warn_level_lu(id, name, info) VALUES (3, 'Error', "Error");
 INSERT INTO warn_level_lu(id, name, info) VALUES (4, 'Critical', "Critial");
 INSERT INTO warn_level_lu(id, name, info) VALUES (5, 'Fatal', "Fatal");
+
+INSERT INTO resource_type_lu(id, name) VALUES (1, 'Project');

@@ -18,3 +18,4 @@ INSERT INTO topic_broker_xref(broker_id, topic_id) VALUES (1, 1);
 INSERT INTO topic_broker_xref(broker_id, topic_id) VALUES (2, 1);
 INSERT INTO topic_broker_xref(broker_id, topic_id) VALUES (2, 2);
 
+INSERT INTO name_server(id, ip, port, create_time, update_time) VALUES (NULL, '172.30.30125', '9876', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

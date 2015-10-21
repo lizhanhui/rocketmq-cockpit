@@ -220,6 +220,18 @@ CREATE TABLE IF NOT EXISTS warning (
   level INT NOT NULL REFERENCES warn_level_lu(id)
 ) ENGINE = INNODB;
 
+
+CREATE TABLE resource_type_lu (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL
+) ENGINE = INNODB;
+
+CREATE TABLE resource_permission(
+  resource_id INT NOT NULL,
+  team_id INT NOT NULL REFERENCES team(id),
+  resource_type_id INT REFERENCES resource_type_lu(id)
+) ENGINE = INNODB;
+
 CREATE INDEX idx_token ON login(token) USING HASH;
 
 ALTER TABLE topic ADD CONSTRAINT uniq_cluster_topic UNIQUE(cluster_name, topic);
@@ -227,3 +239,5 @@ ALTER TABLE topic ADD CONSTRAINT uniq_cluster_topic UNIQUE(cluster_name, topic);
 ALTER TABLE consumer_group ADD CONSTRAINT  uniq_cluster_consumer_group UNIQUE (cluster_name, group_name);
 
 ALTER TABLE broker ADD CONSTRAINT  uniq_cluster_broker_name_broker_id UNIQUE (cluster_name, broker_name, broker_id);
+
+ALTER TABLE resource_permission ADD CONSTRAINT uniq_resource_id_type_team UNIQUE (resource_id, resource_type_id, team_id);

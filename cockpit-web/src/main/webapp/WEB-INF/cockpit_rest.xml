@@ -18,14 +18,12 @@
     </bean>
 
     <bean id="nameServerAddressBean" class="com.ndpmedia.rocketmq.nameserver.impl.NameServerAddressServiceImpl" />
-    <bean id="ipMappingBean" class="com.ndpmedia.rocketmq.ip.impl.IPMappingServiceImpl" />
     <bean id="monitorBean" class="com.ndpmedia.rocketmq.monitor.impl.MonitorServiceImpl" />
     <bean id="ssoBean" class="com.ndpmedia.rocketmq.sso.impl.SSOServiceImpl" />
 
     <jaxrs:server id="restServer" address="/">
         <jaxrs:serviceBeans>
             <ref bean="nameServerAddressBean" />
-            <ref bean="ipMappingBean" />
             <ref bean="monitorBean" />
             <ref bean="ssoBean" />
         </jaxrs:serviceBeans>
