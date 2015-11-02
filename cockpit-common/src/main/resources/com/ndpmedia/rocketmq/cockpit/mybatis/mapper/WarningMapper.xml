@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper">
+
+    <insert id="create" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
+        INSERT INTO warning(id, msg, create_time, status, level)
+        VALUES (NULL, #{msg}, #{createTime}, #{status.ordinal}, #{level.ordinal})
+    </insert>
+
+    <update id="mark">
+        UPDATE warning
+        SET status = #{status.ordinal}
+        WHERE id = #{id}
+    </update>
+
+    <resultMap id="warningResultMap" type="com.ndpmedia.rocketmq.cockpit.model.Warning">
+        <id column="id" property="id" />
+        <result column="msg" property="msg" />
+        <result column="create_time" property="createTime" />
+        <result column="status" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+
+        <result column="level" property="level"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Level" />
+    </resultMap>
+
+    <select id="get" resultMap="warningResultMap">
+        SELECT id, msg, create_time, status, level
+        FROM warning
+        WHERE id = #{id}
+    </select>
+
+    <select id="list" resultMap="warningResultMap">
+        SELECT id, msg, create_time, status, level
+        FROM warning
+        WHERE 1 = 1
+        <if test="statuses != null">
+           AND status IN
+            <foreach collection="statuses" open="(" separator="," close=")" item="status">#{status.ordinal}</foreach>
+        </if>
+
+        <if test="levels != null">
+            AND level IN
+            <foreach collection="levels" open="(" separator="," close=")" item="level">#{level.ordinal}</foreach>
+        </if>
+    </select>
+</mapper>
