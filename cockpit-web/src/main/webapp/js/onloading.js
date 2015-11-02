@@ -36,8 +36,8 @@ function buildImgs(){
     var loadingObj = document.createElement("div");
     loadingObj.setAttribute( 'id', 'loadingDiv' );
     loadingObj.style.position = "absolute";
-    lw = 400;
-    lh = 300;
+    lw = 32;
+    lh = 32;
     lt = (bodyHeight/2) - (lh/2);
     ll = (bodyWidth/2) - (lw/2);
     loadingObj.style.top = lt + "px";

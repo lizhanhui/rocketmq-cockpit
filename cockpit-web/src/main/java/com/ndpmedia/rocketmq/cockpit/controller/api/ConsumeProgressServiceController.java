@@ -6,6 +6,8 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,8 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/api/consume-progress")
 public class ConsumeProgressServiceController {
+
+    private Logger logger = LoggerFactory.getLogger(ConsumeProgressServiceController.class);
 
     @Autowired
     private ConsumeProgressMapper consumeProgressMapper;
@@ -54,14 +58,22 @@ public class ConsumeProgressServiceController {
     public List<ConsumeProgress> list(@PathVariable("consumerGroup") String consumerGroup,
             @PathVariable("topic") String topic, @PathVariable("broker") String broker,
             @PathVariable("queue") String queue, HttpServletRequest request) {
-        if ("-1".equals(topic))
-            return consumeProgressMapper.diffList(consumerGroup, null, null, -1);
-        if ("-1".equals(broker))
-            return consumeProgressMapper.diffList(consumerGroup, topic, null, -1);
-        if ("-1".equals(queue))
-            return consumeProgressMapper.diffList(consumerGroup, topic, broker, -1);
+        String suffix = "";
+        try{
+            suffix = "_" + consumeProgressMapper.groupTableID(consumerGroup);
+        }catch (Exception e){
+            logger.warn("[ConsumeProgressServiceController]try to get tableID by consumer group name failed." + consumerGroup);
+        }
 
-        return consumeProgressMapper.diffList(consumerGroup, topic, broker, Integer.parseInt(queue));
+        if ("-1".equals(topic))
+            return consumeProgressMapper.diffList(consumerGroup, null, null, -1, suffix);
+        if ("-1".equals(broker))
+            return consumeProgressMapper.diffList(consumerGroup, topic, null, -1, suffix);
+        if ("-1".equals(queue))
+            return consumeProgressMapper.diffList(consumerGroup, topic, broker, -1, suffix);
+
+        List<ConsumeProgress> results = consumeProgressMapper.diffList(consumerGroup, topic, broker, Integer.parseInt(queue), suffix);
+        return results;
     }
 
     private long getTeamId(HttpServletRequest request) {

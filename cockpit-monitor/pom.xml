@@ -70,7 +70,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                         </configuration>
                     </execution>
@@ -85,6 +85,9 @@
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                     <mainClass>com.ndpmedia.rocketmq.cockpit.scheduler.Main</mainClass>
+                                    <useUniqueVersions>false</useUniqueVersions>
+                                    <!--<classpathLayoutType>custom</classpathLayoutType>-->
+                                    <!--<customClasspathLayout>lib/cockpit-common-3.2.2.R2.jar lib/spring-beans-3.2.5.RELEASE.jar lib/spring-context-3.2.5.RELEASE.jar lib/spring-expression-3.2.5.RELEASE.jar lib/spring-core-3.2.5.RELEASE.jar lib/commons-logging-1.1.1.jar lib/spring-tx-3.2.5.RELEASE.jar lib/aopalliance-1.0.jar lib/spring-aop-3.2.5.RELEASE.jar lib/spring-jdbc-3.2.5.RELEASE.jar lib/mybatis-3.2.3.jar lib/mybatis-spring-1.2.1.jar lib/mysql-connector-java-5.1.31.jar lib/druid-1.0.9.jar lib/rocketmq-tools-3.2.2.R3-SNAPSHOT.jar lib/rocketmq-client-3.2.2.R3-SNAPSHOT.jar lib/rocketmq-common-3.2.2.R3-SNAPSHOT.jar lib/commons-math3-3.4.1.jar lib/rocketmq-store-3.2.2.R3-SNAPSHOT.jar lib/rocketmq-srvutil-3.2.2.R3-SNAPSHOT.jar lib/rocketmq-remoting-3.2.2.R3-SNAPSHOT.jar lib/netty-all-4.0.31.Final.jar lib/commons-cli-1.2.jar lib/commons-io-2.4.jar lib/fastjson-1.2.7.jar lib/slf4j-api-1.7.5.jar lib/logback-classic-1.0.13.jar lib/logback-core-1.0.13.jar</customClasspathLayout>-->
                                 </manifest>
                             </archive>
                         </configuration>

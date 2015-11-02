@@ -19,8 +19,8 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <jdbc.url>jdbc:mysql://localhost:3306/cockpit2?zeroDateTimeBehavior=convertToNull</jdbc.url>
-                <jdbc.userName>root</jdbc.userName>
+                <jdbc.url>jdbc:mysql://172.30.30.4:3306/cockpit_test?zeroDateTimeBehavior=convertToNull</jdbc.url>
+                <jdbc.userName>cockpit</jdbc.userName>
                 <jdbc.password>password</jdbc.password>
             </properties>
         </profile>
@@ -31,9 +31,9 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <jdbc.url>jdbc:mysql://localhost:3306/cockpit2?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;transformedBitIsBoolean=true</jdbc.url>
+                <jdbc.url>jdbc:mysql://172.30.30.4:3306/cockpit_test?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;transformedBitIsBoolean=true</jdbc.url>
                 <jdbc.userName>cockpit</jdbc.userName>
-                <jdbc.password>changeIt</jdbc.password>
+                <jdbc.password>password</jdbc.password>
             </properties>
         </profile>
     </profiles>

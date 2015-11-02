@@ -3,6 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.scheduler;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitMessageMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.LoginMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by robert on 2015/6/9.
@@ -39,12 +41,23 @@ public class DataAgingScheduler {
     public void deleteDeprecatedData() {
         logger.info("Start to clean deprecated data");
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-        int numberOfRecordsDeleted = consumeProgressMapper.bulkDelete(calendar.getTime());
+        calendar.add(Calendar.HOUR_OF_DAY, -24);
+        int numberOfRecordsDeleted = consumeProgressMapper.bulkDelete("", calendar.getTime());
         logger.info("Deleted " + numberOfRecordsDeleted + " consume progress records.");
+//        numberOfRecordsDeleted = cockpitMessageMapper.bulkDelete(calendar.getTime());
+//        logger.info("Deleted " + numberOfRecordsDeleted + " message flow records.");
 
-        numberOfRecordsDeleted = cockpitMessageMapper.bulkDelete(calendar.getTime());
-        logger.info("Deleted " + numberOfRecordsDeleted + " message flow records.");
+        calendar.add(Calendar.HOUR_OF_DAY, -48);
+
+        List<Integer> IDs = consumeProgressMapper.groupTableIDS();
+        for(int id : IDs){
+            try {
+                numberOfRecordsDeleted = consumeProgressMapper.bulkDelete("_" + id, calendar.getTime());
+                logger.info("Deleted " + numberOfRecordsDeleted + " in " + id + " consume progress records.");
+            }catch (Exception e){
+                logger.warn("[MONITOR][OLD DATA DELETE] some table already deleted.");
+            }
+        }
     }
 
     /**

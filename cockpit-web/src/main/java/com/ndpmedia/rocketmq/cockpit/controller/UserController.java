@@ -35,7 +35,7 @@ public class UserController {
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public ModelAndView register() {
-        ModelAndView modelAndView = new ModelAndView("user/activate");
+        ModelAndView modelAndView = new ModelAndView("user/register");
         List<Team> teamList = teamMapper.list();
         modelAndView.addObject("teamList", teamList);
 

@@ -6,12 +6,19 @@ import com.alibaba.rocketmq.client.producer.DefaultMQProducer;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.common.message.Message;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Created by robert.xu on 2015/4/7.
+ */
 @Controller
 @RequestMapping(value = "/api/producer")
 public class CockpitProducerController {
+
+    private Logger logger = LoggerFactory.getLogger(CockpitProducerController.class);
 
     @RequestMapping(value = "/{producerGroup}/{topic}/{tag}/{key}/{body}", method = RequestMethod.GET)
     @ResponseBody
@@ -33,7 +40,7 @@ public class CockpitProducerController {
             return sendResult.toString();
         }
         catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
-            e.printStackTrace();
+            logger.warn("[CockpitProducerController]try to send message failed." + e);
         } finally {
             producer.shutdown();
         }

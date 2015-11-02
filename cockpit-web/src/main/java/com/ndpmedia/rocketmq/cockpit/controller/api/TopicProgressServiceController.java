@@ -4,7 +4,11 @@ import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
+import com.ndpmedia.rocketmq.cockpit.model.TopicPerSecond;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
+import com.ndpmedia.rocketmq.cockpit.util.ConsumeProgressHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/api/topic-progress")
 public class TopicProgressServiceController {
+
+    private Logger logger = LoggerFactory.getLogger(TopicProgressServiceController.class);
 
     @Autowired
     private ConsumeProgressMapper consumeProgressMapper;
@@ -32,8 +36,16 @@ public class TopicProgressServiceController {
 
     @RequestMapping(value = "/{topic}", method = RequestMethod.GET)
     @ResponseBody
-    public List<ConsumeProgress> list(@PathVariable("topic") String topic) {
-        return consumeProgressMapper.brokerTPSList(null, topic, null, -1);
+    public List<TopicPerSecond> list(@PathVariable("topic") String topic) {
+        List<ConsumeProgress> consumeProgresses = new ArrayList<>();
+        try{
+            consumeProgresses.addAll(consumeProgressMapper.brokerTPSList(null, topic, null, -1));
+        }catch (Exception e){
+            logger.warn("[TopicProgressServiceController] try get topic progress failed.");
+            consumeProgresses.addAll(consumeProgressMapper.brokerTPSListOLD(null, topic, null, -1));
+        }
+        Collections.reverse(consumeProgresses);
+        return ConsumeProgressHelper.getTPSListFromDiffList(consumeProgresses);
     }
 
     @RequestMapping(value = "/d", method = RequestMethod.GET)
@@ -50,11 +62,13 @@ public class TopicProgressServiceController {
                     result.add(temp);
             }
         } catch (MQClientException e) {
-            e.printStackTrace();
+            logger.warn("[TopicProgressServiceController]try to get topic list failed." + e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("[TopicProgressServiceController]try to get topic list failed." + e);
         } catch (RemotingException e) {
-            e.printStackTrace();
+            logger.warn("[TopicProgressServiceController]try to get topic list failed." + e);
+        } finally {
+            defaultMQAdminExt.shutdown();
         }
 
         return result;

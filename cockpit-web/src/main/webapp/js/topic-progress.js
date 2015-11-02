@@ -71,7 +71,6 @@ $(document).ready(function() {
     Highcharts.setOptions({ global: { useUTC: false } });
     var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
 
-
     $.get("cockpit/api/topic-progress", function(data) {
         showCloud();
         var otext1 = document.createTextNode("Topic：");
@@ -97,8 +96,8 @@ $(document).ready(function() {
         var topic = "undefined" === typeof($("#selectT").children('option:selected').val()) ? "-1" : $("#selectT").children('option:selected').val();
 
         if (topic.indexOf("%") != -1){
-                    topic = topic.replace(new RegExp("%","gm"), "%25");
-                }
+            topic = topic.replace(new RegExp("%","gm"), "%25");
+        }
 
         if ($.trim(topic) === "" || "-1" === topic) {
             alert("consumer group should not be null");
@@ -112,31 +111,14 @@ $(document).ready(function() {
                 contentType: "application/json; charset=UTF-8",
                 dataType: "json",
                 success: function(backdata) {
-                    var line = topic;
-                    var firstB = -1;
-                    var lastT = (new Date()).getTime() - 1000 * 60 * 60 *24 ;
-                    backdata.reverse();
-                    backdata.forEach(function(consumeProgress){
+                    backdata.forEach(function(topicPerSecond){
                         var temp = [];
-                        var time = consumeProgress.createTime.replace(new RegExp("-","gm"),"/");
-                        var milTime = (new Date(time)).getTime();
-                        temp.push(milTime);
-                        if (-1 === firstB){
-
-                        }else{
-                            if (consumeProgress.brokerOffset >= firstB){
-                               temp.push(Math.round(100*1000*(consumeProgress.brokerOffset - firstB)/(milTime - lastT))/100);
-                            }else{
-                                temp.push(Math.round(0));
-                            }
-                            x.push(temp);
-                        }
-
-                        firstB = consumeProgress.brokerOffset;
-                        lastT = milTime;
+                        temp.push(topicPerSecond.timeStamp);
+                        temp.push(topicPerSecond.tps);
+                        x.push(temp);
                     });
 
-                    showCharts(line, x);
+                    showCharts(topic, x);
 
                     hideCloud();
                 }

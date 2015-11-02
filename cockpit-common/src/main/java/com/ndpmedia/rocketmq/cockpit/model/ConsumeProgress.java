@@ -28,6 +28,8 @@ public class ConsumeProgress {
 
     private Date createTime;
 
+    private int tableID;
+
     public ConsumeProgress() {
     }
 
@@ -109,6 +111,14 @@ public class ConsumeProgress {
 
     public void setConsumerGroup(String consumerGroup) {
         this.consumerGroup = consumerGroup;
+    }
+
+    public int getTableID() {
+        return tableID;
+    }
+
+    public void setTableID(int tableID) {
+        this.tableID = tableID;
     }
 
     @Override

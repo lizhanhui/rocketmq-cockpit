@@ -40,12 +40,10 @@
         <security:intercept-url pattern="/cockpit/ip/**" requires-channel="http" access="ROLE_ADMIN"/>
         <security:intercept-url pattern="/cockpit/name-server/**" requires-channel="http" access="ROLE_ADMIN"/>
 
-        <security:intercept-url pattern="/**"  access="ROLE_USER, ROLE_ADMIN"/>
+        <security:intercept-url pattern="/*"  access="ROLE_USER,ROLE_ADMIN"/>
 
         <security:form-login authentication-failure-handler-ref="rocketMQUserLoginFailedHandler"
                              authentication-success-handler-ref="rocketMQUserLoginSuccessHandler"
-                             default-target-url="/cockpit/home"
-                             always-use-default-target="true"
                              login-page="/cockpit/login.jsp"
                              login-processing-url="/j_spring_security_check"
                              authentication-failure-url="/cockpit/login.jsp?error=true"/>
