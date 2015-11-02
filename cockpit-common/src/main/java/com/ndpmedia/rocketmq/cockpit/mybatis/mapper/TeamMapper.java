@@ -1,5 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
+import com.ndpmedia.rocketmq.cockpit.model.ResourceType;
 import com.ndpmedia.rocketmq.cockpit.model.Team;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +25,10 @@ public interface TeamMapper {
     void update(Team team);
 
     void addMember(@Param("teamId") long teamId, @Param("memberId") long memberId);
+
+
+    boolean hasAccess(@Param("teamId") long teamId,
+                      @Param("resourceId") long resourceId,
+                      @Param("resourceType") ResourceType resourceType);
+
 }

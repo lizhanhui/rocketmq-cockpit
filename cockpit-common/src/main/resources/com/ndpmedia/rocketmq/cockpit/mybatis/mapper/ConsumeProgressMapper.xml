@@ -47,15 +47,14 @@
         WHERE #{date} > create_time
     </delete>
 
-    <resultMap id="consumerGroupMap" type="ConsumerGroup">
+    <resultMap id="consumerGroupMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
         <id column="id" property="id" />
         <result column="cluster_name" property="clusterName" />
         <result column="which_broker_when_consume_slowly" property="whichBrokerWhenConsumeSlowly" />
         <result column="group_name" property="groupName" />
         <result column="consume_enable" property="consumeEnable" />
         <result column="consume_broadcast_enable" property="consumeBroadcastEnable" />
-        <result column="broker_address" property="brokerAddress" />
-        <result column="broker_id" property="brokerId" />
+        <result column="consume_from_broker_id" property="consumeFromBrokerId" />
         <result column="retry_max_times" property="retryMaxTimes" />
         <result column="retry_queue_num" property="retryQueueNum" />
         <result column="consume_from_min_enable" property="consumeFromMinEnable" />
@@ -66,7 +65,7 @@
         <result column="update_time" property="updateTime" />
     </resultMap>
 
-    <resultMap id="consumeProgressMap" type="ConsumeProgress">
+    <resultMap id="consumeProgressMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress">
         <id column="id" property="id" />
         <result column="topic" property="topic" />
         <result column="broker_name" property="brokerName" />

@@ -2,45 +2,94 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper">
 
-    <insert id="insert" parameterType="Topic" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO topic (id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time)
-        VALUES (NULL, #{topic}, #{clusterName}, #{permission}, #{writeQueueNum}, #{readQueueNum}, #{unit}, #{hasUnitSubscription}, #{brokerAddress}, #{order}, #{status.id}, #{createTime}, #{updateTime})
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO topic (id, topic, cluster_name, `order`, status, create_time, update_time)
+        VALUES (NULL, #{topic}, #{clusterName}, #{order}, #{status.ordinal}, #{createTime}, #{updateTime})
     </insert>
 
-    <insert id="associateTeam">
-        INSERT INTO topic_team_xref(topic_id, team_id)
-        VALUES (#{topicId}, #{teamId})
+    <insert id="insertTopicBrokerInfo">
+        INSERT INTO topic_broker_xref(broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, create_time, update_time)
+        VALUES (#{broker.id}, #{topicMetadata.id}, #{permission}, #{readQueueNum}, #{writeQueueNum}, #{status.ordinal}, #{createTime}, #{updateTime})
     </insert>
 
-    <select id="getTeamId" resultType="long">
-        SELECT team_id
-        FROM topic_team_xref
-        WHERE topic_id = #{topicId}
-        GROUP BY team_id
+    <insert id="connectProject">
+        INSERT INTO project_topic_xref(topic_id, project_id)
+        VALUES (#{topicId}, #{projectId})
+    </insert>
+
+    <insert id="insertDCAllowed">
+        INSERT INTO topic_dc_xref(topic_id, dc_id, status)
+        VALUES (#{topicId}, #{dcId}, #{status.ordinal})
+    </insert>
+
+    <select id="getProjects" resultType="long">
+        SELECT DISTINCT xref.project_id
+        FROM project_topic_xref AS xref
+        <if test="topic != null">
+            JOIN topic AS t ON t.id = xref.topic_id
+        </if>
+        WHERE 1 = 1
+        <if test="topic != null">
+            AND topic = #{topic}
+        </if>
+        <if test="topicId > 0">
+            AND topic_id = #{topicId}
+        </if>
     </select>
 
-    <delete id="removeTopicTeamAssociation">
+    <delete id="disconnectProject">
         DELETE
-        FROM topic_team_xref
+        FROM project_topic_xref
         WHERE 1 = 1
-
         <if test="topicId > 0">
             AND topic_id = #{topicId}
         </if>
 
-        <if test="teamId > 0">
-            AND team_id = #{teamId}
+        <if test="projectId > 0">
+            AND project_id = #{projectId}
         </if>
     </delete>
 
-    <update id="update" parameterType="Topic">
-        UPDATE topic SET topic = #{topic}, cluster_name = #{clusterName},
-            permission = #{permission}, write_queue_num = #{writeQueueNum},
-            read_queue_num = #{readQueueNum}, unit = #{unit},
-            has_unit_subscription = #{hasUnitSubscription}, broker_address = #{brokerAddress},
-            order_type = #{order}, status_id = #{status.id},
-            create_time = #{createTime}, update_time = #{updateTime}
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata">
+        UPDATE topic
+        SET topic = #{topic},
+            cluster_name = #{clusterName},
+            `order` = #{order},
+            create_time = #{createTime},
+            update_time = #{updateTime}
         WHERE id = #{id}
+    </update>
+
+    <update id="updateTopicBrokerInfo">
+        UPDATE topic_broker_xref
+        SET permission = #{permission},
+            write_queue_num = #{writeQueueNum},
+            read_queue_num = #{readQueueNum},
+            status_id = #{status.ordinal},
+            update_time = CURRENT_TIMESTAMP
+        WHERE broker_id = #{broker.id}
+        AND topic_id = #{topicMetadata.id}
+    </update>
+
+    <update id="refresh">
+        UPDATE topic_broker_xref
+        SET sync_time = CURRENT_TIMESTAMP
+        WHERE broker_id = #{brokerId}
+        AND topic_id = #{topicId}
+    </update>
+
+    <update id="changeTopicDCStatus">
+      UPDATE topic_dc_xref
+      SET status = #{status.ordinal}
+      WHERE 1 = 1
+
+      <if test="dcId > 0">
+          AND dc_id = #{dcId}
+      </if>
+
+      <if test="topicId > 0">
+          AND topic_id = #{topicId}
+      </if>
     </update>
 
     <delete id="delete" parameterType="long">
@@ -49,104 +98,181 @@
         WHERE id = #{id}
     </delete>
 
-    <update id="register" parameterType="long">
-        UPDATE topic SET status_id = 2, update_time = now()
-        WHERE id = #{id}
-    </update>
-
-    <update id="unregister" parameterType="long" >
-        UPDATE topic SET status_id = 3, update_time = now()
-        WHERE id = #{id}
-    </update>
-
-    <resultMap id="topicMap" type="Topic">
+    <resultMap id="topicMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata">
         <id column="id" property="id" />
         <result column="topic" property="topic" />
         <result column="cluster_name" property="clusterName" />
-        <result column="permission" property="permission" />
-        <result column="write_queue_num" property="writeQueueNum" />
-        <result column="read_queue_num" property="readQueueNum" />
-        <result column="unit" property="unit" />
-        <result column="has_unit_subscription" property="hasUnitSubscription" />
-        <result column="broker_address" property="brokerAddress" />
-        <result column="order_type" property="order" />
-        <result column="status_id" property="status"
+        <result column="`order`" property="order" />
+        <result column="status" property="status"
                 typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
                 javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
 
-    <select id="get" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
-        FROM topic
-        WHERE 1 = 1
-        <if test="id > 0">
-            AND id = #{id}
-        </if>
-        <if test="topic != null">
-            AND topic = #{topic}
-        </if>
-        <if test="broker != null">
-            AND broker_address = #{broker}
-        </if>
-        <if test="cluster != null">
-            AND cluster_name = #{cluster}
-        </if>
-        limit 1
-    </select>
-
     <select id="list" resultMap="topicMap">
-        SELECT topic, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, order_type, min(create_time) as create_time, max(update_time) as update_time
-        FROM topic
-        <if test="teamId > 0">
-            JOIN topic_team_xref AS xref ON id = xref.topic_id
+        SELECT t.id, t.topic,  t.`order`, t.status, t.create_time, t.update_time
+        FROM topic AS t
+        <if test="projectId > 0">
+            JOIN project_topic_xref AS ptx ON t.id = ptx.topic_id
         </if>
         WHERE 1 = 1
-        <if test="teamId > 0">
-            AND xref.team_id = #{teamId}
+        <if test="projectId > 0">
+            AND ptx.project_id = #{projectId}
+        </if>
+
+        <if test="statusIds != null">
+            AND t.status IN
+            <foreach collection="statusIds" separator="," open="(" close=")" item="status">#{status}</foreach>
+        </if>
+
+        <if test="cluster != null">
+            AND t.cluster_name = #{cluster}
+        </if>
+    </select>
+
+    <select id="queryTopicsAvailability" resultType="com.ndpmedia.rocketmq.cockpit.model.TopicAvailability">
+        SELECT tdx.topic_id AS topicId
+        , tdx.dc_id AS dcId
+        , COUNT(b.id) AS availability
+        FROM topic_dc_xref AS tdx
+            LEFT JOIN topic_broker_xref AS tbx ON tdx.topic_id = tbx.topic_id
+            LEFT JOIN broker AS b ON b.id = tbx.broker_id AND b.dc = tdx.dc_id
+            JOIN topic AS t ON tdx.topic_id = t.id
+        WHERE (b.broker_id = 0 OR b.broker_id IS NULL)
+            <if test="statuses != null">
+                AND t.status IN
+                <foreach collection="statuses" open="(" separator="," close=")" item="status">#{status.ordinal}</foreach>
+            </if>
+        GROUP BY tdx.dc_id, tdx.topic_id
+        ORDER BY availability ASC
+    </select>
+
+    <resultMap id="dataCenterResultMap" type="com.ndpmedia.rocketmq.cockpit.model.DataCenter">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="status" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+    </resultMap>
+
+    <select id="queryAllowedDC" resultMap="dataCenterResultMap" parameterType="long">
+        SELECT xref.status, dc.id, dc.name
+        FROM topic_dc_xref AS xref
+        JOIN data_center AS dc ON xref.dc_id = dc.id
+        WHERE xref.topic_id = #{topicId}
+    </select>
+
+    <select id="queryAssociatedConsumerGroup" resultType="long">
+        SELECT consumer_group_id
+        FROM topic_consumer_group_xref
+        WHERE topic_id = #{topicId}
+    </select>
+
+    <select id="isDCAllowed" resultType="java.lang.Boolean">
+        SELECT COUNT(1) > 0
+        FROM topic_dc_xref
+        WHERE topic_id = #{topicId}
+        AND dc_id = #{dcId}
+        AND status IN (3, 5)
+    </select>
+
+    <resultMap id="topicMetadataResultMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata">
+        <id column="id" property="id" />
+        <result column="topic" property="topic" />
+        <result column="cluster_name" property="clusterName" />
+        <result column="`order`" property="order" />
+        <result column="status" property="status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <select id="getMetadata" parameterType="long" resultMap="topicMetadataResultMap">
+        SELECT id, topic, cluster_name, `order`, status, create_time, update_time
+        FROM topic
+        WHERE 1 = 1
+        AND id = #{topicId}
+    </select>
+
+
+    <select id="getMetadataByTopic" resultMap="topicMetadataResultMap">
+        SELECT id, topic, cluster_name, `order`, status, create_time, update_time
+        FROM topic
+        WHERE 1 = 1
+
+        <if test="clusterName != null">
+            AND cluster_name = #{clusterName}
         </if>
 
         <if test="topic != null">
             AND topic = #{topic}
         </if>
-
-        <if test="statusId > 0">
-            AND status_id = #{statusId}
-        </if>
-
-        GROUP BY topic, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, order_type
     </select>
 
-    <select id="delList" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
-        FROM topic
-        WHERE status_id = 3
-    </select>
+    <resultMap id="topicBrokerInfoResultMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo">
+        <result column="permission" property="permission" />
 
-    <select id="activeList" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
-        FROM topic
-        WHERE status_id = 2
-    </select>
+        <result column="status_id" property="status"
+                javaType="com.ndpmedia.rocketmq.cockpit.model.Status"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
 
-    <select id="detailList" resultMap="topicMap">
-        SELECT id, topic, cluster_name, permission, write_queue_num, read_queue_num, unit, has_unit_subscription, broker_address, order_type, status_id, create_time, update_time
-        FROM topic
-        <if test="teamId > 0">
-            JOIN topic_team_xref AS xref ON id = xref.topic_id
-        </if>
+        <result column="write_queue_num" property="writeQueueNum" />
+        <result column="read_queue_num" property="readQueueNum" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="sync_time" property="syncTime" />
+        <association property="broker"
+                     column="broker_id"
+                     foreignColumn="id"
+                     javaType="com.ndpmedia.rocketmq.cockpit.model.Broker"
+                     select="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper.get" />
+        <association property="topicMetadata"
+                     column="topic_id"
+                     javaType="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata"
+                     select="getMetadata" />
+    </resultMap>
+
+    <select id="queryTopicBrokerInfo" resultMap="topicBrokerInfoResultMap">
+        SELECT tbx.broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, tbx.create_time, tbx.update_time, tbx.sync_time
+        FROM topic_broker_xref AS tbx
+        LEFT JOIN broker AS b ON tbx.broker_id = b.id
         WHERE 1 = 1
-        <if test="teamId > 0">
-            AND xref.team_id = #{teamId}
+
+        <if test="brokerId > 0">
+            AND tbx.broker_id = #{brokerId}
         </if>
 
-        <if test="topic != null">
-            AND topic = #{topic}
+        <if test="topicId > 0">
+            AND topic_id = #{topicId}
         </if>
 
-        <if test="statusId > 0">
-            AND status_id = #{statusId}
+        <if test="dc > 0">
+            AND b.dc = #{dc}
         </if>
+    </select>
+
+    <select id="listByProject" resultMap="topicMetadataResultMap">
+        SELECT t.id, t.topic, t.cluster_name, t.`order`, t.status, t.create_time, t.update_time
+        FROM topic AS t
+        JOIN project_topic_xref AS ptx ON ptx.topic_id = t.id
+        WHERE ptx.project_id = #{projectId}
+    </select>
+
+    <select id="queryEndangeredTopicsByBroker" resultMap="topicBrokerInfoResultMap">
+        <![CDATA[
+            SELECT tbx.broker_id, tbx.topic_id, tbx.permission, tbx.write_queue_num, tbx.read_queue_num, tbx.status_id, tbx.create_time, tbx.update_time, tbx.sync_time
+            FROM topic_broker_xref AS tbx
+            JOIN topic AS t ON t.id = tbx.topic_id
+            JOIN broker AS b ON b.id = tbx.broker_id
+            WHERE t.status IN (3, 5)
+            AND tbx.status_id IN (3, 5)
+            AND b.broker_id = 0
+            AND (tbx.sync_time IS NULL OR tbx.sync_time < CURRENT_TIMESTAMP - INTERVAL 600 SECOND)
+        ]]>
+           <if test="brokerId > 0">
+               AND b.id = #{brokerId}
+           </if>
     </select>
 </mapper>

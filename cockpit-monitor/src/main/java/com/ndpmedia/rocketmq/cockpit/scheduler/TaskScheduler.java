@@ -1,11 +1,12 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
+import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressNSService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupNSService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +33,10 @@ public class TaskScheduler {
     private ConsumeProgressMapper consumeProgressMapper;
 
     @Autowired
-    private CockpitConsumeProgressNSService cockpitConsumeProgressNSService;
+    private CockpitConsumeProgressService cockpitConsumeProgressService;
 
     @Autowired
-    private CockpitTopicService cockpitTopicService;
-
-    @Autowired
-    private CockpitConsumerGroupNSService cockpitConsumerGroupNSService;
+    private CockpitConsumerGroupMQService cockpitConsumerGroupMQService;
 
     private static AtomicInteger counts = new AtomicInteger(0);
 
@@ -77,7 +75,7 @@ public class TaskScheduler {
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
         try {
             defaultMQAdminExt.start();
-            Set<String> groupList = cockpitConsumerGroupNSService.getGroups(defaultMQAdminExt);
+            Set<String> groupList = cockpitConsumerGroupMQService.getGroups(defaultMQAdminExt);
 
             if (groupList.size() > groupTableRel.size()){
                 createPrivateTable(groupList);
@@ -85,7 +83,7 @@ public class TaskScheduler {
 
             List<ConsumeProgress> consumeProgressList;
             for (String group : groupList) {
-                consumeProgressList = cockpitConsumeProgressNSService.queryConsumerProgress(defaultMQAdminExt, group, null, null);
+                consumeProgressList = cockpitConsumeProgressService.queryConsumerProgress(group, null, null);
                 for (ConsumeProgress cp : consumeProgressList) {
                     if (null == cp || null == cp.getTopic() || null == cp.getBrokerName()) {
                         logger.info("[MONITOR][CONSUME-PROGRESS] this group has no progress" + group);

@@ -17,7 +17,11 @@ public class Broker {
 
     private int dc;
 
-    private Date lastUpdateTime;
+    private Date createTime;
+
+    private Date updateTime;
+
+    private Date syncTime;
 
     public long getId() {
         return id;
@@ -75,12 +79,28 @@ public class Broker {
         this.dc = dc;
     }
 
-    public Date getLastUpdateTime() {
-        return lastUpdateTime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setLastUpdateTime(Date lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public Date getSyncTime() {
+        return syncTime;
+    }
+
+    public void setSyncTime(Date syncTime) {
+        this.syncTime = syncTime;
     }
 
     @Override

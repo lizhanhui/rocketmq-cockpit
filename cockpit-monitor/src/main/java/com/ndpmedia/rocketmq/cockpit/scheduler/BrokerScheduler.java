@@ -1,43 +1,59 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
+import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.protocol.body.ClusterInfo;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
+import com.google.common.base.Preconditions;
 import com.ndpmedia.rocketmq.cockpit.model.Broker;
+import com.ndpmedia.rocketmq.cockpit.model.Level;
+import com.ndpmedia.rocketmq.cockpit.model.Status;
+import com.ndpmedia.rocketmq.cockpit.model.Warning;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
+import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 @Component
 public class BrokerScheduler {
-    private Logger logger = LoggerFactory.getLogger(BrokerScheduler.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrokerScheduler.class);
 
     @Autowired
     private BrokerMapper brokerMapper;
 
     /**
-     * Check broker status every 30 minutes.
+     * Check broker status every 5 minutes.
      */
-    @Scheduled(fixedRate = 1800000)
-    public void checkBrokerStatus() {
-        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(Long.toString(System.currentTimeMillis()) + "brokerScheduler");
-        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+    @Scheduled(fixedRate = 300000)
+    public void synchronizeBrokers() {
+        DefaultMQAdminExt defaultMQAdminExt = null;
+        defaultMQAdminExt = new DefaultMQAdminExt(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
+        } catch (MQClientException e) {
+            LOGGER.warn("Failed to start defaultMQAdminExt", e);
+            return;
+        }
+
+        try {
             ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
 
-            Map<String, Set<String>> clusterAddrTable = clusterInfo.getClusterAddrTable();
-            Map<String, BrokerData> brokerDataMap = clusterInfo.getBrokerAddrTable();
+            Map<String /* Cluster */, Set<String> /* Broker Name */> clusterBrokerTable =
+                    clusterInfo.getClusterAddrTable();
+            Map<String /* Broker Name */, BrokerData> brokerDataMap = clusterInfo.getBrokerAddrTable();
 
-            if (null != clusterAddrTable && !clusterAddrTable.isEmpty()) {
-                for (Map.Entry<String, Set<String>> entry : clusterInfo.getClusterAddrTable().entrySet()) {
+            if (null != clusterBrokerTable && !clusterBrokerTable.isEmpty()) {
+                for (Map.Entry<String, Set<String>> entry : clusterBrokerTable.entrySet()) {
                     String clusterName = entry.getKey();
                     TreeSet<String> brokerNameSet = new TreeSet<String>();
                     brokerNameSet.addAll(entry.getValue());
@@ -49,13 +65,16 @@ public class BrokerScheduler {
                                 Broker broker = new Broker();
                                 broker.setClusterName(clusterName);
                                 broker.setBrokerName(brokerName);
+                                broker.setDc(parseDC(brokerName));
                                 broker.setBrokerId(brokerEntry.getKey().intValue());
                                 broker.setAddress(brokerEntry.getValue());
-
+                                broker.setCreateTime(new Date());
+                                broker.setUpdateTime(new Date());
+                                broker.setSyncTime(new Date());
                                 if (!brokerMapper.exists(broker)) {
                                     brokerMapper.insert(broker);
                                 } else {
-                                    brokerMapper.refresh(broker);
+                                    brokerMapper.refresh(broker.getId(), broker.getAddress());
                                 }
                             }
 
@@ -65,9 +84,40 @@ public class BrokerScheduler {
             }
 
         } catch (Throwable e) {
-            logger.warn(e.toString());
+            LOGGER.warn("Failed to update broker status", e);
         } finally {
             defaultMQAdminExt.shutdown();
+        }
+
+        warnDeprecatedBrokers();
+    }
+
+    /**
+     * A sample broker name is: DefaultCluster_1_broker1.
+     *
+     * @param brokerName Broker name.
+     * @return DC inferred from broker name.
+     */
+    private int parseDC(String brokerName) {
+        Preconditions.checkNotNull(brokerName);
+        Preconditions.checkArgument(!brokerName.trim().isEmpty());
+
+        String[] segments = brokerName.split("_");
+        if (segments.length < 3) {
+            LOGGER.warn("Broker Name is not normalized. If it's developing environment, please ignore this warning; otherwise, please contact admin to fix this issue");
+            return 100;
+        }
+        return Integer.parseInt(segments[1]);
+    }
+
+    private void warnDeprecatedBrokers() {
+        List<Broker> deprecatedBrokers = brokerMapper.queryDeprecatedBrokers(null, 0);
+        for (Broker broker : deprecatedBrokers) {
+            Warning warning = new Warning();
+            warning.setCreateTime(new Date());
+            warning.setLevel(Level.CRITICAL);
+            warning.setStatus(Status.ACTIVE);
+            warning.setMsg("Broker is not responding in the last 10 min: " + broker);
         }
     }
 }

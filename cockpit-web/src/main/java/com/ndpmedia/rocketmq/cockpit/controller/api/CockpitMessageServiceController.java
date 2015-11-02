@@ -44,13 +44,7 @@ public class CockpitMessageServiceController {
             defaultMQAdminExt.start();
             MessageExt messageExt = defaultMQAdminExt.viewMessage(id);
             return MessageTranslate.translateFrom(messageExt);
-        } catch (MQClientException e) {
-            logger.warn("[CockpitMessageServiceController] try to get message by id failed." + e);
-        } catch (InterruptedException e) {
-            logger.warn("[CockpitMessageServiceController] try to get message by id failed." + e);
-        } catch (RemotingException e) {
-            logger.warn("[CockpitMessageServiceController] try to get message by id failed." + e);
-        } catch (MQBrokerException e) {
+        } catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
             logger.warn("[CockpitMessageServiceController] try to get message by id failed." + e);
         } finally {
             defaultMQAdminExt.shutdown();
@@ -135,13 +129,7 @@ public class CockpitMessageServiceController {
             defaultMQAdminExt.start();
             return defaultMQAdminExt.queryTopicConsumeByWho(topic).getGroupList();
 
-        } catch (MQClientException e) {
-            logger.warn("[CockpitMessageServiceController] try to get consumer connection failed." + e);
-        } catch (InterruptedException e) {
-            logger.warn("[CockpitMessageServiceController] try to get consumer connection failed." + e);
-        } catch (RemotingException e) {
-            logger.warn("[CockpitMessageServiceController] try to get consumer connection failed." + e);
-        } catch (MQBrokerException e) {
+        } catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
             logger.warn("[CockpitMessageServiceController] try to get consumer connection failed." + e);
         } finally {
             defaultMQAdminExt.shutdown();
@@ -157,13 +145,7 @@ public class CockpitMessageServiceController {
         try {
             defaultMQAdminExt.start();
             return defaultMQAdminExt.consumeMessageDirectly(consumerGroup, client, msgId).toString();
-        } catch (MQClientException e) {
-            logger.warn("[CockpitMessageServiceController] try to resend message failed." + e);
-        } catch (InterruptedException e) {
-            logger.warn("[CockpitMessageServiceController] try to resend message failed." + e);
-        } catch (RemotingException e) {
-            logger.warn("[CockpitMessageServiceController] try to resend message failed." + e);
-        } catch (MQBrokerException e) {
+        } catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
             logger.warn("[CockpitMessageServiceController] try to resend message failed." + e);
         } finally {
             defaultMQAdminExt.shutdown();

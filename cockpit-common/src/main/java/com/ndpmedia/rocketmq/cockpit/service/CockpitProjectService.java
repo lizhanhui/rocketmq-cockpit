@@ -1,9 +1,10 @@
 package com.ndpmedia.rocketmq.cockpit.service;
 
+import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 
 import java.util.List;
-import java.util.Set;
 
 public interface CockpitProjectService {
 
@@ -15,14 +16,9 @@ public interface CockpitProjectService {
      */
     void insert(Project project);
 
-    /**
-     * add project and consumer group ref
-     * add project and topic ref
-     * @param project   project name
-     * @param consumerGroup consumer group name
-     * @param topic topic name
-     */
-    void addRef(String project, String consumerGroup, String topic);
+    void addTopic(long projectId, long topicId);
+
+    void addConsumerGroup(long projectId, long consumerGroupId);
 
     /**
      * del project from database
@@ -33,13 +29,12 @@ public interface CockpitProjectService {
     /**
      * get project by id or name
      * @param projectId id
-     * @param projectName   name
      * @return  project
      */
-    Project get(long projectId, String projectName);
+    Project get(long projectId);
 
-    List<String> getConsumerGroups(String projectName);
+    List<ConsumerGroup> getConsumerGroups(long projectId);
 
-    List<String> getTopics(String projectName);
+    List<TopicMetadata> getTopics(long projectId);
 
 }

@@ -1,7 +1,11 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
+import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ProjectMapper;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +18,16 @@ import java.util.List;
 @Service("cockpitProjectService")
 public class CockpitProjectServiceImpl implements CockpitProjectService {
 
-    private Logger logger = LoggerFactory.getLogger(CockpitProjectServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CockpitProjectServiceImpl.class);
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private ConsumerGroupMapper consumerGroupMapper;
+
+    @Autowired
+    private TopicMapper topicMapper;
 
     @Override
     public List<Project> list(long teamId) {
@@ -30,35 +40,35 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
     }
 
     @Override
-    public void addRef(String project, String consumerGroup, String topic) {
-        if (null != consumerGroup && !consumerGroup.isEmpty() && !consumerGroup.equals("$EMPTY$"))
-            projectMapper.createRefC(project, consumerGroup);
-        if (null != topic && !topic.isEmpty() && !topic.equals("$EMPTY$"))
-            projectMapper.createRefT(project, topic);
+    public void addTopic(long projectId, long topicId) {
+        topicMapper.connectProject(projectId, topicId);
+    }
+
+    @Override
+    public void addConsumerGroup(long projectId, long consumerGroupId) {
+        consumerGroupMapper.connectProject(projectId, consumerGroupId);
     }
 
     @Transactional
     @Override
     public void remove(long projectId) {
-        Project project = projectMapper.get(projectId, null);
-        //TODO we use ID to build the reference
+        topicMapper.disconnectProject(0, projectId);
+        consumerGroupMapper.disconnectProject(0, projectId);
         projectMapper.delete(projectId);
-        projectMapper.deleteC(project.getName());
-        projectMapper.deleteT(project.getName());
     }
 
     @Override
-    public Project get(long projectId, String projectName) {
-        return projectMapper.get(projectId, projectName);
+    public Project get(long projectId) {
+        return projectMapper.get(projectId);
     }
 
     @Override
-    public List<String> getConsumerGroups(String projectName) {
-        return projectMapper.listC(projectName);
+    public List<ConsumerGroup> getConsumerGroups(long projectId) {
+        return consumerGroupMapper.list(projectId, null, null, 0, null);
     }
 
     @Override
-    public List<String> getTopics(String projectName) {
-        return projectMapper.listT(projectName);
+    public List<TopicMetadata> getTopics(long projectId) {
+        return topicMapper.list(projectId, null, null);
     }
 }

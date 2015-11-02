@@ -9,7 +9,7 @@
         <version>3.2.2.R2</version>
     </parent>
     <artifactId>cockpit-monitor</artifactId>
-    <name>${artifactId} ${project.version}</name>
+    <name>${project.artifactId} ${project.version}</name>
 
     <dependencies>
 
@@ -37,6 +37,21 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
     </dependencies>
 

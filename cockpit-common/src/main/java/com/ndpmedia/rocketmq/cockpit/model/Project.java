@@ -1,6 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.model;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Project {
 
@@ -9,7 +10,9 @@ public class Project {
     private String description;
     private long teamId;
 
-    private Set<Long> topicIds;
+    private List<TopicMetadata> topics = new ArrayList<>();
+
+    private List<ConsumerGroup> consumerGroups = new ArrayList<>();
 
     public long getId() {
         return id;
@@ -43,11 +46,19 @@ public class Project {
         this.teamId = teamId;
     }
 
-    public Set<Long> getTopicIds() {
-        return topicIds;
+    public List<TopicMetadata> getTopics() {
+        return topics;
     }
 
-    public void setTopicIds(Set<Long> topicIds) {
-        this.topicIds = topicIds;
+    public void setTopics(List<TopicMetadata> topics) {
+        this.topics = topics;
+    }
+
+    public List<ConsumerGroup> getConsumerGroups() {
+        return consumerGroups;
+    }
+
+    public void setConsumerGroups(List<ConsumerGroup> consumerGroups) {
+        this.consumerGroups = consumerGroups;
     }
 }

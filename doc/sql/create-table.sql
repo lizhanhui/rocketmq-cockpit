@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS cockpit CHARACTER SET 'UTF8';
+CREATE DATABASE IF NOT EXISTS cockpit2 CHARACTER SET 'UTF8';
 
-USE cockpit;
+USE cockpit2;
 
 CREATE TABLE IF NOT EXISTS name_server (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -33,7 +33,9 @@ CREATE TABLE IF NOT EXISTS broker (
   address VARCHAR(255) NOT NULL,
   version VARCHAR(100) DEFAULT '3.2.2',
   dc INT NOT NULL REFERENCES data_center(id),
-  last_update_time TIMESTAMP NOT NULL,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT 0,
+  sync_time TIMESTAMP,
   CONSTRAINT uniq_cluster_name_id UNIQUE (cluster_name, broker_name, broker_id)
 ) ENGINE = INNODB;
 
@@ -41,23 +43,22 @@ CREATE TABLE IF NOT EXISTS topic (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   topic VARCHAR(255) NOT NULL,
   cluster_name VARCHAR(100) NOT NULL DEFAULT 'DefaultCluster',
+  `order` BOOL DEFAULT FALSE,
+  status INT NOT NULL DEFAULT 1,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT 0
+) ENGINE = INNODB;
+
+CREATE TABLE topic_broker_xref (
+  broker_id INT NOT NULL REFERENCES broker(id),
+  topic_id INT NOT NULL REFERENCES topic(id),
   permission TINYINT NOT NULL DEFAULT 6,
   write_queue_num INT NOT NULL DEFAULT 4,
   read_queue_num INT NOT NULL DEFAULT 4,
-  unit BOOL NOT NULL DEFAULT FALSE ,
-  has_unit_subscription BOOL NOT NULL DEFAULT FALSE ,
-  broker_address VARCHAR(255),
-  order_type BOOL DEFAULT FALSE,
   status_id INT NOT NULL DEFAULT 1 REFERENCES status_lu(id) ON DELETE RESTRICT ,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time TIMESTAMP NOT NULL DEFAULT 0
--- update_time TIMESTAMP NOT NULL DEFAULT 0 ON UPDATE CURRENT_TIMESTAMP
-) ENGINE = INNODB;
-
-CREATE TABLE broker_topic_xref (
-  broker_id INT NOT NULL REFERENCES broker(id),
-  topic_id INT NOT NULL REFERENCES topic(id),
-  status INT NOT NULL REFERENCES status_lu(id),
+  update_time TIMESTAMP NOT NULL DEFAULT 0,
+  sync_time TIMESTAMP NOT NULL DEFAULT  0,
   CONSTRAINT uniq_broker_topic UNIQUE (broker_id, topic_id)
 ) ENGINE = INNODB;
 
@@ -72,11 +73,10 @@ CREATE TABLE IF NOT EXISTS consumer_group (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   cluster_name VARCHAR(255) NOT NULL DEFAULT 'DefaultCluster',
   which_broker_when_consume_slowly INT NOT NULL DEFAULT 1,
+  consume_from_broker_id INT NOT NULL DEFAULT 0,
   group_name VARCHAR(255) NOT NULL,
   consume_enable BOOL NOT NULL DEFAULT TRUE ,
   consume_broadcast_enable BOOL NOT NULL DEFAULT FALSE,
-  broker_address VARCHAR(255),
-  broker_id INT,
   retry_max_times INT NOT NULL DEFAULT 3,
   retry_queue_num MEDIUMINT NOT NULL DEFAULT 3,
   consume_from_min_enable BOOL NOT NULL DEFAULT TRUE,
@@ -88,10 +88,20 @@ CREATE TABLE IF NOT EXISTS consumer_group (
   update_time TIMESTAMP NOT NULL DEFAULT 0
 ) ENGINE = INNODB;
 
+CREATE TABLE IF NOT EXISTS topic_consumer_group_xref (
+  topic_id INT NOT NULL REFERENCES topic(id),
+  consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT 0,
+  CONSTRAINT uniq_topic_consumer_group UNIQUE (topic_id, consumer_group_id)
+) ENGINE = INNODB;
+
 CREATE TABLE IF NOT EXISTS broker_consumer_group_xref (
   broker_id INT NOT NULL REFERENCES broker(id),
   consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
-  status SMALLINT NOT NULL REFERENCES status_lu(id),
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT 0,
+  sync_time TIMESTAMP NOT NULL DEFAULT 0,
   CONSTRAINT uniq_broker_consumer_group UNIQUE (broker_id, consumer_group_id)
 );
 
@@ -148,15 +158,15 @@ CREATE TABLE IF NOT EXISTS project (
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS project_topic_xref (
-  project_name VARCHAR(255) NOT NULL REFERENCES project(name),
-  topic_name VARCHAR(255) NOT NULL REFERENCES topic(topic),
-  CONSTRAINT uniq_project_topic UNIQUE (project_name, topic_name)
+  project_id VARCHAR(255) NOT NULL REFERENCES project(id),
+  topic_id VARCHAR(255) NOT NULL REFERENCES topic(id),
+  CONSTRAINT uniq_project_topic UNIQUE (project_id, topic_id)
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS project_consumer_group_xref (
-  project_name VARCHAR(255) NOT NULL REFERENCES project(name),
-  consumer_group_name VARCHAR(255) NOT NULL REFERENCES consumer_group(group_name),
-  CONSTRAINT uniq_project_consumer_group UNIQUE (project_name, consumer_group_name)
+  project_id VARCHAR(255) NOT NULL REFERENCES project(id),
+  consumer_group_id VARCHAR(255) NOT NULL REFERENCES consumer_group(id),
+  CONSTRAINT uniq_project_consumer_group UNIQUE (project_id, consumer_group_id)
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS cockpit_user (
@@ -221,7 +231,56 @@ CREATE TABLE IF NOT EXISTS login (
   token CHAR(32) NOT NULL
 ) ENGINE = INNODB;
 
+
+-- Statistics
+
+CREATE TABLE IF NOT EXISTS topic_stat (
+  topic_id INT NOT NULL REFERENCES topic(id),
+  broker_id INT NOT NULL REFERENCES broker(id),
+  in_tps FLOAT NOT NULL DEFAULT 0,
+  out_tps FLOAT NOT NULL DEFAULT 0,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS broker_stat (
+  broker_id INT NOT NULL REFERENCES broker(id),
+  in_tps FLOAT NOT NULL DEFAULT 0,
+  out_tps FLOAT NOT NULL DEFAULT 0,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS warn_level_lu (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  info VARCHAR(255)
+) ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS warning (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  msg MEDIUMTEXT NOT NULL ,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  status INT NOT NULL REFERENCES status_lu(id),
+  level INT NOT NULL REFERENCES warn_level_lu(id)
+) ENGINE = INNODB;
+
+
+CREATE TABLE resource_type_lu (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL
+) ENGINE = INNODB;
+
+CREATE TABLE resource_permission(
+  resource_id INT NOT NULL,
+  team_id INT NOT NULL REFERENCES team(id),
+  resource_type_id INT REFERENCES resource_type_lu(id)
+) ENGINE = INNODB;
+
 CREATE INDEX idx_token ON login(token) USING HASH;
 
+ALTER TABLE topic ADD CONSTRAINT uniq_cluster_topic UNIQUE(cluster_name, topic);
 
+ALTER TABLE consumer_group ADD CONSTRAINT  uniq_cluster_consumer_group UNIQUE (cluster_name, group_name);
 
+ALTER TABLE broker ADD CONSTRAINT  uniq_cluster_broker_name_broker_id UNIQUE (cluster_name, broker_name, broker_id);
+
+ALTER TABLE resource_permission ADD CONSTRAINT uniq_resource_id_type_team UNIQUE (resource_id, resource_type_id, team_id);

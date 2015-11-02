@@ -1,35 +1,50 @@
 package com.ndpmedia.rocketmq.cockpit.mybatis.mapper;
 
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
+import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ConsumerGroupMapper {
 
-    List<ConsumerGroup> list(@Param("teamId") long teamId,
+    List<ConsumerGroup> list(@Param("projectId") long projectId,
                              @Param("clusterName") String clusterName,
-                             @Param("consumerGroupName") String consumerGroupName);
+                             @Param("consumerGroupName") String consumerGroupName,
+                             @Param("brokerId") long brokerId,
+                             @Param("brokerAddress") String brokerAddress);
 
-    ConsumerGroup get(@Param("id") long id,
-                      @Param("groupName") String groupName,
-                      @Param("clusterName") String clusterName,
-                      @Param("broker") String broker);
+    List<ConsumerGroup> listByTopic(@Param("topicId")long topicId);
 
-    ConsumerGroup getBase(String name);
+    List<ConsumerGroup> listByProject(@Param("projectId") long projectId);
+
+    ConsumerGroup get(@Param("id") long id);
+
+    ConsumerGroup getByName(@Param("groupName") String groupName);
+
+    void refresh(@Param("brokerId")long brokerId,
+                 @Param("consumerGroupId")long consumerGroupId);
 
     long insert(ConsumerGroup consumerGroup);
 
     void update(ConsumerGroup consumerGroup);
 
-    void register(long id);
-
     void delete(long id);
 
-    void deleteConsumerGroupTeamAssociation(@Param(value = "consumerGroupId") long consumerGroupId,
-                                            @Param(value = "teamId") long teamId);
+    List<ConsumerGroupHosting> queryHosting(@Param("consumerGroupId") long consumerGroupId,
+                                            @Param("statuses") int[] status,
+                                            @Param("brokerId") Integer brokerId,
+                                            @Param("dcId") long dcId,
+                                            @Param("syncTimeDeadline") Date syncTimeDeadline);
 
-    void associateTeam(@Param(value = "consumerGroupId") long consumerGroupId,
-                       @Param(value = "teamId") long teamId);
+    void disconnectProject(@Param(value = "consumerGroupId") long consumerGroupId,
+                           @Param(value = "projectId") long projectId);
+
+    void connectProject(@Param(value = "consumerGroupId") long consumerGroupId,
+                        @Param(value = "projectId") long projectId);
+
+
+    List<ConsumerGroupHosting> queryEndangeredHosting(@Param("brokerId") long brokerId);
 
 }

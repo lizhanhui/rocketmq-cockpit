@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TeamMapper">
 
-    <insert id="insert" parameterType="Team" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.Team" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO team(id, name)
         VALUES (NULL, #{name})
     </insert>
@@ -14,7 +14,7 @@
                 WHERE NOT EXISTS(SELECT * FROM team_user_xref WHERE team_id = #{teamId} AND user_id = #{memberId})
     </insert>
 
-    <update id="update" parameterType="Team">
+    <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.Team">
         UPDATE team SET name = #{name}
         WHERE id = #{id}
     </update>
@@ -24,43 +24,54 @@
         WHERE id = #{id}
     </delete>
 
-    <select id="get" resultType="Team" parameterType="long">
+    <select id="get" resultType="com.ndpmedia.rocketmq.cockpit.model.Team" parameterType="long">
         SELECT id, name
         FROM team
         WHERE id = #{id}
     </select>
 
-    <select id="getByName" resultType="Team" parameterType="string">
+    <select id="getByName" resultType="com.ndpmedia.rocketmq.cockpit.model.Team" parameterType="string">
         SELECT id, name
         FROM team
         WHERE name = #{name}
     </select>
 
-    <select id="list" resultType="Team">
+    <select id="list" resultType="com.ndpmedia.rocketmq.cockpit.model.Team">
         SELECT id, name
         FROM team
-        WHERE 1 = 1
-        AND id > 0
     </select>
 
-    <select id="getCockpitUsersByTeamId" resultType="CockpitUser" parameterType="long">
-        SELECT u.id AS uid, u.role, u.username, u.password
+    <resultMap id="cockpitUserResultMap" type="com.ndpmedia.rocketmq.cockpit.model.CockpitUser">
+        <id column="uid" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <collection property="cockpitRoles" column="uid" select="selectRoles" />
+    </resultMap>
+
+    <select id="selectRoles" resultType="com.ndpmedia.rocketmq.cockpit.model.CockpitRole">
+        SELECT role.id, role.name
+        FROM cockpit_role AS role
+        JOIN cockpit_user_role_xref AS xref ON role.id = xref.role_id
+        WHERE xref.user_id = #{id}
+    </select>
+
+    <select id="getCockpitUsersByTeamId" resultMap="cockpitUserResultMap" parameterType="long">
+        SELECT u.id AS uid, u.username, u.password
         FROM cockpit_user AS u
             JOIN team_user_xref AS xref ON u.id = xref.user_id
-        WHERE xref.team_id = #{id}
+        WHERE xref.team_id = #{uid}
     </select>
 
-    <resultMap id="teamMap" type="Team">
+    <resultMap id="teamMap" type="com.ndpmedia.rocketmq.cockpit.model.Team">
         <id column="id" property="id" />
         <result column="name" property="name" />
-        <collection property="cockpitUsers" ofType="CockpitUser" select="getCockpitUsersByTeamId" column="id" />
+        <collection property="cockpitUsers" ofType="com.ndpmedia.rocketmq.cockpit.model.CockpitUser" select="getCockpitUsersByTeamId" column="id" />
     </resultMap>
 
     <select id="getTeamAndMembersByTeamId" resultMap="teamMap" parameterType="long">
         SELECT id, name
         FROM team
         WHERE id = #{id}
-
     </select>
 
     <select id="getTeamAndMembersByTeamName" resultMap="teamMap" parameterType="string">
@@ -68,4 +79,13 @@
         FROM team
         WHERE name = #{name}
     </select>
+
+    <select id="hasAccess" resultType="java.lang.Boolean">
+        SELECT COUNT(1) > 0
+        FROM resource_permission
+        WHERE resource_id = #{resourceId}
+        AND team_id = #{teamId}
+        AND resource_type_id = #{resourceType.ordinal}
+    </select>
+
 </mapper>

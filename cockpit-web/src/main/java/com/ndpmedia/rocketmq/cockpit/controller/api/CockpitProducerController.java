@@ -39,18 +39,9 @@ public class CockpitProducerController {
             SendResult sendResult = producer.send(msg);
             return sendResult.toString();
         }
-        catch (MQClientException e) {
+        catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
             logger.warn("[CockpitProducerController]try to send message failed." + e);
-        }
-        catch (InterruptedException e) {
-            logger.warn("[CockpitProducerController]try to send message failed." + e);
-        }
-        catch (RemotingException e) {
-            logger.warn("[CockpitProducerController]try to send message failed." + e);
-        }
-        catch (MQBrokerException e) {
-            logger.warn("[CockpitProducerController]try to send message failed." + e);
-        }finally {
+        } finally {
             producer.shutdown();
         }
 

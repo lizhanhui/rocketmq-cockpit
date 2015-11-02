@@ -2,29 +2,40 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper">
 
-    <insert id="insert" parameterType="Broker" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
-        INSERT INTO broker(cluster_name, broker_name, broker_id, address, version, dc, last_update_time)
-        VALUES (#{clusterName}, #{brokerName}, #{brokerId}, #{address}, #{version}, #{dc}, CURRENT_TIMESTAMP)
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO broker(cluster_name, broker_name, broker_id, address, version, dc, create_time, update_time, sync_time)
+        VALUES (#{clusterName}, #{brokerName}, #{brokerId}, #{address}, #{version}, #{dc}, #{createTime}, #{updateTime}, #{syncTime})
     </insert>
 
-    <update id="refresh" parameterType="Broker">
+    <insert id="createConsumerGroup">
+        INSERT INTO broker_consumer_group_xref(broker_id, consumer_group_id, create_time, update_time, sync_time)
+        VALUES (#{brokerId}, #{consumerGroupId}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    </insert>
+
+    <update id="refresh" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         UPDATE broker
-        SET last_update_time = CURRENT_TIMESTAMP
-        WHERE cluster_name = #{clusterName} AND
-        broker_name = #{brokerName} AND
-        broker_id = #{brokerId}
+        SET sync_time = CURRENT_TIMESTAMP
+        WHERE 1 = 1
+
+        <if test="brokerAddress != null">
+          AND address = #{brokerAddress}
+        </if>
+
+        <if test="id > 0">
+            AND id = #{id}
+        </if>
     </update>
 
-    <select id="exists" resultType="java.lang.Boolean" parameterType="Broker">
+    <select id="exists" resultType="java.lang.Boolean" parameterType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         SELECT count(1) > 0 FROM broker
         WHERE cluster_name = #{clusterName} AND
               broker_name = #{brokerName} AND
               broker_id = #{brokerId}
     </select>
 
-    <select id="list" resultType="Broker">
+    <select id="list" resultType="com.ndpmedia.rocketmq.cockpit.model.Broker">
         SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
-        address, version, dc, last_update_time AS lastUpdateTime
+        address, version, dc, update_time AS updateTime
         FROM broker
         WHERE 1 = 1
         <if test="clusterName != null">
@@ -43,11 +54,80 @@
             AND dc = #{dc}
         </if>
 
-        <if test="lastUpdateTime != null">
+        <if test="syncTimeDeadline != null">
          <![CDATA[
-            AND last_update_time >= #{lastUpdateTime}
+            AND sync_time >= #{syncTimeDeadline}
          ]]>
         </if>
     </select>
 
+    <select id="queryBrokerLoad" resultType="com.ndpmedia.rocketmq.cockpit.model.BrokerLoad">
+        SELECT b.dc AS dcId
+             , b.id AS brokerId
+             , IFNULL(SUM(tbx.read_queue_num ), 0) AS readQueueNum
+             , IFNULL(SUM(tbx.write_queue_num), 0) AS writeQueueNum
+        FROM broker AS b
+            LEFT JOIN topic_broker_xref AS tbx ON b.id = tbx.broker_id
+            LEFT JOIN topic AS t ON tbx.topic_id = t.id
+        WHERE 1 = 1
+        <if test="dcId > 0">
+            AND b.dc = #{dcId}
+        </if>
+
+        <if test="brokerId != null">
+            AND b.broker_id = #{brokerId}
+        </if>
+
+        GROUP BY b.dc, b.id
+        ORDER BY write_queue_num, read_queue_num ASC
+    </select>
+
+    <select id="hasConsumerGroup" resultType="java.lang.Boolean">
+        SELECT COUNT(1) > 0
+        FROM broker_consumer_group_xref AS xref
+        WHERE xref.broker_id = #{brokerId}
+        AND xref.consumer_group_id = #{consumerGroupId}
+    </select>
+
+    <select id="get" resultType="com.ndpmedia.rocketmq.cockpit.model.Broker">
+        SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
+            address, version, dc, update_time AS updateTime, sync_time AS syncTime
+        FROM broker
+        WHERE id = #{id}
+    </select>
+
+    <select id="hasTopic" resultType="java.lang.Boolean">
+        SELECT COUNT(1) > 0
+        FROM topic_broker_xref
+        WHERE broker_id = #{brokerId}
+        AND topic_id = #{topicId}
+    </select>
+
+    <select id="getBrokerByAddress" resultType="com.ndpmedia.rocketmq.cockpit.model.Broker">
+        SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
+        address, version, dc, update_time AS updateTime, sync_time AS syncTime
+        FROM broker
+        WHERE 1 = 1
+        <if test="address != null">
+            AND address = #{address}
+        </if>
+    </select>
+
+    <select id="queryDeprecatedBrokers" resultType="com.ndpmedia.rocketmq.cockpit.model.Broker">
+        SELECT id, cluster_name AS clusterName, broker_name AS brokerName, broker_id AS brokerId,
+            address, version, dc, update_time AS updateTime, sync_time AS syncTime
+        FROM broker
+        WHERE 1 = 1
+        <if test="clusterName != null">
+            AND cluster_name = #{clusterName}
+        </if>
+
+        <if test="dc > 0">
+            AND dc = #{dc}
+        </if>
+
+        <![CDATA[
+            AND sync_time < CURRENT_TIMESTAMP - INTERVAL 600 SECOND
+        ]]>
+    </select>
 </mapper>

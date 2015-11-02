@@ -38,15 +38,18 @@ public class CockpitRole {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CockpitRole)) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof CockpitRole))  {
+            return false;
+        }
 
         CockpitRole that = (CockpitRole) o;
 
-        if (id != that.id) return false;
-        if (!name.equals(that.name)) return false;
+        return id == that.id && name.equals(that.name);
 
-        return true;
     }
 
     @Override

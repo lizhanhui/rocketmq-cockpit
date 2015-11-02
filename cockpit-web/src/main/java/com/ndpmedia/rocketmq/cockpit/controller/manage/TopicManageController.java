@@ -1,7 +1,8 @@
 package com.ndpmedia.rocketmq.cockpit.controller.manage;
 
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicNSService;
+import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,18 +15,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class TopicManageController {
 
     @Autowired
-    private CockpitTopicNSService cockpitTopicNSService;
+    private CockpitTopicMQService cockpitTopicMQService;
 
     @RequestMapping(method = {RequestMethod.POST, RequestMethod.PUT})
     @ResponseBody
-    public boolean update(@RequestBody Topic topic) {
-        return cockpitTopicNSService.createOrUpdateTopic(topic);
+    public boolean update(@RequestBody TopicMetadata topicMetadata) throws CockpitException {
+        return cockpitTopicMQService.createOrUpdateTopic(null, topicMetadata);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseBody
-    public boolean delete(@RequestBody Topic topic) {
-        return cockpitTopicNSService.deleteTopic(topic);
+    public boolean delete(@RequestBody TopicMetadata topicMetadata) throws CockpitException {
+        return cockpitTopicMQService.deleteTopic(null, topicMetadata);
     }
 
 }

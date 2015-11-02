@@ -35,7 +35,6 @@ public class TopicTranslate {
      */
     public static Topic translateFrom(TopicConfig topicConfig, String cluster, String broker){
         Topic topic = new Topic();
-        topic.setBrokerAddress(broker);
         topic.setClusterName(cluster);
         topic.setCreateTime(new Date());
         topic.setOrder(topicConfig.isOrder());
@@ -44,6 +43,7 @@ public class TopicTranslate {
         topic.setWriteQueueNum(topicConfig.getWriteQueueNums());
         topic.setStatus(Status.ACTIVE);
         topic.setTopic(topicConfig.getTopicName());
+
         topic.setUpdateTime(new Date());
 
         return topic;

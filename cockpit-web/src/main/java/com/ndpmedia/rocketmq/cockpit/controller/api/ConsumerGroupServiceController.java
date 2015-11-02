@@ -2,11 +2,13 @@ package com.ndpmedia.rocketmq.cockpit.controller.api;
 
 import com.alibaba.rocketmq.common.protocol.body.Connection;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
+import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
+import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +32,12 @@ public class ConsumerGroupServiceController {
     private ConsumerGroupMapper consumerGroupMapper;
 
     @Autowired
-    private CockpitConsumerGroupService cockpitConsumerGroupService;
+    private CockpitConsumerGroupDBService cockpitConsumerGroupDBService;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> list(HttpServletRequest request) {
-        List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(getTeamId(request), null, null);
+        List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(getProjectId(request), null, null, 0, null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", consumerGroups.size());
@@ -47,21 +49,21 @@ public class ConsumerGroupServiceController {
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ConsumerGroup get(@PathVariable("id") long id) {
-        return consumerGroupMapper.get(id, null, null, null);
+        return consumerGroupMapper.get(id);
     }
 
     @RequestMapping(value = "/cluster-name/{clusterName}", method = RequestMethod.GET)
     @ResponseBody
     public List<ConsumerGroup> listByClusterName(@PathVariable("clusterName") String clusterName,
                                                  HttpServletRequest request) {
-        return consumerGroupMapper.list(getTeamId(request), clusterName, null);
+        return consumerGroupMapper.list(getProjectId(request), clusterName, null, 0, null);
     }
 
     @RequestMapping(value = "/consumer-group-name/{consumerGroupName}", method = RequestMethod.GET)
     @ResponseBody
     public ConsumerGroup getByConsumerGroupName(@PathVariable("consumerGroupName") String consumerGroupName,
                                                 HttpServletRequest request) {
-        List<ConsumerGroup> groups = consumerGroupMapper.list(getTeamId(request), null, consumerGroupName);
+        List<ConsumerGroup> groups = consumerGroupMapper.list(getProjectId(request), null, consumerGroupName, 0, null);
         if (groups.isEmpty())
             return new ConsumerGroup();
         return groups.get(0);
@@ -69,10 +71,8 @@ public class ConsumerGroupServiceController {
 
     @RequestMapping(method = RequestMethod.PUT)
     @ResponseBody
-    public ConsumerGroup add(@RequestBody ConsumerGroup consumerGroup, HttpServletRequest request) {
-        CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-        long teamId = cockpitUser.getTeam().getId();
-        cockpitConsumerGroupService.insert(consumerGroup, teamId);
+    public ConsumerGroup add(@RequestBody ConsumerGroup consumerGroup, long projectId) {
+        cockpitConsumerGroupDBService.insert(consumerGroup, projectId);
         return consumerGroup;
     }
 
@@ -83,16 +83,10 @@ public class ConsumerGroupServiceController {
         consumerGroupMapper.update(consumerGroup);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    @ResponseBody
-    public void register(@PathVariable("id") long id){
-        consumerGroupMapper.register(id);
-    }
-
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseBody
     public void delete(@PathVariable("id") long id) {
-        cockpitConsumerGroupService.delete(id);
+        cockpitConsumerGroupDBService.delete(id);
     }
 
     @RequestMapping(value = "/client/{consumerGroup}", method = RequestMethod.GET)
@@ -111,9 +105,16 @@ public class ConsumerGroupServiceController {
     }
 
     private long getTeamId(HttpServletRequest request) {
-        CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-        long teamId = cockpitUser.getTeam().getId();
+        long teamId = 0;
+        if (!WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN)) {
+            CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
+            teamId = cockpitUser.getTeam().getId();
+        }
         return teamId;
+    }
+
+    private long getProjectId(HttpServletRequest request) {
+        throw new RuntimeException("Not initialized.");
     }
 
 }

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.LoginMapper">
 
-    <insert id="insert" parameterType="Login" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ndpmedia.rocketmq.cockpit.model.Login" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO login(id, token, login_time, user_id)
         VALUES (NULL, #{token}, #{loginTime}, #{cockpitUser.id})
     </insert>

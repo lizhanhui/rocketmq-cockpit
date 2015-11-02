@@ -9,7 +9,7 @@
         <version>3.2.2.R2</version>
     </parent>
     <artifactId>cockpit-common</artifactId>
-    <name>${artifactId} ${project.version}</name>
+    <name>${project.artifactId} ${project.version}</name>
     <packaging>jar</packaging>
 
     <profiles>
@@ -19,7 +19,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <jdbc.url>jdbc:mysql://localhost:3306/cockpit</jdbc.url>
+                <jdbc.url>jdbc:mysql://172.30.30.4:3306/cockpit_test?zeroDateTimeBehavior=convertToNull</jdbc.url>
                 <jdbc.userName>cockpit</jdbc.userName>
                 <jdbc.password>password</jdbc.password>
             </properties>
@@ -31,9 +31,9 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <jdbc.url>jdbc:mysql://localhost:3306/cockpit?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;transformedBitIsBoolean=true</jdbc.url>
+                <jdbc.url>jdbc:mysql://172.30.30.4:3306/cockpit_test?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull&amp;transformedBitIsBoolean=true</jdbc.url>
                 <jdbc.userName>cockpit</jdbc.userName>
-                <jdbc.password>changeIt</jdbc.password>
+                <jdbc.password>password</jdbc.password>
             </properties>
         </profile>
     </profiles>
@@ -68,6 +68,16 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
 
         <dependency>

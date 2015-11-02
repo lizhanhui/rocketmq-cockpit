@@ -7,16 +7,6 @@
         VALUES (NULL, #{name}, #{description}, #{teamId})
     </insert>
 
-    <insert id="createRefC">
-        INSERT INTO project_consumer_group_xref(project_name, consumer_group_name)
-        VALUES (#{project}, #{consumerGroup})
-    </insert>
-
-    <insert id="createRefT">
-        INSERT INTO project_topic_xref(project_name, topic_name)
-        VALUES (#{project}, #{topic})
-    </insert>
-
     <update id="update" parameterType="com.ndpmedia.rocketmq.cockpit.model.Project">
         UPDATE project
         SET name = #{name}, description = #{description}, team_id = #{teamId}
@@ -29,33 +19,7 @@
         WHERE id = #{id}
     </delete>
 
-    <delete id="deleteC" parameterType="java.lang.String">
-        DELETE
-        FROM project_consumer_group_xref
-        WHERE project_name = #{name}
-    </delete>
-
-    <delete id="deleteT" parameterType="java.lang.String">
-        DELETE
-        FROM project_topic_xref
-        WHERE project_name = #{name}
-    </delete>
-
-    <select id="listC"  parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT consumer_group_name
-        FROM project_consumer_group_xref
-        WHERE project_name = #{name}
-        GROUP BY consumer_group_name
-    </select>
-
-    <select id="listT" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT topic_name
-        FROM project_topic_xref
-        WHERE project_name = #{name}
-        GROUP BY topic_name
-    </select>
-
-    <select id="list" resultType="com.ndpmedia.rocketmq.cockpit.model.Project" parameterType="long">
+    <select id="list" resultMap="projectResultMap" parameterType="long">
         SELECT id, name, description, team_id AS teamId
         FROM project
         WHERE 1 = 1
@@ -64,17 +28,23 @@
         </if>
     </select>
 
-    <select id="get" resultType="com.ndpmedia.rocketmq.cockpit.model.Project">
+    <resultMap id="projectResultMap" type="com.ndpmedia.rocketmq.cockpit.model.Project">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="teamId" property="teamId" />
+        <collection property="topics" column="id"
+                    ofType="com.ndpmedia.rocketmq.cockpit.model.Topic"
+                    select="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper.listByProject" />
+        <collection property="consumerGroups" column="id"
+                    ofType="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup"
+                    select="com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper.listByProject" />
+    </resultMap>
+
+    <select id="get" resultMap="projectResultMap" parameterType="long">
         SELECT id, name, description, team_id AS teamId
-        FROM project
-        WHERE 1 = 1
-        <if test="projectId > 0">
-            AND id = #{projectId}
-        </if>
-        <if test="projectName != null">
-            AND name = #{projectName}
-        </if>
-        LIMIT 1
+        FROM project AS p
+        WHERE id = #{projectId}
     </select>
 
 </mapper>

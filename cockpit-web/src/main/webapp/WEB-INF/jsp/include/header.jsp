@@ -17,7 +17,7 @@
                 <!--
                 <li class="active"><a href="#">Home</a></li>
                 -->
-                <!--
+
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Topic<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
@@ -25,8 +25,7 @@
                             <li><a href="cockpit/topic-progress/">Topic Progress</a> </li>
                         </ul>
                     </li>
-                -->
-                <!--
+
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Consumer Group<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
@@ -34,7 +33,6 @@
                             <li><a href="cockpit/consume-progress/">Consumer Group Progress </a> </li>
                         </ul>
                     </li>
-                -->
                 <li><a href="cockpit/message/">Query Message</a></li>
 
                 <li class="dropdown">
@@ -48,13 +46,13 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
-                        <!--    <li><a href="cockpit/admin/user">Manage User</a></li>   -->
+                            <li><a href="cockpit/admin/user">Manage User</a></li>
                             <li><a href="cockpit/ip/">IP Mapping</a></li>
                             <li class="divider"></li>
                             <li><a href="cockpit/name-server/">Name Server List</a></li>
                             <li><a href="cockpit/name-server/kv">Name Server KV</a></li>
-                        <!--    <li class="divider"></li>                               -->
-                        <!--    <li><a href="console/">Console</a> </li>                -->
+                            <li class="divider"></li>
+                            <li><a href="console/">Console</a> </li>
                         </ul>
                     </li>
             </ul>

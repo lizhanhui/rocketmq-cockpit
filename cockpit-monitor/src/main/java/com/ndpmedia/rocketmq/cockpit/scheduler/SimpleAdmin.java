@@ -3,8 +3,8 @@ package com.ndpmedia.rocketmq.cockpit.scheduler;
 import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.srvutil.ServerUtil;
 import com.alibaba.rocketmq.tools.command.SubCommand;
-import com.ndpmedia.rocketmq.cockpit.scheduler.command.SyncConsumerGroupCommand;
-import com.ndpmedia.rocketmq.cockpit.scheduler.command.SyncTopicCommand;
+import com.ndpmedia.rocketmq.cockpit.scheduler.command.ConsumerGroupSyncUpCommand;
+import com.ndpmedia.rocketmq.cockpit.scheduler.command.TopicSyncUpCommand;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
@@ -12,15 +12,12 @@ import org.apache.commons.cli.PosixParser;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by robert on 2015/5/29.
- */
 public class SimpleAdmin {
     private static List<SubCommand> cmdList = new ArrayList<>();
 
     static{
-        cmdList.add(new SyncTopicCommand());
-        cmdList.add(new SyncConsumerGroupCommand());
+        cmdList.add(new TopicSyncUpCommand());
+        cmdList.add(new ConsumerGroupSyncUpCommand());
     }
 
     public static void main(String[] args){

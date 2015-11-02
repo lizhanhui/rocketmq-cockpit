@@ -21,9 +21,10 @@
         <java_source_version>1.7</java_source_version>
         <java_target_version>1.7</java_target_version>
         <file_encoding>UTF-8</file_encoding>
-
+        <maven.test.skip>true</maven.test.skip>
         <spring.version>3.2.5.RELEASE</spring.version>
-        <cxf.version>3.0.2</cxf.version>
+        <spring.security.version>3.2.5.RELEASE</spring.security.version>
+        <cxf.version>3.1.3</cxf.version>
         <guava.version>18.0</guava.version>
         <rocketmq.version>3.2.2.R3-SNAPSHOT</rocketmq.version>
     </properties>
@@ -89,6 +90,13 @@
 
             <dependency>
                 <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
                 <version>${spring.version}</version>
             </dependency>
@@ -114,13 +122,13 @@
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-web</artifactId>
-                <version>${spring.version}</version>
+                <version>${spring.security.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-config</artifactId>
-                <version>${spring.version}</version>
+                <version>${spring.security.version}</version>
             </dependency>
 
             <dependency>
@@ -204,7 +212,7 @@
             <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis-spring</artifactId>
-                <version>1.2.1</version>
+                <version>1.2.3</version>
             </dependency>
 
             <dependency>
@@ -217,6 +225,13 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
                 <version>1.0.13</version>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
