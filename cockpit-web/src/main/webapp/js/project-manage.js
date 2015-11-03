@@ -43,18 +43,18 @@ $(document).ready(function() {
 
     $(document).on("click", ".addCGItem", function() {
         var row = $(this).parent().parent();
-        var name = row.children().eq(1).html();
+        var id = row.children().eq(0).html();
 
         document.getElementById("addConsumerGroupDIV").style.display = "block";
-        $("input.cgProject").val(name);
+        $("input.cgProject").val(id);
     });
 
     $(document).on("click", ".addTItem", function() {
         var row = $(this).parent().parent();
-        var name = row.children().eq(1).html();
+        var id = row.children().eq(0).html();
 
         document.getElementById("addTopicDIV").style.display = "block";
-        $("input.tProject").val(name);
+        $("input.tProject").val(id);
     });
 
     $(document).on("click", ".jumpShow", function() {
@@ -70,7 +70,10 @@ $(document).ready(function() {
     });
 
     $(".addConsumerGroup").click(function() {
-        var project = $("input.cgProject").val();
+        var projectId = 0;
+        var consumerGroupId = 0;
+        var topicId = 0;
+        projectId = $("input.cgProject").val();
         var topic = "$EMPTY$";
 
         var clusterName = $("input.CGcluster_name").val();
@@ -86,32 +89,35 @@ $(document).ready(function() {
         var allow = "DRAFT";
         var CG = JSON.stringify({"clusterName":clusterName,"whichBrokerWhenConsumeSlowly":whichBrokerWhenConsumeSlowly,
             "groupName":groupName,"consumeEnable":consumeEnable, "consumeBroadcastEnable":consumeBroadcastEnable,
-            "brokerAddress":brokerAddress, "brokerId":brokerId, "retryMaxTimes":retryMaxTimes,
+            "consumeFromBrokerId":brokerId, "retryMaxTimes":retryMaxTimes,
             "retryQueueNum":retryQueueNum, "consumeFromMinEnable":consumeFromMinEnable,"status":allow});
+        if(document.getElementById("CGaddExistGroup_label").innerHTML === "false"){
+            $.ajax({
+                async: false,
+                url: "cockpit/api/consumer-group/" + projectId,
+                type: "PUT",
+                dataType: "json",
+                contentType: 'application/json',
+                data: CG,
+                success: function() {
 
+                },
+                error: function() {
+                    alert(" ERROR ");
+                }
+            });
+        }else{
+            consumerGroupId = document.getElementById("CGaddExistGroup_id").innerHTML;
+        }
         $.ajax({
             async: false,
-            url: "cockpit/api/consumer-group",
+            url: "cockpit/api/project/" + projectId + "/" + consumerGroupId + "/" + topicId,
             type: "PUT",
             dataType: "json",
-            contentType: 'application/json',
-            data: CG,
-            success: function() {
-                $.ajax({
-                    async: false,
-                    //TODO we use ID to build the reference
-                    url: "cockpit/api/project/" + project + "/" + groupName + "/" + topic,
-                    type: "PUT",
-                    dataType: "json",
-                    contentType: "application/json",
-                    complete: function() {
-                        alert(" SUCCESS ");
-                        location.reload(true);
-                    }
-                });
-            },
-            error: function() {
-                alert(" ERROR ");
+            contentType: "application/json",
+            complete: function() {
+                alert(" SUCCESS ");
+                location.reload(true);
             }
         });
     });
@@ -121,8 +127,12 @@ $(document).ready(function() {
     });
 
     $(".addTopic").click(function() {
-        var project = $("input.tProject").val();
+        var projectId = 0;
+        var consumerGroupId = 0;
+        var topicId = 0;
+        projectId = $("input.tProject").val();
         var groupName = "$EMPTY$";
+
         var topic = $("input.topic").val();
         if ($.trim(topic) === ""){
             alert("your topic need a name");
@@ -144,38 +154,39 @@ $(document).ready(function() {
         var order = $("input.order").val();
         var allow = "DRAFT";
 
-        var ob = JSON.stringify({"topic":topic,"writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
-            "brokerAddress":broker_address, "clusterName":cluster_name, "permission":permission, "unit":unit, "hasUnitSubscription":has_unit_subscription, "order":order, "status":allow});
+        var ob = JSON.stringify({"topic":topic,"clusterName":cluster_name, "order":order, "status":allow});
+        if(document.getElementById("addExistTopic_label").innerHTML === "false"){
+            $.ajax({
+                async: false,
+                url: "cockpit/api/topic/" + projectId,
+                type: "PUT",
+                dataType: "json",
+                contentType: 'application/json',
+                data: ob,
+                success: function() {
 
+                },
+                error: function() {
+                    alert(" ERROR ");
+                }
+            });
+        }else{
+            topicId = document.getElementById("addExistTopic_id").innerHTML;
+        }
         $.ajax({
             async: false,
-            url: "cockpit/api/topic",
+            url: "cockpit/api/project/" + projectId + "/" + consumerGroupId + "/" + topicId,
             type: "PUT",
             dataType: "json",
-            contentType: 'application/json',
-            data: ob,
-            success: function() {
-                $.ajax({
-                    async: false,
-                    //TODO we use ID to build the reference
-                    url: "cockpit/api/project/" + project + "/" + groupName + "/" + topic,
-                    type: "PUT",
-                    dataType: "json",
-                    contentType: "application/json",
-                    complete: function() {
-                        alert(" SUCCESS ");
-                        location.reload(true);
-                    }
-                });
-            },
-            error: function() {
-                alert(" ERROR ");
+            contentType: "application/json",
+            complete: function() {
+                alert(" SUCCESS ");
+                location.reload(true);
             }
         });
     });
 
 });
-
 
 function checkInfo(num){
     var text;
@@ -210,11 +221,17 @@ function checkInfo(num){
         case 21 :
             text = $("input.CGgroup_name").val();
             var check = document.getElementById("CGgroupNameCheck_label");
+            var existGroup = document.getElementById("CGaddExistGroup_label");
+            var groupId = document.getElementById("CGaddExistGroup_id");
             if (text === ""){
                 check.style.color = "red";
-                check.innerHTML = " group name can not be null."
+                check.innerHTML = " group name can not be null.";
+                existGroup.innerHTML = "false";
             }else{
                 //check this consumer group maybe exist
+                existGroup.innerHTML = "false";
+                check.style.color = "green";
+                check.innerHTML = "group name is ok.";
                 $.ajax({
                     async: false,
                     url: "cockpit/api/consumer-group/consumer-group-name/" + text,
@@ -225,9 +242,8 @@ function checkInfo(num){
                         if (consumerGroup.groupName === text){
                             check.style.color = "blue";
                             check.innerHTML = "This group is exist. Make sure you want make this group connect to your project.";
-                        }else{
-                            check.style.color = "green";
-                            check.innerHTML = "group name is ok.";
+                            existGroup.innerHTML = "true";
+                            groupId.innerHTML = consumerGroup.id;
                         }
                     }
                 });
@@ -236,23 +252,28 @@ function checkInfo(num){
         case 30 :
             text = $("input.topic").val();
             var check = document.getElementById("topicCheck_label");
+            var existTopic = document.getElementById("addExistTopic_label");
+            var topicId = document.getElementById("addExistTopic_id");
             if (text === ""){
                 check.style.color = "red";
                 check.innerHTML = "topic can not be null.";
+                existTopic.innerHTML = "false";
             }else{
+                existTopic.innerHTML = "false";
+                check.style.color = "green";
+                check.innerHTML = "topic name is ok.";
                 $.ajax({
                     async: false,
                     url: "cockpit/api/topic/" + text,
                     type: "GET",
                     contentType: "application/json; charset=UTF-8",
                     dataType: "json",
-                    success: function(data) {
-                        if (null == data || data.length == 0) {
-                            check.style.color = "green";
-                            check.innerHTML = "topic name is ok.";
-                        } else {
+                    success: function(topicMetadata) {
+                        if (topicMetadata.topic === text) {
                             check.style.color = "blue";
                             check.innerHTML = "This topic is exist. Make sure you want make this topic connect to your project.";
+                            existTopic.innerHTML = "true";
+                            topicId.innerHTML = topicMetadata.id;
                         }
                     }
                 });

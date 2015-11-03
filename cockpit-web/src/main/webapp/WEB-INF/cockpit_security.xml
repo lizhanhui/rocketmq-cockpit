@@ -40,7 +40,7 @@
         <security:intercept-url pattern="/cockpit/ip/**" requires-channel="http" access="ROLE_ADMIN"/>
         <security:intercept-url pattern="/cockpit/name-server/**" requires-channel="http" access="ROLE_ADMIN"/>
 
-        <security:intercept-url pattern="/*"  access="ROLE_USER,ROLE_ADMIN"/>
+        <security:intercept-url pattern="/**"  access="ROLE_USER,ROLE_ADMIN"/>
 
         <security:form-login authentication-failure-handler-ref="rocketMQUserLoginFailedHandler"
                              authentication-success-handler-ref="rocketMQUserLoginSuccessHandler"

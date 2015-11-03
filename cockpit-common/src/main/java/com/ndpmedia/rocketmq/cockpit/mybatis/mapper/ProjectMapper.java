@@ -15,5 +15,5 @@ public interface ProjectMapper {
 
     void delete(@Param("id") long id);
 
-    Project get(@Param("projectId") long projectId);
+    Project get(@Param("projectId") long projectId, @Param("projectName") String projectName);
 }

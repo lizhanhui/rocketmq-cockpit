@@ -51,7 +51,11 @@
                     </tr>
                     <tr>
                         <td>group_name:</td>
-                        <td><input type="text" class="form-control CGgroup_name" placeholder="group_name" onblur="checkInfo(21)"><span><label id="CGgroupNameCheck_label"></label></span></td>
+                        <td><input type="text" class="form-control CGgroup_name" placeholder="group_name" onblur="checkInfo(21)">
+                            <span><label id="CGgroupNameCheck_label"></label></span>
+                            <span style="display:none"><label id="CGaddExistGroup_label"></label></span>
+                            <span style="display:none"><label id="CGaddExistGroup_id"></label></span>
+                        </td>
                     </tr>
                     <tr>
                         <td>consume_enable:</td>
@@ -102,7 +106,11 @@
                 <table width="100%" class="table table-bordered">
                     <tr>
                         <td width="30%">Topic:</td>
-                        <td> <input type="text" class="form-control topic" placeholder="topic" onblur="checkInfo(30)"><span><label id="topicCheck_label"></label></span></td>
+                        <td> <input type="text" class="form-control topic" placeholder="topic" onblur="checkInfo(30)">
+                             <span><label id="topicCheck_label"></label></span>
+                             <span style="display:none"><label id="addExistTopic_label"></label></span>
+                             <span style="display:none"><label id="addExistTopic_id"></label></span>
+                        </td>
                     </tr>
                     <tr class="hide">
                         <td>Write Queue Number:</td>

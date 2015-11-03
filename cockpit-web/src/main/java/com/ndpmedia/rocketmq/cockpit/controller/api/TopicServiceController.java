@@ -4,6 +4,7 @@ import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
@@ -26,17 +27,17 @@ import java.util.Map;
 public class TopicServiceController {
 
     @Autowired
-    private TopicMapper topicMapper;
+    private CockpitTopicMQService cockpitTopicMQService;
 
     @Autowired
-    private CockpitTopicMQService cockpitTopicMQService;
+    private CockpitTopicDBService cockpitTopicDBService;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> list(HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        List<TopicMetadata> topics = topicMapper.list(0, null, null);
+        List<TopicMetadata> topics = cockpitTopicDBService.getTopics(null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", topics.size());
@@ -50,7 +51,7 @@ public class TopicServiceController {
     public Map<String, Object> detailList(HttpServletRequest request, @PathVariable("topic") String topic) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        TopicMetadata topicMetadata = topicMapper.getMetadataByTopic("DefaultCluster", topic);
+        TopicMetadata topicMetadata = cockpitTopicDBService.getTopic("DefaultCluster", topic);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", 1);
@@ -62,34 +63,14 @@ public class TopicServiceController {
     @RequestMapping(value = "/{topic}", method = RequestMethod.GET)
     @ResponseBody
     public TopicMetadata lookUp(@PathVariable("topic") String topic) {
-        return topicMapper.getMetadataByTopic("DefaultCluster", topic);
+        return cockpitTopicDBService.getTopic("DefaultCluster", topic);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = "/{projectId}",method = RequestMethod.PUT)
     @ResponseBody
-    public TopicMetadata add(@RequestBody TopicMetadata topicMetadata, long projectId, HttpServletRequest request) {
-        CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-//        if (null == topic.getBrokerAddress() || topic.getBrokerAddress().isEmpty()) {
-//            DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
-//            defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
-//            try {
-//                defaultMQAdminExt.start();
-//                Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
-//                for (String broker:brokers){
-//                    // topic.setBrokerAddress(broker);
-//                    // TODO Fix me.
-//                    topicMapper.connectProject(topic.getId(), projectId);
-//                }
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }finally {
-//                defaultMQAdminExt.shutdown();
-//            }
-//        } else {
-//            topicMapper.connectProject(topic.getId(), projectId);
-//        }
-//        return topic;
-        throw new RuntimeException("Not implemented.");
+    public TopicMetadata add(@RequestBody TopicMetadata topicMetadata, @PathVariable("projectId") long projectId, HttpServletRequest request) {
+        cockpitTopicDBService.insert(topicMetadata, projectId);
+        return topicMetadata;
     }
 
 
@@ -97,6 +78,6 @@ public class TopicServiceController {
     @ResponseBody
     public void update(@RequestBody TopicMetadata topic) {
         topic.setUpdateTime(new Date());
-        topicMapper.update(topic);
+        cockpitTopicDBService.update(topic);
     }
 }

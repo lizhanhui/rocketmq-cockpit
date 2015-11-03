@@ -31,7 +31,7 @@ public interface CockpitProjectService {
      * @param projectId id
      * @return  project
      */
-    Project get(long projectId);
+    Project get(long projectId, String projectName);
 
     List<ConsumerGroup> getConsumerGroups(long projectId);
 

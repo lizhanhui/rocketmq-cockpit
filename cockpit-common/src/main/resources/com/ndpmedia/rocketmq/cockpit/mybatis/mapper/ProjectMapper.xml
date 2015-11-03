@@ -44,7 +44,13 @@
     <select id="get" resultMap="projectResultMap" parameterType="long">
         SELECT id, name, description, team_id AS teamId
         FROM project AS p
-        WHERE id = #{projectId}
+        WHERE 1 = 1
+        <if test="projectId > -1">
+            AND id = #{projectId}
+        </if>
+        <if test="projectName != null">
+            AND name = #{projectName}
+        </if>
     </select>
 
 </mapper>

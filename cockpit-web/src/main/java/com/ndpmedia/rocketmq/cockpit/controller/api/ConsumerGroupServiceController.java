@@ -29,15 +29,12 @@ public class ConsumerGroupServiceController {
     private Logger logger = LoggerFactory.getLogger(ConsumerGroupServiceController.class);
 
     @Autowired
-    private ConsumerGroupMapper consumerGroupMapper;
-
-    @Autowired
     private CockpitConsumerGroupDBService cockpitConsumerGroupDBService;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> list(HttpServletRequest request) {
-        List<ConsumerGroup> consumerGroups = consumerGroupMapper.list(getProjectId(request), null, null, 0, null);
+        List<ConsumerGroup> consumerGroups = cockpitConsumerGroupDBService.list(getProjectId(request), null, null, 0, null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", consumerGroups.size());
@@ -49,29 +46,31 @@ public class ConsumerGroupServiceController {
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ConsumerGroup get(@PathVariable("id") long id) {
-        return consumerGroupMapper.get(id);
+        return cockpitConsumerGroupDBService.get(id, null);
     }
 
     @RequestMapping(value = "/cluster-name/{clusterName}", method = RequestMethod.GET)
     @ResponseBody
     public List<ConsumerGroup> listByClusterName(@PathVariable("clusterName") String clusterName,
                                                  HttpServletRequest request) {
-        return consumerGroupMapper.list(getProjectId(request), clusterName, null, 0, null);
+        return cockpitConsumerGroupDBService.list(getProjectId(request), clusterName, null, 0, null);
     }
 
     @RequestMapping(value = "/consumer-group-name/{consumerGroupName}", method = RequestMethod.GET)
     @ResponseBody
     public ConsumerGroup getByConsumerGroupName(@PathVariable("consumerGroupName") String consumerGroupName,
                                                 HttpServletRequest request) {
-        List<ConsumerGroup> groups = consumerGroupMapper.list(getProjectId(request), null, consumerGroupName, 0, null);
-        if (groups.isEmpty())
-            return new ConsumerGroup();
-        return groups.get(0);
+        //TODO user can not get every group
+//        List<ConsumerGroup> groups = consumerGroupMapper.list(getProjectId(request), null, consumerGroupName, 0, null);
+        return cockpitConsumerGroupDBService.get(-1, consumerGroupName);
+//        if (groups.isEmpty())
+//            return new ConsumerGroup();
+//        return groups.get(0);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = "/{projectId}",method = RequestMethod.PUT)
     @ResponseBody
-    public ConsumerGroup add(@RequestBody ConsumerGroup consumerGroup, long projectId) {
+    public ConsumerGroup add(@RequestBody ConsumerGroup consumerGroup, @PathVariable("projectId") long projectId) {
         cockpitConsumerGroupDBService.insert(consumerGroup, projectId);
         return consumerGroup;
     }
@@ -80,7 +79,7 @@ public class ConsumerGroupServiceController {
     @ResponseBody
     public void update(@RequestBody ConsumerGroup consumerGroup) {
         consumerGroup.setUpdateTime(new Date());
-        consumerGroupMapper.update(consumerGroup);
+        cockpitConsumerGroupDBService.update(consumerGroup);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

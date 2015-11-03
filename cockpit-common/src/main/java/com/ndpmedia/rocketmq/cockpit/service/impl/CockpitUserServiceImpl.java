@@ -1,6 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
+import com.ndpmedia.rocketmq.cockpit.model.ResourceType;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitUserMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TeamMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitUserService;
@@ -30,5 +31,10 @@ public class CockpitUserServiceImpl implements CockpitUserService {
         //For now, grant user and watcher role.
         cockpitUserMapper.grant(cockpitUser.getId(), 3);
         cockpitUserMapper.grant(cockpitUser.getId(), 4);
+    }
+
+    @Override
+    public boolean hasAccess(long teamId, long resourceId, ResourceType resourceType){
+        return teamMapper.hasAccess(teamId, resourceId, resourceType);
     }
 }
