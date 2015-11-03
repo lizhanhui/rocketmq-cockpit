@@ -4,6 +4,7 @@ import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
@@ -30,6 +31,9 @@ public class TopicServiceController {
 
     @Autowired
     private CockpitTopicMQService cockpitTopicMQService;
+
+    @Autowired
+    private CockpitTopicDBService cockpitTopicDBService;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
@@ -65,31 +69,11 @@ public class TopicServiceController {
         return topicMapper.getMetadataByTopic("DefaultCluster", topic);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = "/{projectId}",method = RequestMethod.PUT)
     @ResponseBody
-    public TopicMetadata add(@RequestBody TopicMetadata topicMetadata, long projectId, HttpServletRequest request) {
-        CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-//        if (null == topic.getBrokerAddress() || topic.getBrokerAddress().isEmpty()) {
-//            DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
-//            defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
-//            try {
-//                defaultMQAdminExt.start();
-//                Set<String> brokers = cockpitBrokerService.getALLBrokers(defaultMQAdminExt);
-//                for (String broker:brokers){
-//                    // topic.setBrokerAddress(broker);
-//                    // TODO Fix me.
-//                    topicMapper.connectProject(topic.getId(), projectId);
-//                }
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }finally {
-//                defaultMQAdminExt.shutdown();
-//            }
-//        } else {
-//            topicMapper.connectProject(topic.getId(), projectId);
-//        }
-//        return topic;
-        throw new RuntimeException("Not implemented.");
+    public TopicMetadata add(@RequestBody TopicMetadata topicMetadata, @PathVariable("projectId") long projectId, HttpServletRequest request) {
+        cockpitTopicDBService.insert(topicMetadata, projectId);
+        return topicMetadata;
     }
 
 

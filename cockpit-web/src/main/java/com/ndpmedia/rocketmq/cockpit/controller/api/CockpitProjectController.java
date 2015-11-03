@@ -67,17 +67,18 @@ public class CockpitProjectController {
 
     @RequestMapping(method = RequestMethod.PUT)
     @ResponseBody
-    public boolean add(@RequestBody Project project, HttpServletRequest request){
+    public long add(@RequestBody Project project, HttpServletRequest request){
         try {
             CockpitUser cockpitUser = (CockpitUser) request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
             long teamId = cockpitUser.getTeam().getId();
             project.setTeamId(teamId);
             cockpitProjectService.insert(project);
+
+            return cockpitProjectService.get(-1, project.getName()).getId();
         }catch (Exception e){
             e.printStackTrace();
-            return false;
+            return 0;
         }
-        return true;
     }
 
     @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
@@ -86,11 +87,11 @@ public class CockpitProjectController {
         CockpitUser cockpitUser = (CockpitUser) request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
 
         if (isAdmin(cockpitUser)) {
-            return cockpitProjectService.get(projectId);
+            return cockpitProjectService.get(projectId, null);
         }
 
         if (teamMapper.hasAccess(cockpitUser.getTeam().getId(), projectId, ResourceType.PROJECT)) {
-            return cockpitProjectService.get(projectId);
+            return cockpitProjectService.get(projectId, null);
         } else {
             throw new CockpitRuntimeException("Access Denied");
         }
@@ -101,8 +102,10 @@ public class CockpitProjectController {
     public void addProjectResources(@PathVariable("projectId") long projectId,
                                     @PathVariable("consumerGroupId") long consumerGroupId,
                                     @PathVariable("topicId") long topicId){
-        topicMapper.connectProject(topicId, projectId);
-        consumerGroupMapper.connectProject(consumerGroupId, projectId);
+        if (topicId > 0)
+            topicMapper.connectProject(topicId, projectId);
+        if (consumerGroupId > 0)
+            consumerGroupMapper.connectProject(consumerGroupId, projectId);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)

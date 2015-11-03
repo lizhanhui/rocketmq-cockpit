@@ -93,6 +93,17 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     }
 
     @Override
+    public void insert(TopicMetadata topicMetadata, long projectId){
+        if (exists(topicMetadata.getClusterName(), topicMetadata.getTopic())) {
+            return;
+        }
+
+        topicMapper.insert(topicMetadata);
+
+        topicMapper.connectProject(topicMetadata.getId(), projectId);
+    }
+
+    @Override
     public void insertTopicBrokerInfo(TopicBrokerInfo topicBrokerInfo) {
         topicMapper.insertTopicBrokerInfo(topicBrokerInfo);
     }

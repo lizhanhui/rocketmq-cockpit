@@ -118,7 +118,7 @@
         WHERE id = #{id}
     </select>
 
-    <select id="getByName" resultType="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
+    <select id="getByName" resultMap="consumerGroupMap">
         SELECT id, cluster_name, which_broker_when_consume_slowly, group_name, consume_enable, consume_broadcast_enable, retry_max_times, retry_queue_num, consume_from_min_enable, status_id, create_time, update_time
         FROM consumer_group
         WHERE group_name = #{groupName}

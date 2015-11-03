@@ -25,7 +25,9 @@
                     </tr>
                     <tr>
                         <td width="30%">cluster_name:</td>
-                        <td><input type="text" class="form-control CGcluster_name" placeholder="cluster_name" onblur="checkInfo(20)"><span><label id="CGclusterNameCheck_label"></label></span></td>
+                        <td><input type="text" class="form-control CGcluster_name" placeholder="cluster_name" onblur="checkInfo(20)"><span>
+                            <label id="CGclusterNameCheck_label"></label></span>
+                        </td>
                     </tr>
                     <tr style="display:none">
                         <td>which_broker_when_consume_slowly:</td>
@@ -33,7 +35,11 @@
                     </tr>
                     <tr>
                         <td>group_name:</td>
-                        <td><input type="text" class="form-control CGgroup_name" placeholder="group_name" onblur="checkInfo(21)"><span><label id="CGgroupNameCheck_label"></label></span></td>
+                        <td><input type="text" class="form-control CGgroup_name" placeholder="group_name" onblur="checkInfo(21)"><span>
+                            <label id="CGgroupNameCheck_label"></label></span>
+                            <span style="display:none"><label id="CGaddExistGroup_label"></label></span>
+                            <span style="display:none"><label id="CGaddExistGroup_id"></label></span>
+                        </td>
                     </tr>
                     <tr>
                         <td>consume_enable:</td>
@@ -88,7 +94,11 @@
                     </tr>
                     <tr>
                         <td width="30%">Topic:</td>
-                        <td> <input type="text" class="form-control topic" placeholder="topic" onblur="checkInfo(30)"><span><label id="topicCheck_label"></label></span></td>
+                        <td> <input type="text" class="form-control topic" placeholder="topic" onblur="checkInfo(30)"><span>
+                             <label id="topicCheck_label"></label></span>
+                             <span style="display:none"><label id="addExistTopic_label"></label></span>
+                             <span style="display:none"><label id="addExistTopic_id"></label></span>
+                        </td>
                     </tr>
                     <tr class="hide">
                         <td>Write Queue Number:</td>

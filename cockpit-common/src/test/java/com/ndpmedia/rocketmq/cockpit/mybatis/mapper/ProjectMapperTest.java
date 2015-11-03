@@ -80,7 +80,7 @@ public class ProjectMapperTest {
 
     @Test
     public void testGet() throws Exception {
-        Project project = projectMapper.get(1);
+        Project project = projectMapper.get(1, null);
         Assert.assertNotNull(project);
     }
 }

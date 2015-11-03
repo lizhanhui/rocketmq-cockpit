@@ -63,15 +63,17 @@ public class ConsumerGroupServiceController {
     @ResponseBody
     public ConsumerGroup getByConsumerGroupName(@PathVariable("consumerGroupName") String consumerGroupName,
                                                 HttpServletRequest request) {
-        List<ConsumerGroup> groups = consumerGroupMapper.list(getProjectId(request), null, consumerGroupName, 0, null);
-        if (groups.isEmpty())
-            return new ConsumerGroup();
-        return groups.get(0);
+        //TODO user can not get every group
+//        List<ConsumerGroup> groups = consumerGroupMapper.list(getProjectId(request), null, consumerGroupName, 0, null);
+        return cockpitConsumerGroupDBService.get(-1, consumerGroupName);
+//        if (groups.isEmpty())
+//            return new ConsumerGroup();
+//        return groups.get(0);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = "/{projectId}",method = RequestMethod.PUT)
     @ResponseBody
-    public ConsumerGroup add(@RequestBody ConsumerGroup consumerGroup, long projectId) {
+    public ConsumerGroup add(@RequestBody ConsumerGroup consumerGroup, @PathVariable("projectId") long projectId) {
         cockpitConsumerGroupDBService.insert(consumerGroup, projectId);
         return consumerGroup;
     }

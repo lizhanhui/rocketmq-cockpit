@@ -58,8 +58,8 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
     }
 
     @Override
-    public Project get(long projectId) {
-        return projectMapper.get(projectId);
+    public Project get(long projectId, String projectName) {
+        return projectMapper.get(projectId, projectName);
     }
 
     @Override

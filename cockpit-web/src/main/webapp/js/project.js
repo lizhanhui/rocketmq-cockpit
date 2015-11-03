@@ -16,7 +16,7 @@ $(document).ready(function() {
         }
 
         if (baseProject.indexOf($.trim(projectName)) > -1){
-            if(window.confirm("there already had this project, do you want to add consumer group and topic for if ?")){
+            if(window.confirm("there already had this project, do you want to add consumer group and topic for it ?")){
 
             }else{
                 $("input.projectName").val("");
@@ -52,6 +52,9 @@ $(document).ready(function() {
     });
 
     $(".addTopic").click(function() {
+        var projectId = 0;
+        var consumerGroupId = 0;
+        var topicId = 0;
         var topic = $("input.topic").val();
         if ($.trim(topic) === ""){
             alert("your topic need a name");
@@ -83,7 +86,7 @@ $(document).ready(function() {
         var allow = "DRAFT";
         var CG = JSON.stringify({"clusterName":clusterName,"whichBrokerWhenConsumeSlowly":whichBrokerWhenConsumeSlowly,
             "groupName":groupName,"consumeEnable":consumeEnable, "consumeBroadcastEnable":consumeBroadcastEnable,
-            "brokerAddress":brokerAddress, "brokerId":brokerId, "retryMaxTimes":retryMaxTimes,
+            "consumeFromBrokerId":brokerId, "retryMaxTimes":retryMaxTimes,
             "retryQueueNum":retryQueueNum, "consumeFromMinEnable":consumeFromMinEnable,"status":allow});
 
         var write_queue_num = $("input.writeQueueNum").val();
@@ -92,8 +95,7 @@ $(document).ready(function() {
         var unit = $("input.unit").val();
         var has_unit_subscription = $("input.hasUnitSubscription").val();
         var order = $("input.order").val();
-        var ob = JSON.stringify({"topic":topic,"writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
-            "brokerAddress":broker_address, "clusterName":cluster_name, "permission":permission, "unit":unit, "hasUnitSubscription":has_unit_subscription, "order":order, "status":allow});
+        var ob = JSON.stringify({"topic":topic, "clusterName":cluster_name, "order":order, "status":allow});
         $.ajax({
             async: false,
             url: "cockpit/api/project",
@@ -101,45 +103,56 @@ $(document).ready(function() {
             dataType: "json",
             contentType: "application/json",
             data: project,
-            success: function() {
+            success: function(dataP) {
+                projectId = dataP;
+                if(document.getElementById("CGaddExistGroup_label").innerHTML === "false"){
+                    $.ajax({
+                        async: false,
+                        url: "cockpit/api/consumer-group/" + projectId,
+                        type: "PUT",
+                        dataType: "json",
+                        contentType: 'application/json',
+                        data: CG,
+                        success: function() {
+
+                        },
+                        error: function() {
+                            alert(" ADD CONSUMER GROUP ERROR ");
+                        }
+                    });
+                }else{
+                    consumerGroupId = document.getElementById("CGaddExistGroup_id").innerHTML;
+                }
+                if(document.getElementById("addExistTopic_label").innerHTML === "false"){
+                    $.ajax({
+                        async: false,
+                        url: "cockpit/api/topic/" + projectId,
+                        type: "PUT",
+                        dataType: "json",
+                        contentType: 'application/json',
+                        data: ob,
+                        success: function() {
+
+                        },
+                        error: function() {
+                            alert(" ADD TOPIC ERROR ");
+                        }
+                    });
+                }else{
+                    topicId = document.getElementById("addExistTopic_id").innerHTML;
+                }
                 $.ajax({
                     async: false,
-                    url: "cockpit/api/consumer-group",
+                    url: "cockpit/api/project/" + projectId + "/" + consumerGroupId + "/" + topicId,
                     type: "PUT",
                     dataType: "json",
-                    contentType: 'application/json',
-                    data: CG,
-                    success: function() {
-                        $.ajax({
-                            async: false,
-                            url: "cockpit/api/topic",
-                            type: "PUT",
-                            dataType: "json",
-                            contentType: 'application/json',
-                            data: ob,
-                            success: function() {
-                                $.ajax({
-                                    async: false,
-                                    //TODO we use ID to build the reference
-                                    url: "cockpit/api/project/" + projectName + "/" + groupName + "/" + topic,
-                                    type: "PUT",
-                                    dataType: "json",
-                                    contentType: "application/json",
-                                    complete: function() {
-                                        alert(" SUCCESS ");
-                                        location.reload(true);
-                                    }
-                                });
-                            },
-                            error: function() {
-                                alert(" ERROR ");
-                            }
-                        });
-                    },
-                    error: function() {
-                        alert(" ERROR ");
+                    contentType: "application/json",
+                    complete: function() {
+                        alert(" SUCCESS ");
+                        location.href="cockpit/project/manage";
                     }
                 });
+
             }
         });
     });
@@ -184,11 +197,17 @@ function checkInfo(num){
         case 21 :
             text = $("input.CGgroup_name").val();
             var check = document.getElementById("CGgroupNameCheck_label");
+            var existGroup = document.getElementById("CGaddExistGroup_label");
+            var groupId = document.getElementById("CGaddExistGroup_id");
             if (text === ""){
                 check.style.color = "red";
-                check.innerHTML = " group name can not be null."
+                check.innerHTML = " group name can not be null.";
+                existGroup.innerHTML = "false";
             }else{
                 //check this consumer group maybe exist
+                existGroup.innerHTML = "false";
+                check.style.color = "green";
+                check.innerHTML = "group name is ok.";
                 $.ajax({
                     async: false,
                     url: "cockpit/api/consumer-group/consumer-group-name/" + text,
@@ -199,9 +218,8 @@ function checkInfo(num){
                         if (consumerGroup.groupName === text){
                             check.style.color = "blue";
                             check.innerHTML = "This group is exist. Make sure you want make this group connect to your project.";
-                        }else{
-                            check.style.color = "green";
-                            check.innerHTML = "group name is ok.";
+                            existGroup.innerHTML = "true";
+                            groupId.innerHTML = consumerGroup.id;
                         }
                     }
                 });
@@ -210,23 +228,28 @@ function checkInfo(num){
         case 30 :
             text = $("input.topic").val();
             var check = document.getElementById("topicCheck_label");
+            var existTopic = document.getElementById("addExistTopic_label");
+            var topicId = document.getElementById("addExistTopic_id");
             if (text === ""){
                 check.style.color = "red";
                 check.innerHTML = "topic can not be null.";
+                existTopic.innerHTML = "false";
             }else{
+                existTopic.innerHTML = "false";
+                check.style.color = "green";
+                check.innerHTML = "topic name is ok.";
                 $.ajax({
                     async: false,
                     url: "cockpit/api/topic/" + text,
                     type: "GET",
                     contentType: "application/json; charset=UTF-8",
                     dataType: "json",
-                    success: function(data) {
-                        if (null == data || data.length == 0) {
-                            check.style.color = "green";
-                            check.innerHTML = "topic name is ok.";
-                        } else {
+                    success: function(topicMetadata) {
+                        if (topicMetadata.topic === text) {
                             check.style.color = "blue";
                             check.innerHTML = "This topic is exist. Make sure you want make this topic connect to your project.";
+                            existTopic.innerHTML = "true";
+                            topicId.innerHTML = topicMetadata.id;
                         }
                     }
                 });
