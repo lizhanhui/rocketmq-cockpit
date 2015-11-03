@@ -94,14 +94,18 @@ $(document).ready(function () {
     var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
 
     $.get("cockpit/api/project", function (data) {
+        var targetPID = 0;
         var text = document.createTextNode("Project: ");
         var divP = document.getElementById("divPro");
         var selectP = document.createElement("select");
         selectP.id = "selectP";
 
-        selectP.appendChild(createOption(null));
+        selectP.appendChild(createOption(null, null));
         data.forEach(function (project) {
-            selectP.appendChild(createOption(project.name));
+            selectP.appendChild(createOption(project.id, project.name));
+            if ("" !== cookieString && cookieString.split("=")[1] === project.name){
+                targetPID = project.id;
+            }
         });
 
         divP.appendChild(text);
@@ -113,7 +117,7 @@ $(document).ready(function () {
         };
 
         if ("" !== cookieString) {
-            changeProject(cookieString.split("=")[1]);
+            changeProject(targetPID);
             optionSelectedByValue(selectP, cookieString.split("=")[1]);
             $('h1').html(cookieString.split("=")[1]);
             var date=new Date();
@@ -134,12 +138,12 @@ $(document).ready(function () {
     })
 });
 
-function changeProject(project){
-    if (-1 != project) {
-        $('h1').html(project);
+function changeProject(projectId){
+    if (-1 != projectId) {
+        $('h1').html(projectId);
         $.ajax({
             async: false,
-            url: "cockpit/api/project/" + project,//查询该project对应的Consumer Group
+            url: "cockpit/api/project/" + projectId + "/consumer-groups",//查询该project对应的Consumer Group
             type: "GET",
             dataType: "json",
             contentType: "application/json",
@@ -168,9 +172,9 @@ function changeProject(project){
 
         $.ajax({
             async: false,
-            url: "cockpit/api/project/" + project,//查询该project对应的Topic
+            url: "cockpit/api/project/" + projectId + "/topics",//查询该project对应的Topic
             type: "POST",
-            data: project,
+            data: projectId,
             dataType: "json",
             contentType: "application/json",
             success: function (datas) {
@@ -200,9 +204,9 @@ function changeProject(project){
     }
 }
 
-function createOption(text) {
+function createOption(id, text) {
     var selOption = document.createElement("option");
-    selOption.value = null === text ? -1 : text;
+    selOption.value = null === id ? -1 : id;
     selOption.innerHTML = null === text ? selectDefault : text;
     return selOption;
 }
