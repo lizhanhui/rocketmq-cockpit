@@ -27,9 +27,6 @@ import java.util.Map;
 public class TopicServiceController {
 
     @Autowired
-    private TopicMapper topicMapper;
-
-    @Autowired
     private CockpitTopicMQService cockpitTopicMQService;
 
     @Autowired
@@ -40,7 +37,7 @@ public class TopicServiceController {
     public Map<String, Object> list(HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        List<TopicMetadata> topics = topicMapper.list(0, null, null);
+        List<TopicMetadata> topics = cockpitTopicDBService.getTopics(null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", topics.size());
@@ -54,7 +51,7 @@ public class TopicServiceController {
     public Map<String, Object> detailList(HttpServletRequest request, @PathVariable("topic") String topic) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        TopicMetadata topicMetadata = topicMapper.getMetadataByTopic("DefaultCluster", topic);
+        TopicMetadata topicMetadata = cockpitTopicDBService.getTopic("DefaultCluster", topic);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", 1);
@@ -66,7 +63,7 @@ public class TopicServiceController {
     @RequestMapping(value = "/{topic}", method = RequestMethod.GET)
     @ResponseBody
     public TopicMetadata lookUp(@PathVariable("topic") String topic) {
-        return topicMapper.getMetadataByTopic("DefaultCluster", topic);
+        return cockpitTopicDBService.getTopic("DefaultCluster", topic);
     }
 
     @RequestMapping(value = "/{projectId}",method = RequestMethod.PUT)
@@ -81,6 +78,6 @@ public class TopicServiceController {
     @ResponseBody
     public void update(@RequestBody TopicMetadata topic) {
         topic.setUpdateTime(new Date());
-        topicMapper.update(topic);
+        cockpitTopicDBService.update(topic);
     }
 }

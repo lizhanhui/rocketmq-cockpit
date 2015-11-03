@@ -5,6 +5,7 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,11 @@ import java.util.List;
 public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDBService {
     @Autowired
     private ConsumerGroupMapper consumerGroupMapper;
+
+    public List<ConsumerGroup> list(long projectId, String clusterName, String consumerGroupName, long brokerId,
+                                    String brokerAddress){
+        return consumerGroupMapper.list(projectId, clusterName, consumerGroupName, brokerId, brokerAddress);
+    }
 
     @Override
     public List<ConsumerGroup> listByTopic(long topicId) {
@@ -57,6 +63,11 @@ public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDB
     public void delete(long consumerGroupId) {
         consumerGroupMapper.disconnectProject(consumerGroupId, 0);
         consumerGroupMapper.delete(consumerGroupId);
+    }
+
+    @Override
+    public void update(ConsumerGroup consumerGroup){
+        consumerGroupMapper.update(consumerGroup);
     }
 
     @Override

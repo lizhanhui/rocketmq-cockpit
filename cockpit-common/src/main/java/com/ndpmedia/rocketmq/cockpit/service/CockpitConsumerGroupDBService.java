@@ -7,6 +7,9 @@ import java.util.List;
 
 public interface CockpitConsumerGroupDBService {
 
+    List<ConsumerGroup> list(long projectId, String clusterName, String consumerGroupName, long brokerId,
+                             String brokerAddress);
+
     List<ConsumerGroup> listByTopic(long topicId);
 
     ConsumerGroup get(long consumerGroupId, String consumerGroupName);
@@ -16,6 +19,8 @@ public interface CockpitConsumerGroupDBService {
     void insert(ConsumerGroup consumerGroup, long projectId);
 
     void delete(long consumerGroupId);
+
+    void update(ConsumerGroup consumerGroup);
 
     void refresh(long brokerId, long consumerGroupId);
 

@@ -42,6 +42,7 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
 
     void insert(TopicMetadata topicMetadata);
 
+    void update(TopicMetadata topicMetadata);
 
     void insert(TopicMetadata topicMetadata, long projectId);
 

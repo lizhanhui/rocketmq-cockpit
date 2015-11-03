@@ -30,12 +30,18 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
 
     @Override
     public List<TopicMetadata> getTopics(Status... statuses) {
-        int[] statusIds = new int[statuses.length];
-        int i = 0;
-        for (Status s : statuses) {
-            statusIds[i++] = s.ordinal();
+        if (statuses != null) {
+            int[] statusIds = new int[statuses.length];
+            int i = 0;
+            for (Status s : statuses) {
+                statusIds[i++] = s.ordinal();
+            }
+
+            return topicMapper.list(0, statusIds, null);
+        }else {
+
+            return topicMapper.list(0, null, null);
         }
-        return topicMapper.list(0, statusIds, null);
     }
 
     @Override
@@ -90,6 +96,11 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
         }
 
         topicMapper.insert(topicMetadata);
+    }
+
+    @Override
+    public void update(TopicMetadata topicMetadata){
+        topicMapper.update(topicMetadata);
     }
 
     @Override

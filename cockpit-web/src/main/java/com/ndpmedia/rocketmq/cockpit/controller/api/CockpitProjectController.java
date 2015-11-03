@@ -7,10 +7,8 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
 import com.ndpmedia.rocketmq.cockpit.model.ResourceType;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TeamMapper;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitProjectService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitUserService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,14 +29,7 @@ public class CockpitProjectController {
     private CockpitProjectService cockpitProjectService;
 
     @Autowired
-    private TopicMapper topicMapper;
-
-    @Autowired
-    private ConsumerGroupMapper consumerGroupMapper;
-
-    @Autowired
-    private TeamMapper teamMapper;
-
+    private CockpitUserService cockpitUserService;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
@@ -90,7 +81,7 @@ public class CockpitProjectController {
             return cockpitProjectService.get(projectId, null);
         }
 
-        if (teamMapper.hasAccess(cockpitUser.getTeam().getId(), projectId, ResourceType.PROJECT)) {
+        if (cockpitUserService.hasAccess(cockpitUser.getTeam().getId(), projectId, ResourceType.PROJECT)) {
             return cockpitProjectService.get(projectId, null);
         } else {
             throw new CockpitRuntimeException("Access Denied");
@@ -103,9 +94,9 @@ public class CockpitProjectController {
                                     @PathVariable("consumerGroupId") long consumerGroupId,
                                     @PathVariable("topicId") long topicId){
         if (topicId > 0)
-            topicMapper.connectProject(topicId, projectId);
+            cockpitProjectService.addTopic(projectId, topicId);
         if (consumerGroupId > 0)
-            consumerGroupMapper.connectProject(consumerGroupId, projectId);
+            cockpitProjectService.addConsumerGroup(projectId, consumerGroupId);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
