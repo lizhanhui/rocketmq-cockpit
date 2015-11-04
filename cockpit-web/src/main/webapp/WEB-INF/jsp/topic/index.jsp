@@ -18,37 +18,6 @@
       <h1>TOPIC</h1>
     </div>
   </div>
-    <div id="addTopicDIV" class="col-xs-8 col-xs-offset-2 text-left table-responsive">
-        <table class="table table-bordered">
-            <tr><td>Topic:</td><td>  <input type="text" class="form-control topic" placeholder="topic"></td></tr>
-            <tr class="hide"><td>Write Queue Number:</td><td>  <input type="text" class="form-control writeQueueNum"
-            placeholder="Write Queue Number, Default 16"></td></tr>
-            <tr class="hide"><td>Read Queue Number:</td><td>  <input type="text" class="form-control readQueueNum"
-            placeholder="Read Queue Number, Default 16"></td></tr>
-            <tr><td>Broker Address:</td><td>  <input type="text" class="form-control brokerAddress"
-            placeholder="IP:10911"></td></tr>
-            <tr><td>Cluster Name:</td><td>  <input type="text" class="form-control clusterName"
-            placeholder="Cluster Name" value="DefaultCluster"></td></tr>
-            <tr class="hide"><td>Permission:</td><td>  <input type="text" class="form-control permission"
-                    placeholder="Read: 2/Write: 4/Read&Write: 6"></td></tr>
-            <tr class="hide"><td>Unit:</td><td>  <input type="text" class="form-control unit"
-                    placeholder="true/false"></td></tr>
-            <tr class="hide"><td>Has Unit Subscription:</td><td>  <input type="text" class="form-control hasUnitSubscription"
-                    placeholder="true/false"></td></tr>
-            <tr><td>Order:</td><td>  <input type="text" class="form-control order" placeholder="order"></td></tr>
-            <tr>
-                <td colspan="2">
-                    <div class="col-xs-2">
-                      <button type="submit" class="btn btn-primary addTopic">Add</button>
-                    </div>
-                    <div class="col-xs-2">
-                      <button type="submit" class="btn btn-primary cancelTopic">cancel</button>
-                    </div>
-                </td>
-            </tr>
-        </table>
-</div>
-
 <div id="sendMessageTestDIV" class="col-xs-8 col-xs-offset-2 text-left table-responsive">
     <table class="table table-bordered">
         <tr><td>Topic:</td><td>  <input type="text" class="form-control send_topic" placeholder="topic"></td></tr>
@@ -71,34 +40,11 @@
     </table>
 </div>
 <div id="topicDIV">
-
       <table cellspacing="0" class="display" id="topic" width="100%">
         <thead>
            <tr>
                   <th>Topic</th>
-                  <th>Write Queue Number</th>
-                  <th>Read Queue Number</th>
-                  <th>Permission</th>
-                  <th>Unit</th>
-                  <th>Has Unit Subscription</th>
                   <th>Order</th>
-                  <th>Create Time</th>
-                  <th>Update Time</th>
-                  <th>Operation</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-</div>
-<div id="topicDetailDIV" class="col-xs-8 col-xs-offset-2 text-left table-responsive">
-<button id="closeDetail" onclick="closeDetail();">close</button>
-      <table cellspacing="0" class="display" id="topicDetail" width="100%" style="margin-left: 0px;">
-        <thead>
-           <tr>
-                  <th>Topic</th>
-                  <th>Cluster Name</th>
-                  <th>Broker Address</th>
                   <th>Status</th>
                   <th>Create Time</th>
                   <th>Update Time</th>
@@ -108,6 +54,73 @@
         <tbody>
         </tbody>
       </table>
+</div>
+<div id="topicDetailDIV" class="col-xs-8 col-xs-offset-2 text-left table-responsive" style="padding:20px">
+<div id="topicDetailButton" style="padding:5px">
+<button id="addDetail" onclick="addDetail();">Add Details</button>
+<button id="closeDetail" onclick="closeDetail();">close</button>
+</div>
+    <div id="addTopicDIV" style="display:none">
+        <table cellspacing="1" class="col-xs-8 col-xs-offset-2 text-left table-responsive" id="addDetailTable" style="padding-left: 50px;">
+            <tr class="hide">
+                <td>Topic:</td>
+                <td><input type="text" class="form-control topic" placeholder="topic"></td>
+            </tr>
+            <tr>
+                <td>Write Queue Number:</td>
+                <td>  <input type="text" class="form-control writeQueueNum" placeholder="Write Queue Number, Default 16"></td>
+            </tr>
+            <tr>
+                <td>Read Queue Number:</td>
+                <td>  <input type="text" class="form-control readQueueNum" placeholder="Read Queue Number, Default 16"></td>
+            </tr>
+            <tr>
+                <td>Broker Address:</td>
+                <td>  <input type="text" class="form-control brokerAddress" placeholder="IP:10911"></td>
+            </tr>
+            <tr>
+                <td>Cluster Name:</td>
+                <td>  <input type="text" class="form-control clusterName" placeholder="Cluster Name" value="DefaultCluster"></td>
+            </tr>
+            <tr>
+                <td>Permission:</td>
+                <td>  <input type="text" class="form-control permission" placeholder="Read: 2/Write: 4/Read&Write: 6"></td>
+            </tr>
+            <tr><td>Order:</td><td>  <input type="text" class="form-control order" placeholder="order"></td></tr>
+            <tr>
+                <td colspan="2">
+                    <div class="col-xs-2">
+                      <button type="submit" class="btn btn-primary addTopic">Add</button>
+                    </div>
+                    <div class="col-xs-2">
+                      <button type="submit" class="btn btn-primary cancelTopic">cancel</button>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div align="center" id="topicDetailTable">
+      <table cellspacing="0" class="display" id="topicDetail" width="100%" style="margin-left: 0px;">
+        <thead>
+           <tr>
+                  <th>Topic</th>
+                  <th>Cluster Name</th>
+                  <th>Broker Address</th>
+                  <th>Status</th>
+                  <th>Write Queue Num</th>
+                  <th>Read Queue Num</th>
+                  <th>Permission</th>
+                  <th>Create Time</th>
+                  <th>Update Time</th>
+                  <th>SyncTime</th>
+                  <th>Operation</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
 </div>
 
 </div>

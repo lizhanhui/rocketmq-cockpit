@@ -2,6 +2,7 @@ package com.ndpmedia.rocketmq.cockpit.controller.api;
 
 import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
@@ -52,11 +53,12 @@ public class TopicServiceController {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
         TopicMetadata topicMetadata = cockpitTopicDBService.getTopic("DefaultCluster", topic);
+        List<TopicBrokerInfo> topicBrokerInfos = cockpitTopicDBService.queryTopicBrokerInfoByTopic(topicMetadata.getId(), 0L, 0);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", 1);
         result.put("iTotalDisplayRecords", 1);
-        result.put("aaData", topicMetadata);
+        result.put("aaData", topicBrokerInfos);
         return result;
     }
 

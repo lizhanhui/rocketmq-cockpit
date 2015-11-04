@@ -164,4 +164,8 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     public List<TopicBrokerInfo> queryEndangeredTopicBrokerInfoList(long brokerId) {
         return topicMapper.queryEndangeredTopicsByBroker(brokerId);
     }
+
+    public List<TopicBrokerInfo> queryTopicBrokerInfoByTopic(long topicId, long brokerId, int dc){
+        return topicMapper.queryTopicBrokerInfo(topicId, 0L, 0);
+    }
 }
