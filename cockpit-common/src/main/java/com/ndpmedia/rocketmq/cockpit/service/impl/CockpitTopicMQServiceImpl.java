@@ -218,6 +218,10 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
         throw new CockpitException("Not Implemented");
     }
 
+    public boolean deleteTopicByBroker(MQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException {
+        throw new CockpitException("not Implemented");
+    }
+
     public static TopicConfig wrapTopicToTopicConfig(TopicBrokerInfo topicBrokerInfo) {
         TopicConfig topicConfig = new TopicConfig();
 
