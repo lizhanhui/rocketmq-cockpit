@@ -89,7 +89,6 @@ $(document).ready(function() {
 
     $(".cancelMes").click(function() {
         document.getElementById("sendMessageTestDIV").style.display="none";
-        document.getElementById("addButton").style.display="block";
         document.getElementById("topicDIV").style.display="block";
         $("input.send_topic").val("");
         $("input.send_producerGroup").val("");
@@ -266,7 +265,7 @@ function _deleteFun(brokerId, topicId, topic, cluster_name, broker_address) {
     while (index < max){
         cell = cells.eq(index);
         if (cell.children().eq(0).html() === topic && cell.children().eq(1).html() === cluster_name && cell.children().eq(2).html() === broker_address){
-            cell.remove();
+            cell.children().eq(3).html("DELETE");
         }
         index++;
     }
@@ -304,6 +303,17 @@ function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read
                     success: function(data) {
                         if (data){
                             alert("SUCCESS");
+                            var cells = dTable.children().eq(1).children();
+                            var index = 0;
+                            var max = cells.length
+                            while (index < max){
+                                cell = cells.eq(index);
+                                if (cell.children().eq(0).html() === topic && cell.children().eq(1).html() === cluster_name && cell.children().eq(2).html() === broker_address){
+                                    cell.children().eq(3).html("ACTIVE");
+                                }
+                                index++;
+                            }
+                        hideCloud();
                         }
                     },
                     error: function(e) {
@@ -312,7 +322,6 @@ function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read
                     }
                 });
             }
-            location.reload(true);
         },
         error: function(msg) {
             alert(msg.statusText);
@@ -325,16 +334,9 @@ function _sendFun(topic) {
     document.getElementById("sendMessageTestDIV").style.display = "block";
     document.getElementById("topicDetailDIV").style.display="none";
     document.getElementById("topicDIV").style.display="none";
-    document.getElementById("addButton").style.display="none";
     $("input.send_topic").val(topic);
 }
 
-function addButton(){
-    document.getElementById("addButton").style.display="none";
-    document.getElementById("addTopicDIV").style.display="block";
-    document.getElementById("topicDetailDIV").style.display="none";
-    document.getElementById("topicDIV").style.display="none";
-}
 
 function closeDetail(){
     document.getElementById("topicDetailDIV").style.display="none";
