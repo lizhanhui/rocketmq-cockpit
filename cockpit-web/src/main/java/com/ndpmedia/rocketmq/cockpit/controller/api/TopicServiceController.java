@@ -1,12 +1,9 @@
 package com.ndpmedia.rocketmq.cockpit.controller.api;
 
-import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
-import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
-import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
-import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
+import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
+import com.ndpmedia.rocketmq.cockpit.model.*;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
 import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +15,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/api/topic")
 public class TopicServiceController {
 
     @Autowired
-    private CockpitTopicMQService cockpitTopicMQService;
+    private CockpitTopicDBService cockpitTopicDBService;
 
     @Autowired
-    private CockpitTopicDBService cockpitTopicDBService;
+    private CockpitBrokerDBService cockpitBrokerDBService;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
@@ -75,11 +69,71 @@ public class TopicServiceController {
         return topicMetadata;
     }
 
+    @RequestMapping(value = "/activate", method = RequestMethod.POST)
+    @ResponseBody
+    public boolean activate(@RequestBody TopicBrokerInfo topicBrokerInfo) throws CockpitException {
+        try {
+            TopicMetadata topicMetadata = cockpitTopicDBService.getTopic(topicBrokerInfo.getTopicMetadata().getClusterName(), topicBrokerInfo.getTopicMetadata().getTopic());
+
+            cockpitTopicDBService.activate(topicMetadata.getId(), topicBrokerInfo.getBroker().getId());
+        } catch (Exception e){
+            throw new CockpitException("" + e);
+        }
+        return true;
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    public void update(@RequestBody TopicMetadata topic) {
-        topic.setUpdateTime(new Date());
-        cockpitTopicDBService.update(topic);
+    public boolean add(@RequestBody TopicBrokerInfo topicBrokerInfo) throws CockpitException {
+        try {
+            TopicMetadata topicMetadata = cockpitTopicDBService.getTopic(topicBrokerInfo.getTopicMetadata().getClusterName(), topicBrokerInfo.getTopicMetadata().getTopic());
+
+            topicBrokerInfo.setTopicMetadata(topicMetadata);
+            topicBrokerInfo.setStatus(Status.ACTIVE);
+
+            List<Broker> brokers = new ArrayList<>();
+            if (topicBrokerInfo.getBroker().getId() == -1L){
+                brokers.addAll(cockpitBrokerDBService.list(topicBrokerInfo.getTopicMetadata().getClusterName(), null, 0, 0));
+            }else {
+                brokers.add(cockpitBrokerDBService.get(0, topicBrokerInfo.getBroker().getAddress()));
+            }
+
+            for (Broker broker:brokers) {
+                topicBrokerInfo.setBroker(broker);
+
+                if (topicBrokerInfoCheck(topicBrokerInfo)) {
+                    cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
+                }else
+                    cockpitTopicDBService.update(topicBrokerInfo);
+            }
+        }catch (Exception e){
+            if (e.getMessage().contains("Error updating database") && e.getMessage().contains("Duplicate entry"))
+                throw new CockpitException("this broker already added.");
+            else
+                throw new CockpitException(e);
+        }
+        return true;
+    }
+
+    @RequestMapping(value = "/{topicId}/{brokerId}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public boolean deleteTopicBrokerInfo(@PathVariable("topicId") long topicId, @PathVariable("brokerId") long brokerId) {
+        return cockpitTopicDBService.deactivate(topicId, brokerId);
+    }
+
+    @RequestMapping(value = "/{topicId}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public void deleteTopic(){
+
+    }
+
+    private boolean topicBrokerInfoCheck(TopicBrokerInfo topicBrokerInfo){
+        List<TopicBrokerInfo> topicBrokerInfos = cockpitTopicDBService.queryTopicBrokerInfoByTopic(topicBrokerInfo.getTopicMetadata().getId(),
+                topicBrokerInfo.getBroker().getId(), 0);
+
+        if (null != topicBrokerInfos && topicBrokerInfos.size() > 0)
+            return false;
+
+        return true;
     }
 }

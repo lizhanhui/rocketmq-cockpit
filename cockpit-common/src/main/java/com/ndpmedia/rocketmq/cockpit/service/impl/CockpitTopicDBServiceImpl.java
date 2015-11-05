@@ -65,6 +65,21 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     }
 
     @Override
+    public boolean activate(long topicId, long brokerId) {
+        try {
+            List<TopicBrokerInfo> topicBrokerInfos = topicMapper.queryTopicBrokerInfo(topicId, brokerId, 0);
+            for (TopicBrokerInfo topicBrokerInfo:topicBrokerInfos){
+                topicBrokerInfo.setStatus(Status.ACTIVE);
+                topicMapper.updateTopicBrokerInfo(topicBrokerInfo);
+            }
+        }catch (Exception e){
+            LOGGER.warn("" + e);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean deactivate(long id){
         try{
             TopicMetadata topic = topicMapper.getMetadata(id);
@@ -73,7 +88,21 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
                 topicMapper.update(topic);
             }
         } catch (Exception e){
-            e.printStackTrace();
+            LOGGER.warn("" + e);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean deactivate(long topicId, long brokerId) {
+        try{
+            List<TopicBrokerInfo> topicBrokerInfos = topicMapper.queryTopicBrokerInfo(topicId, brokerId, 0);
+            for (TopicBrokerInfo topicBrokerInfo:topicBrokerInfos){
+                topicBrokerInfo.setStatus(Status.DELETED);
+                topicMapper.updateTopicBrokerInfo(topicBrokerInfo);
+            }
+        }catch (Exception e) {
             return false;
         }
         return true;
@@ -101,6 +130,11 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     @Override
     public void update(TopicMetadata topicMetadata){
         topicMapper.update(topicMetadata);
+    }
+
+    @Override
+    public void update(TopicBrokerInfo topicBrokerInfo){
+        topicMapper.updateTopicBrokerInfo(topicBrokerInfo);
     }
 
     @Override
