@@ -46,6 +46,8 @@ public interface CockpitTopicMQService extends CockpitTopicBaseService {
      */
     boolean createOrUpdateTopic(MQAdminExt adminExt, TopicMetadata topicMetadata) throws CockpitException;
 
+    boolean createOrUpdateTopic(MQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException;
+
     /**
      * delete topic on cluster or broker
      * @param topicMetadata topic

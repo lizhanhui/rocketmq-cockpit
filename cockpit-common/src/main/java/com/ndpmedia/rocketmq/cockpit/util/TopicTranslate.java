@@ -3,6 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.util;
 import com.alibaba.rocketmq.common.TopicConfig;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 
 import java.util.Date;
 
@@ -13,15 +14,15 @@ public class TopicTranslate {
 
     /**
      * get topic config by topic
-     * @param topic topic
+     * @param topicBrokerInfo topic
      * @return topic config
      */
-    public static TopicConfig translateFrom(Topic topic){
+    public static TopicConfig translateFrom(TopicBrokerInfo topicBrokerInfo){
         TopicConfig topicConfig = new TopicConfig();
-        topicConfig.setTopicName(topic.getTopic());
-        topicConfig.setWriteQueueNums(topic.getWriteQueueNum());
-        topicConfig.setReadQueueNums(topic.getReadQueueNum());
-        topicConfig.setPerm(topic.getPermission());
+        topicConfig.setTopicName(topicBrokerInfo.getTopicMetadata().getTopic());
+        topicConfig.setWriteQueueNums(topicBrokerInfo.getWriteQueueNum());
+        topicConfig.setReadQueueNums(topicBrokerInfo.getReadQueueNum());
+        topicConfig.setPerm(topicBrokerInfo.getPermission());
 
         return topicConfig;
     }

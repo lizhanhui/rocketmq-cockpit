@@ -10,11 +10,13 @@ import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.admin.MQAdminExt;
+import com.alibaba.rocketmq.tools.command.CommandUtil;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
+import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,13 +215,61 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
     }
 
     @Override
+    public boolean createOrUpdateTopic(MQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException {
+        try {
+            if (null == adminExt)
+                adminExt = new DefaultMQAdminExt("CockpitMQAdmin");
+            adminExt.start();
+            TopicConfig topicConfig = TopicTranslate.translateFrom(topicBrokerInfo);
+            if (-1 != topicBrokerInfo.getBroker().getId())
+                adminExt.createAndUpdateTopicConfig(topicBrokerInfo.getBroker().getAddress(), topicConfig);
+            else{
+                Set<String> masterSet =
+                        CommandUtil.fetchMasterAddrByClusterName(adminExt, topicBrokerInfo.getTopicMetadata().getClusterName());
+                for (String addr : masterSet) {
+                    int retry = 0;
+                    while (retry < 5) {
+                        try {
+                            adminExt.createAndUpdateTopicConfig(addr, topicConfig);
+                            break;
+                        } catch (Exception e) {
+                            logger.warn("createAndUpdateTopicConfig faild:" + addr + e);
+                            retry++;
+                        }
+                    }
+                }
+            }
+
+        }catch (Exception e){
+            throw new CockpitException(e.getMessage());
+        }finally {
+            adminExt.shutdown();
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean deleteTopic(MQAdminExt adminExt, TopicMetadata topic) throws CockpitException {
 
         throw new CockpitException("Not Implemented");
     }
 
     public boolean deleteTopicByBroker(MQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException {
-        throw new CockpitException("not Implemented");
+        try {
+            if (null == adminExt)
+                adminExt = new DefaultMQAdminExt();
+            adminExt.start();
+            Set<String> addrs = new HashSet<>();
+            addrs.add(topicBrokerInfo.getBroker().getAddress());
+            adminExt.deleteTopicInBroker(addrs, topicBrokerInfo.getTopicMetadata().getTopic());
+        } catch (Exception e) {
+            logger.warn(" " + e);
+            return false;
+        } finally {
+            adminExt.shutdown();
+        }
+        return true;
     }
 
     public static TopicConfig wrapTopicToTopicConfig(TopicBrokerInfo topicBrokerInfo) {

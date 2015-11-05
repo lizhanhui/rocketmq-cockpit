@@ -10,41 +10,73 @@ $(document).ready(function() {
 
     $(".addTopic").click(function() {
         showCloud();
+        var brokerId = "undefined" === typeof($("#brokerList").children('option:selected').val()) ? "-1" : $("#brokerList").children('option:selected').val();
+
         var topic = $("input.topic").val();
         var write_queue_num = $("input.writeQueueNum").val();
         var read_queue_num = $("input.readQueueNum").val();
-        var broker_address = $("input.brokerAddress").val();
+
         var cluster_name = $("input.clusterName").val();
         var permission = $("input.permission").val();
-        var unit = $("input.unit").val();
-        var has_unit_subscription = $("input.hasUnitSubscription").val();
-        var order = $("input.order").val();
         var allow = "DRAFT";
-        var ob = JSON.stringify({"topic":topic,"writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
-         "brokerAddress":broker_address, "clusterName":cluster_name, "permission":permission, "unit":unit, "hasUnitSubscription":has_unit_subscription, "order":order, "status":allow});
+        var broker_address = "undefined" === typeof($("#brokerList").children('option:selected').val()) ? "-1" : $("#brokerList").children('option:selected').text();
+        var topicMetadata = {"topic":topic,"clusterName":cluster_name};
+        var broker = {"id": brokerId, "clusterName": cluster_name, "address": broker_address};
+        var ob = JSON.stringify({"topicMetadata": topicMetadata, "broker": broker, "writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
+                 "permission":permission});
+
         if ($.trim(topic) === "") {
-         alert(" no topic ?");
-         hideCloud();
-         return false;
+             alert(" no topic ?");
+             hideCloud();
+             return false;
         } else if ($.trim(cluster_name) === "" && $.trim(broker_address) == "") {
-         alert("error");
-         hideCloud();
-         return false;
+             alert("error");
+             hideCloud();
+             return false;
         } else {
-         $.ajax({
-             async: false,
-             url: "cockpit/api/topic",
-             type: "PUT",
-             dataType: "json",
-             contentType: 'application/json',
-             data: ob,
-             success: function() {
-                 location.reload(true);
-             },
-             error: function() {
-                 hideCloud();
-             }
-         });
+            if ("-1" === brokerId){
+                if (window.confirm("no broker ? add it to all ?")){
+                    alert(" will add this topic to all brokers .");
+                }else {
+                    alert(" add your broker.");
+                    hideCloud();
+                    return;
+                }
+            }
+            $.ajax({
+                async: false,
+                url: "cockpit/manage/topic",
+                type: "POST",
+                dataType: "json",
+                contentType : "application/json; charset=utf-8",
+                data: ob,
+                success: function(data) {
+                    if (data){
+                        $.ajax({
+                            async: false,
+                            url: "cockpit/api/topic",
+                            type: "POST",
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            data: ob,
+                            success: function(data) {
+                                if (data){
+                                    alert("SUCCESS");
+                                }
+                            },
+                            error: function(e) {
+                                alert(e.statusText);
+                                hideCloud();
+                            }
+                        });
+                    }
+                    location.reload(true);
+                },
+                error: function(msg) {
+                    alert(msg.statusText);
+                    hideCloud();
+                }
+            });
         }
 
     });
@@ -166,11 +198,11 @@ function detailTable(topic){
             { "data": "topicMetadata.topic",
                 "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
                     if (oData.status != "ACTIVE"){
-                        $(nTd).html("<a href='javascript:void(0);' " + "onclick='_editFun(\"" + oData.broker.id + "\",\"" + oData.topicMetadata.id + "\",\"" + oData.broker.clusterName + "\",\"" + oData.writeQueueNum + "\",\"" + oData.readQueueNum + "\",\"" + oData.permission + "\",\"" + oData.topicMetadata.order + "\")'>Approve</a>&nbsp;&nbsp;")
-                            .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.broker.id + "\",\"" + oData.topicMetadata.id + "\",\"" + oData.broker.clusterName + "\",\"" + oData.broker.address + "\")'>Delete</a>");
+                        $(nTd).html("<a href='javascript:void(0);' " + "onclick='_editFun(\"" + oData.broker.id + "\",\"" + oData.topicMetadata.topic + "\",\"" + oData.broker.clusterName + "\",\"" + oData.broker.address  + "\",\"" + oData.writeQueueNum + "\",\"" + oData.readQueueNum + "\",\"" + oData.permission + "\",\"" + oData.topicMetadata.order + "\")'>Approve</a>&nbsp;&nbsp;")
+                            .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.broker.id + "\",\"" + oData.topicMetadata.id + "\",\"" + oData.topicMetadata.topic + "\",\"" + oData.broker.clusterName + "\",\"" + oData.broker.address + "\")'>Delete</a>");
                     }else {
                         $(nTd).html("<a href='javascript:void(0);' " + "onclick='_sendFun(\"" + oData.topicMetadata.topic + "\")'>test</a>&nbsp;&nbsp;")
-                            .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.broker.id + "\",\"" + oData.topicMetadata.id + "\",\"" + oData.broker.clusterName + "\",\"" + oData.broker.address + "\")'>Delete</a>");
+                            .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.broker.id + "\",\"" + oData.topicMetadata.id + "\",\"" + oData.topicMetadata.topic + "\",\"" + oData.broker.clusterName + "\",\"" + oData.broker.address + "\")'>Delete</a>");
                     }
                 }
             }
@@ -198,11 +230,11 @@ function detailTable(topic){
 
 }
 
-function _deleteFun(brokerId, topicId, cluster_name, broker_address) {
+function _deleteFun(brokerId, topicId, topic, cluster_name, broker_address) {
     showCloud();
     $.ajax({
         async: false,
-        url: "cockpit/manage/topic/" + brokerId + "/" + "topicId",
+        url: "cockpit/manage/topic/" + brokerId + "/" + topicId,
         type: "DELETE",
         dataType: "json",
         contentType: "application/json",
@@ -210,12 +242,13 @@ function _deleteFun(brokerId, topicId, cluster_name, broker_address) {
             if (backdata){
                 $.ajax({
                     async: false,
-                    url: "cockpit/api/topic/" + id,
+                    url: "cockpit/api/topic/" + topicId + "/" + brokerId,
                     type: "DELETE",
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
                     complete: function() {
                         alert("SUCCESS");
+                        hideCloud();
                     }
                 });
             }
@@ -245,32 +278,44 @@ function _deleteFun(brokerId, topicId, cluster_name, broker_address) {
     hideCloud();
 }
 
-function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read_queue_num, permission, unit, has_unit_subscription,  order) {
+function _editFun(id, topic, cluster_name, broker_address, write_queue_num, read_queue_num, permission, order) {
     showCloud();
-    var ob = JSON.stringify({"id":id, "topic":topic,"writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
-        "brokerAddress":broker_address, "clusterName":cluster_name, "permission":permission,
-        "unit":unit, "hasUnitSubscription":has_unit_subscription, "order":order});
+    var topicMetadata = {"topic":topic,"clusterName":cluster_name};
+    var broker = {"id": id, "clusterName": cluster_name, "address": broker_address};
+    var ob = JSON.stringify({"topicMetadata": topicMetadata, "broker": broker, "writeQueueNum":write_queue_num,"readQueueNum":read_queue_num,
+                     "permission":permission});
+
     $.ajax({
         async: false,
-        data: ob,
         url: "cockpit/manage/topic",
         type: "POST",
         dataType: "json",
-        contentType: "application/json",
-        success: function(backdata) {
-            if (backdata) {
+        contentType : "application/json; charset=utf-8",
+        data: ob,
+        success: function(data) {
+            if (data){
                 $.ajax({
                     async: false,
-                    url: "cockpit/api/topic/" + id,
+                    url: "cockpit/api/topic/activate",
                     type: "POST",
                     dataType: "json",
-                    contentType: "application/json",
-                    complete: function() {
-                        window.location.reload(true);
+                    contentType: "application/json; charset=utf-8",
+                    data: ob,
+                    success: function(data) {
+                        if (data){
+                            alert("SUCCESS");
+                        }
+                    },
+                    error: function(e) {
+                        alert(e.statusText);
+                        hideCloud();
                     }
                 });
             }
-
+            location.reload(true);
+        },
+        error: function(msg) {
+            alert(msg.statusText);
             hideCloud();
         }
     });
@@ -296,6 +341,22 @@ function closeDetail(){
 }
 
 function addDetail(){
+    $.ajax({
+        async: false,
+        url: "cockpit/api/broker",
+        type: "GET",
+        dataType: "json",
+        contentType: "application/json",
+        success: function(brokers){
+            var selectB = document.getElementById("brokerList");
+            brokers.forEach(function(broker) {
+                var option = document.createElement("option");
+                option.value = broker.id;
+                option.innerHTML = broker.address;
+                selectB.appendChild(option);
+            });
+        }
+    });
     document.getElementById("addTopicDIV").style.display="block";
     document.getElementById("topicDetailButton").style.display="none";
     document.getElementById("topicDetailTable").style.display="none";

@@ -25,12 +25,16 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
      */
     boolean activate(long id);
 
+    boolean activate(long topicId, long brokerId);
+
     /**
      * update topic status to del on database
      * @param id the topic id on database
      * @return result
      */
     boolean deactivate(long id);
+
+    boolean deactivate(long topicId, long brokerId);
 
 
     /**
@@ -43,6 +47,8 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
     void insert(TopicMetadata topicMetadata);
 
     void update(TopicMetadata topicMetadata);
+
+    void update(TopicBrokerInfo topicBrokerInfo);
 
     void insert(TopicMetadata topicMetadata, long projectId);
 

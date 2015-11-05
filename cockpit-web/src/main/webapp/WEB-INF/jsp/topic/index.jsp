@@ -76,7 +76,7 @@
             </tr>
             <tr>
                 <td>Broker Address:</td>
-                <td>  <input type="text" class="form-control brokerAddress" placeholder="IP:10911"></td>
+                <td><select id="brokerList"><option value="-1">please choose your broker</option></select></td>
             </tr>
             <tr>
                 <td>Cluster Name:</td>
@@ -86,7 +86,7 @@
                 <td>Permission:</td>
                 <td>  <input type="text" class="form-control permission" placeholder="Read: 2/Write: 4/Read&Write: 6"></td>
             </tr>
-            <tr><td>Order:</td><td>  <input type="text" class="form-control order" placeholder="order"></td></tr>
+
             <tr>
                 <td colspan="2">
                     <div class="col-xs-2">

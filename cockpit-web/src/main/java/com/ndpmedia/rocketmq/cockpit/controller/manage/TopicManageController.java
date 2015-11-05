@@ -5,6 +5,7 @@ import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,7 @@ public class TopicManageController {
     @Autowired
     private CockpitTopicDBService cockpitTopicDBService;
 
-    @RequestMapping(method = {RequestMethod.POST, RequestMethod.PUT})
+    @RequestMapping(method = {RequestMethod.PUT})
     @ResponseBody
     public boolean update(@RequestBody TopicMetadata topicMetadata) throws CockpitException {
         return cockpitTopicMQService.createOrUpdateTopic(null, topicMetadata);
@@ -41,6 +42,17 @@ public class TopicManageController {
             return cockpitTopicMQService.deleteTopicByBroker(null, topicBrokerInfo);
         }
 
+        return false;
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseBody
+    public boolean add(@RequestBody TopicBrokerInfo topicBrokerInfo) throws CockpitException{
+        try {
+            cockpitTopicMQService.createOrUpdateTopic(null, topicBrokerInfo);
+        }catch (Exception e){
+            throw new CockpitException(e);
+        }
         return true;
     }
 }
