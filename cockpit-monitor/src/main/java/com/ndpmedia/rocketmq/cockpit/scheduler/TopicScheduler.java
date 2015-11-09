@@ -99,28 +99,7 @@ public class TopicScheduler {
                     }
 
                     for (QueueData queueData: topicRouteData.getQueueDatas()) {
-                        Broker broker = null;
-                        for (BrokerData brokerData : topicRouteData.getBrokerDatas()) {
-                            if (brokerData.getBrokerName().equals(queueData.getBrokerName())) {
-                                for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
-                                    if (entry.getKey() == MixAll.MASTER_ID) {
-                                        broker = cockpitBrokerDBService.get(0, entry.getValue());
-                                        if (null != broker) {
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (null == broker) {
-                                    for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
-                                        broker = cockpitBrokerDBService.get(0, entry.getValue());
-                                        if (null != broker) {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        Broker broker = getBroker(topicRouteData, queueData);
 
                         if (null != broker && !cockpitBrokerDBService.hasTopic(broker.getId(), topicMetadata.getId())) {
                             TopicBrokerInfo topicBrokerInfo = new TopicBrokerInfo();
@@ -145,6 +124,32 @@ public class TopicScheduler {
         } catch (Exception e) {
             logger.error("Failed to sync topic", e);
         }
+    }
+
+    private Broker getBroker(TopicRouteData topicRouteData, QueueData queueData) {
+        Broker broker = null;
+        for (BrokerData brokerData : topicRouteData.getBrokerDatas()) {
+            if (brokerData.getBrokerName().equals(queueData.getBrokerName())) {
+                for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
+                    if (entry.getKey() == MixAll.MASTER_ID) {
+                        broker = cockpitBrokerDBService.get(0, entry.getValue());
+                        if (null != broker) {
+                            break;
+                        }
+                    }
+                }
+
+                if (null == broker) {
+                    for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
+                        broker = cockpitBrokerDBService.get(0, entry.getValue());
+                        if (null != broker) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return broker;
     }
 
     private void syncUpTopics(DefaultMQAdminExt defaultMQAdminExt) {
