@@ -10,28 +10,20 @@ import com.alibaba.rocketmq.common.protocol.route.QueueData;
 import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
-import com.ndpmedia.rocketmq.cockpit.model.Broker;
-import com.ndpmedia.rocketmq.cockpit.model.Level;
-import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
-import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
-import com.ndpmedia.rocketmq.cockpit.model.Warning;
+import com.ndpmedia.rocketmq.cockpit.model.*;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicMQServiceImpl;
+import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by robert on 2015/6/9.
@@ -107,28 +99,7 @@ public class TopicScheduler {
                     }
 
                     for (QueueData queueData: topicRouteData.getQueueDatas()) {
-                        Broker broker = null;
-                        for (BrokerData brokerData : topicRouteData.getBrokerDatas()) {
-                            if (brokerData.getBrokerName().equals(queueData.getBrokerName())) {
-                                for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
-                                    if (entry.getKey() == MixAll.MASTER_ID) {
-                                        broker = cockpitBrokerDBService.get(0, entry.getValue());
-                                        if (null != broker) {
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (null == broker) {
-                                    for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
-                                        broker = cockpitBrokerDBService.get(0, entry.getValue());
-                                        if (null != broker) {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        Broker broker = getBroker(topicRouteData, queueData);
 
                         if (null != broker && !cockpitBrokerDBService.hasTopic(broker.getId(), topicMetadata.getId())) {
                             TopicBrokerInfo topicBrokerInfo = new TopicBrokerInfo();
@@ -155,6 +126,32 @@ public class TopicScheduler {
         }
     }
 
+    private Broker getBroker(TopicRouteData topicRouteData, QueueData queueData) {
+        Broker broker = null;
+        for (BrokerData brokerData : topicRouteData.getBrokerDatas()) {
+            if (brokerData.getBrokerName().equals(queueData.getBrokerName())) {
+                for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
+                    if (entry.getKey() == MixAll.MASTER_ID) {
+                        broker = cockpitBrokerDBService.get(0, entry.getValue());
+                        if (null != broker) {
+                            break;
+                        }
+                    }
+                }
+
+                if (null == broker) {
+                    for (Map.Entry<Long, String> entry : brokerData.getBrokerAddrs().entrySet()) {
+                        broker = cockpitBrokerDBService.get(0, entry.getValue());
+                        if (null != broker) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return broker;
+    }
+
     private void syncUpTopics(DefaultMQAdminExt defaultMQAdminExt) {
         Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
         for (String brokerAddress : brokerAddresses) {
@@ -162,7 +159,7 @@ public class TopicScheduler {
             List<TopicBrokerInfo> list =
                     cockpitTopicDBService.queryEndangeredTopicBrokerInfoList(broker.getId());
             for (TopicBrokerInfo topicBrokerInfo : list) {
-                TopicConfig topicConfig = CockpitTopicMQServiceImpl.wrapTopicToTopicConfig(topicBrokerInfo);
+                TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
                 try {
                     defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddress, topicConfig);
                 } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {

@@ -7,17 +7,9 @@ import com.alibaba.rocketmq.common.subscription.SubscriptionGroupConfig;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.google.common.base.Preconditions;
-import com.ndpmedia.rocketmq.cockpit.model.Broker;
-import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
-import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
-import com.ndpmedia.rocketmq.cockpit.model.Level;
-import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.Warning;
+import com.ndpmedia.rocketmq.cockpit.model.*;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
+import com.ndpmedia.rocketmq.cockpit.service.*;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupMQServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by robert on 2015/6/9.

@@ -2,12 +2,8 @@ package com.ndpmedia.rocketmq.cockpit.controller.api;
 
 import com.alibaba.rocketmq.common.protocol.body.Connection;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
-import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
-import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
-import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
-import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,15 +96,6 @@ public class ConsumerGroupServiceController {
             defaultMQAdminExt.shutdown();
         }
         return null;
-    }
-
-    private long getTeamId(HttpServletRequest request) {
-        long teamId = 0;
-        if (!WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN)) {
-            CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-            teamId = cockpitUser.getTeam().getId();
-        }
-        return teamId;
     }
 
     private long getProjectId(HttpServletRequest request) {
