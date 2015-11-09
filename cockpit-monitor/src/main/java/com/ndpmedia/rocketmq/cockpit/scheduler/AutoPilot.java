@@ -29,8 +29,8 @@ import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupMQServiceImpl;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicMQServiceImpl;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
+import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,7 +197,7 @@ public class AutoPilot {
 
                             // Create topic on matched brokers or update topic read/write queue number.
                             adminExt.createAndUpdateTopicConfig(broker.getAddress(),
-                                    CockpitTopicMQServiceImpl.wrapTopicToTopicConfig(topicBrokerInfo));
+                                    TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo));
                             if (existingTopicBrokerInfo.isEmpty()) {
                                 topicMapper.insertTopicBrokerInfo(topicBrokerInfo);
                             }

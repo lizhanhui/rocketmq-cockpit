@@ -220,7 +220,7 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
             if (null == adminExt)
                 adminExt = new DefaultMQAdminExt("CockpitMQAdmin");
             adminExt.start();
-            TopicConfig topicConfig = TopicTranslate.translateFrom(topicBrokerInfo);
+            TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
             if (-1 != topicBrokerInfo.getBroker().getId())
                 adminExt.createAndUpdateTopicConfig(topicBrokerInfo.getBroker().getAddress(), topicConfig);
             else{
@@ -270,23 +270,5 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
             adminExt.shutdown();
         }
         return true;
-    }
-
-    public static TopicConfig wrapTopicToTopicConfig(TopicBrokerInfo topicBrokerInfo) {
-        TopicConfig topicConfig = new TopicConfig();
-
-        topicConfig.setWriteQueueNums(topicBrokerInfo.getWriteQueueNum());
-        if (topicConfig.getWriteQueueNums() <= 0) {
-            topicConfig.setWriteQueueNums(TopicConfig.DefaultWriteQueueNums);
-        }
-
-        topicConfig.setReadQueueNums(topicBrokerInfo.getReadQueueNum());
-        if (topicConfig.getReadQueueNums() <= 0) {
-            topicConfig.setReadQueueNums(TopicConfig.DefaultReadQueueNums);
-        }
-
-        topicConfig.setTopicName(topicBrokerInfo.getTopicMetadata().getTopic());
-
-        return topicConfig;
     }
 }

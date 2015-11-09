@@ -12,21 +12,24 @@ import java.util.Date;
  */
 public class TopicTranslate {
 
-    /**
-     * get topic config by topic
-     * @param topicBrokerInfo topic
-     * @return topic config
-     */
-    public static TopicConfig translateFrom(TopicBrokerInfo topicBrokerInfo){
+
+    public static TopicConfig wrapTopicToTopicConfig(TopicBrokerInfo topicBrokerInfo) {
         TopicConfig topicConfig = new TopicConfig();
-        topicConfig.setTopicName(topicBrokerInfo.getTopicMetadata().getTopic());
+
         topicConfig.setWriteQueueNums(topicBrokerInfo.getWriteQueueNum());
+        if (topicConfig.getWriteQueueNums() <= 0) {
+            topicConfig.setWriteQueueNums(TopicConfig.DefaultWriteQueueNums);
+        }
+
         topicConfig.setReadQueueNums(topicBrokerInfo.getReadQueueNum());
-        topicConfig.setPerm(topicBrokerInfo.getPermission());
+        if (topicConfig.getReadQueueNums() <= 0) {
+            topicConfig.setReadQueueNums(TopicConfig.DefaultReadQueueNums);
+        }
+
+        topicConfig.setTopicName(topicBrokerInfo.getTopicMetadata().getTopic());
 
         return topicConfig;
     }
-
     /**
      * get topic by topic config, broker cluster
      * @param topicConfig topic config

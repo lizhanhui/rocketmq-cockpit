@@ -21,7 +21,7 @@ import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
-import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitTopicMQServiceImpl;
+import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,7 +162,7 @@ public class TopicScheduler {
             List<TopicBrokerInfo> list =
                     cockpitTopicDBService.queryEndangeredTopicBrokerInfoList(broker.getId());
             for (TopicBrokerInfo topicBrokerInfo : list) {
-                TopicConfig topicConfig = CockpitTopicMQServiceImpl.wrapTopicToTopicConfig(topicBrokerInfo);
+                TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
                 try {
                     defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddress, topicConfig);
                 } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
