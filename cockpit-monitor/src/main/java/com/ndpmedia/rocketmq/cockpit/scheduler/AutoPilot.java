@@ -11,23 +11,9 @@ import com.alibaba.rocketmq.common.subscription.SubscriptionGroupConfig;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.alibaba.rocketmq.tools.admin.MQAdminExt;
-import com.ndpmedia.rocketmq.cockpit.model.Broker;
-import com.ndpmedia.rocketmq.cockpit.model.BrokerLoad;
-import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
-import com.ndpmedia.rocketmq.cockpit.model.DataCenter;
-import com.ndpmedia.rocketmq.cockpit.model.Level;
-import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.TopicAvailability;
-import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
-import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
-import com.ndpmedia.rocketmq.cockpit.model.Warning;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
-import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
+import com.ndpmedia.rocketmq.cockpit.model.*;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.*;
+import com.ndpmedia.rocketmq.cockpit.service.*;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupMQServiceImpl;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
@@ -37,13 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class AutoPilot {

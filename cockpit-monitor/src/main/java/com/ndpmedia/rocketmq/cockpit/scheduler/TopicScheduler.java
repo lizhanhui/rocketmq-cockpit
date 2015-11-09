@@ -10,12 +10,7 @@ import com.alibaba.rocketmq.common.protocol.route.QueueData;
 import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
-import com.ndpmedia.rocketmq.cockpit.model.Broker;
-import com.ndpmedia.rocketmq.cockpit.model.Level;
-import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
-import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
-import com.ndpmedia.rocketmq.cockpit.model.Warning;
+import com.ndpmedia.rocketmq.cockpit.model.*;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
@@ -28,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by robert on 2015/6/9.
