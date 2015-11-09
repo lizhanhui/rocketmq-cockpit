@@ -1,7 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.controller.api;
 
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitRuntimeException;
-import com.ndpmedia.rocketmq.cockpit.model.CockpitRole;
 import com.ndpmedia.rocketmq.cockpit.model.CockpitUser;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
 import com.ndpmedia.rocketmq.cockpit.model.Project;
@@ -10,6 +9,7 @@ import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitProjectService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitUserService;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
+import com.ndpmedia.rocketmq.cockpit.util.UserHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-//TODO 
+
 @Controller
 @RequestMapping(value = "/api/project")
 public class CockpitProjectController {
@@ -35,25 +35,13 @@ public class CockpitProjectController {
     @ResponseBody
     public List<Project> list(HttpServletRequest request){
         CockpitUser cockpitUser = (CockpitUser) request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
-        if (isAdmin(cockpitUser)) {
+        if (UserHelper.isAdmin(cockpitUser)) {
             // return all projects.
             return cockpitProjectService.list(0);
         }
 
         long teamId = cockpitUser.getTeam().getId();
         return cockpitProjectService.list(teamId);
-    }
-
-    private boolean isAdmin(CockpitUser user) {
-        List<CockpitRole> roles = user.getCockpitRoles();
-
-        for (CockpitRole role : roles) {
-            if (CockpitRole.ROLE_ADMIN.equals(role)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @RequestMapping(method = RequestMethod.PUT)
@@ -77,7 +65,7 @@ public class CockpitProjectController {
     public Project get(@PathVariable("projectId") long projectId, HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser) request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
 
-        if (isAdmin(cockpitUser)) {
+        if (UserHelper.isAdmin(cockpitUser)) {
             return cockpitProjectService.get(projectId, null);
         }
 
