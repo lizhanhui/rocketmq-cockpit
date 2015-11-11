@@ -3,10 +3,18 @@
 <html>
 	<head>
 		<title>Login Page</title>
-		<script src="js/jquery.min.js" type="text/javascript"></script>
-		<script src="js/bootstrap.min.js" type="text/javascript"></script>
-		<link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
-		
+		<script src="../js/jquery.min.js" type="text/javascript"></script>
+		<script src="../js/bootstrap.min.js" type="text/javascript"></script>
+		<link href="../css/bootstrap.min.css" type="text/css" rel="stylesheet">
+		<style>
+		    table td {
+		        padding: 10px;
+		    }
+
+		    h3 {
+		        padding-top: 10%;
+		    }
+		</style>
 		<base href="<%=basePath%>">
 		<script type="text/javascript">
 			function check() {
@@ -26,11 +34,11 @@
 					return false;
 				}
 				return true;
-			}
+			};
 		</script>
 	</head>
 	<body onload='document.f.j_username.focus();' style="background-color:#EEFfeE">
-	<h3 align="center" style="padding-top:200px">Login with Username and Password</h3>
+	<h3 id="titles" align="center">Login with Username and Password</h3>
 
 	<form name='f' action='j_spring_security_check' method='POST'>
     <%
@@ -43,9 +51,9 @@
             msg = errSMSG.toString();
         }
     %>
-    <table align="center" valign="middle" style="background-color:#ccffcc">
+    <table align="center" style="background-color:#ccffcc" border="2">
         <tr>
-            <td colspan='2'><span style="color:red"><%=msg%></span></td>
+            <td colspan='2' style="padding:0px;"><span style="color:red"><%=msg%></span></td>
         </tr>
         <tr>
             <td><label for="j_username">User:</label></td>
@@ -60,10 +68,10 @@
             <td><input type="checkbox" id="j_remember-me" name="remember-me"></td>
         </tr>
         <tr>
-            <td colspan='2' align="center">
-
+            <td>
                 <label for="kaptcha">verification code：</label>
-
+            </td>
+            <td>
                 <input name="kaptcha" type="text" id="kaptcha" maxlength="20" class="chknumber_input">
                 <img src="cockpit/captcha-image" width="170" height="40" id="kaptchaImage" style="margin-bottom: -3px"  alt="Captcha">
                 <script type="text/javascript">
@@ -75,7 +83,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan='2' align="right"><input name="submit" type="submit" value="Login" onclick="return check()"/></td>
+            <td colspan='2' align="right"><input name="submit" type="submit" value="Login" onclick="return check()" /></td>
         </tr>
     </table>
 </form>
