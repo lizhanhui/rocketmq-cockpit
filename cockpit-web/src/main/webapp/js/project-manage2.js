@@ -213,7 +213,7 @@ function createOption(id, text) {
 
 function optionSelectedByValue(select, value){
     for ( var i = 0 ; i < select.options.length ; i++){
-        if (select.options[i].value === value){
+        if (select.options[i].text === value){
             select.options[i].selected = true;
             break;
         }
