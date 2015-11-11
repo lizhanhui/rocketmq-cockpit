@@ -34,13 +34,13 @@
 
     <update id="activate" parameterType="long">
         UPDATE cockpit_user
-        SET status_id = 2
+        SET status_id = 5
         WHERE id = #{id}
     </update>
 
     <update id="suspend" parameterType="long">
         UPDATE cockpit_user
-        SET status_id = 3
+        SET status_id = 6
         WHERE id = #{id}
     </update>
 
