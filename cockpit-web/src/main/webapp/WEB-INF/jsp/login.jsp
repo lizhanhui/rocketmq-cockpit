@@ -10,6 +10,10 @@
 		    table td {
 		        padding: 10px;
 		    }
+
+		    h3 {
+		        padding-top: 10%;
+		    }
 		</style>
 		<base href="<%=basePath%>">
 		<script type="text/javascript">
@@ -31,18 +35,10 @@
 				}
 				return true;
 			};
-
-			function loading() {
-			    var bodyWidth = document.documentElement.clientWidth;
-                var bodyHeight = Math.max(document.documentElement.clientHeight, document.body.scrollHeight);
-                var lh = bodyHeight/7;
-                document.getElementById("titles").style.top = lh + "px";
-                document.getElementById("titles").align = "center";
-			};
 		</script>
 	</head>
-	<body onload='document.f.j_username.focus();loading();' style="background-color:#EEFfeE">
-	<h3 id="titles" >Login with Username and Password</h3>
+	<body onload='document.f.j_username.focus();' style="background-color:#EEFfeE">
+	<h3 id="titles" align="center">Login with Username and Password</h3>
 
 	<form name='f' action='j_spring_security_check' method='POST'>
     <%
