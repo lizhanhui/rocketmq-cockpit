@@ -85,11 +85,12 @@ public class AutoPilot {
                             continue;
                         }
                     }
-
-                    List<Broker> brokers = brokerMapper.list(null, null, 0, topicAvailability.getDcId(), null);
-                    if (topicAvailability.getAvailability() >= brokers.size()) {
+                    Calendar calender = Calendar.getInstance();
+                    calender.add(Calendar.HOUR, -2);
+                    List<Broker> brokers = brokerMapper.list(null, null, 0, topicAvailability.getDcId(), calender.getTime());
+                    if (topicAvailability.getAvailability() > brokers.size()) {
                         // We do not have more brokers.
-                        // TODO warning and notify to add more broker in this data center.
+                        // TODO auto add broker.
                         String msgTemplate = "Availability of topic: %s in DC: %s is %s, but we have no more brokers in this DC";
                         String msg = String.format(msgTemplate, topicAvailability.getTopicId(), topicAvailability.getDcId(), topicAvailability.getAvailability());
                         LOGGER.warn(msg);
