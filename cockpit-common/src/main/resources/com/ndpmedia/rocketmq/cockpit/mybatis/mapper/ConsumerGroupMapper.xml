@@ -197,6 +197,18 @@
         WHERE topic_id = #{topicId}
     </select>
 
+    <update id="updateConsumerGroupTopics">
+        INSERT INTO topic_consumer_group_xref (topic_id, consumer_group_id, create_time, update_time)
+        SELECT t.id, c.id, nowTime, nowTime FROM (
+            SELECT consumer_group, topic, #{date} nowTime
+            FROM consume_progress
+            WHERE 1 = 1 and create_time = #{date}
+            GROUP BY consumer_group, topic  ) cts
+        join topic t on cts.topic = t.topic
+        join consumer_group c on cts.consumer_group = c.group_name
+        ON DUPLICATE KEY UPDATE update_time = #{date}
+    </update>
+
 
     <resultMap id="consumerGroupHostingResultMap2" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting">
         <result column="create_time" property="createTime" />
