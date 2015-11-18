@@ -109,7 +109,8 @@ public class TopicScheduler {
                             topicBrokerInfo.setReadQueueNum(queueData.getReadQueueNums());
                             topicBrokerInfo.setWriteQueueNum(queueData.getWriteQueueNums());
                             topicBrokerInfo.setPermission(queueData.getPerm());
-
+                            topicBrokerInfo.setCreateTime(new Date());
+                            topicBrokerInfo.setUpdateTime(new Date());
                             cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
                             if (!cockpitTopicDBService.isDCAllowed(topicMetadata.getId(), broker.getDc())) {
                                 cockpitTopicDBService.addDCAllowed(topicMetadata.getId(), broker.getDc(), Status.ACTIVE);
