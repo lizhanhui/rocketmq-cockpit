@@ -59,7 +59,7 @@
     <bean id="statFilter" class="com.alibaba.druid.filter.stat.StatFilter">
         <property name="mergeSql" value="true" />
         <property name="logSlowSql" value="true" />
-        <property name="slowSqlMillis" value="2000" />
+        <property name="slowSqlMillis" value="10000" />
     </bean>
 
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
