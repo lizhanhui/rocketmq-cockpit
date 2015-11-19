@@ -98,6 +98,8 @@ public class TaskScheduler {
         } catch (Exception e) {
             if (!e.getMessage().contains("offset table is empty")) {
                 logger.warn("[MONITOR][CONSUME-PROGRESS] main method failed." + e);
+            }else {
+                logger.warn("[MONITOR][CONSUME-PROGRESS] main method failed." + e);
             }
         } finally {
             defaultMQAdminExt.shutdown();
@@ -124,10 +126,12 @@ public class TaskScheduler {
     }
 
     private void updateTopicProgressData(){
-        consumeProgressMapper.updateTopicProgress(date);
+        long num = consumeProgressMapper.updateTopicProgress(date);
+        logger.info("[MONITOR][CONSUME-PROGRESS] NOW WE UPDATE TOPIC PROGRESS : " + num);
     }
 
     private void updateConsumerGroupTopics(){
-        consumerGroupMapper.updateConsumerGroupTopics(date);
+        long num = consumerGroupMapper.updateConsumerGroupTopics(date);
+        logger.info("[MONITOR][CONSUME-PROGRESS] NOW WE UPDATE CONSUMER GROUP AND TOPIC XREF : " + num);
     }
 }
