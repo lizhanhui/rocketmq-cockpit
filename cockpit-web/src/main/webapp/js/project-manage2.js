@@ -113,13 +113,13 @@ $(document).ready(function () {
 
         selectP.onchange = function () {
             var project = $("#selectP").children('option:selected').val();
-            changeProject(project);
+            var projectN = $("#selectP").children('option:selected').html();
+            changeProject(project, projectN);
         };
 
         if ("" !== cookieString) {
-            changeProject(targetPID);
+            changeProject(targetPID, cookieString.split("=")[1]);
             optionSelectedByValue(selectP, cookieString.split("=")[1]);
-            $('h1').html(cookieString.split("=")[1]);
             var date=new Date();
             date.setTime(date.getTime()-1000);
             document.cookie = "projectName=x;expires="+date.toGMTString();
@@ -138,9 +138,9 @@ $(document).ready(function () {
     })
 });
 
-function changeProject(projectId){
+function changeProject(projectId, projectName){
     if (-1 != projectId) {
-        $('h1').html(projectId);
+        $('h1').html(projectName);
         $.ajax({
             async: false,
             url: "cockpit/api/project/" + projectId + "/consumer-groups",//查询该project对应的Consumer Group
