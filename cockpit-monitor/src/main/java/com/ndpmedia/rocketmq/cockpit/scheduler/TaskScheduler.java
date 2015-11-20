@@ -68,7 +68,8 @@ public class TaskScheduler {
     public void queryAccumulation() {
         if (groupTableRel.size() == 0 )
             init();
-        date = new Date();
+        date = new Date(System.currentTimeMillis()/1000 * 1000);
+
 
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(Long.toString(System.currentTimeMillis()) + "taskScheduler");
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));

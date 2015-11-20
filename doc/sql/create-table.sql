@@ -120,8 +120,12 @@ CREATE TABLE IF NOT EXISTS consume_progress (
   consumer_offset BIGINT NOT NULL DEFAULT 0,
   last_timestamp BIGINT NOT NULL DEFAULT 0,
   diff BIGINT NOT NULL DEFAULT 0,
-  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE = INNODB;
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `consume_progress_topic` (`topic`),
+  KEY `consume_progress_group` (`consumer_group`),
+  KEY `consume_progress_group_t` (`consumer_group`,`create_time`)
+) ENGINE = INNODB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS topic_progress (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
