@@ -427,6 +427,7 @@
     <select id="lastrow" resultMap="consumeProgressMap">
         SELECT create_time
         FROM consume_progress
+        GROUP by create_time
         ORDER by create_time desc
         LIMIT 2
     </select>
