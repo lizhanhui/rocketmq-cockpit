@@ -41,7 +41,7 @@ public class TopicProgressScheduler {
     @Scheduled(fixedRate = 120000)
     public void queryAccumulation() {
         try {
-            date = consumeProgressMapper.lastrow().getCreateTime();
+            date = consumeProgressMapper.lastrow().get(1).getCreateTime();
             if (consumeProgressMapper.topicReady(date).size() > 0) {
                 logger.info("[MONITOR][TOPIC PROGRESS] last consume progress already analysed");
             }else {
