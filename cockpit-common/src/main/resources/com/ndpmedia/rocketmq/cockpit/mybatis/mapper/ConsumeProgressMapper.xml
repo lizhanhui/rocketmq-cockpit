@@ -428,7 +428,7 @@
         SELECT create_time
         FROM consume_progress
         ORDER by create_time desc
-        LIMIT 1
+        LIMIT 2
     </select>
 
     <select id="topicReady" resultMap="consumeProgressMap">

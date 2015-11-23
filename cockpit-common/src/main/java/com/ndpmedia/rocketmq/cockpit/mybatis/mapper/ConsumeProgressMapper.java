@@ -97,7 +97,7 @@ public interface ConsumeProgressMapper {
 
     int groupTableXREFInsert(@Param("id") int id, @Param("groupName") String groupName);
 
-    ConsumeProgress lastrow();
+    List<ConsumeProgress> lastrow();
 
     List<ConsumeProgress> topicReady(@Param("date") Date date);
 
