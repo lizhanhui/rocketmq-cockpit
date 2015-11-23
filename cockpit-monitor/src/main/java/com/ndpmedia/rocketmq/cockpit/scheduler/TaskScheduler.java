@@ -3,7 +3,6 @@ package com.ndpmedia.rocketmq.cockpit.scheduler;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
 import org.slf4j.Logger;
@@ -27,9 +26,6 @@ public class TaskScheduler {
 
     @Autowired
     private ConsumeProgressMapper consumeProgressMapper;
-
-    @Autowired
-    private ConsumerGroupMapper consumerGroupMapper;
 
     @Autowired
     private CockpitConsumeProgressService cockpitConsumeProgressService;
@@ -93,9 +89,6 @@ public class TaskScheduler {
                     updateConsumeProgressData(cp);
                 }
             }
-
-            updateTopicProgressData();
-            updateConsumerGroupTopics();
         } catch (Exception e) {
             if (!e.getMessage().contains("offset table is empty")) {
                 logger.warn("[MONITOR][CONSUME-PROGRESS] main method failed." + e);
@@ -124,15 +117,5 @@ public class TaskScheduler {
         consumeProgress.setTableID(groupTableRel.get(consumeProgress.getConsumerGroup()));
         consumeProgressMapper.insert(consumeProgress);
         consumeProgressMapper.insertPrivate(consumeProgress);
-    }
-
-    private void updateTopicProgressData(){
-        long num = consumeProgressMapper.updateTopicProgress(date);
-        logger.info("[MONITOR][CONSUME-PROGRESS] NOW WE UPDATE TOPIC PROGRESS : " + num);
-    }
-
-    private void updateConsumerGroupTopics(){
-        long num = consumerGroupMapper.updateConsumerGroupTopics(date);
-        logger.info("[MONITOR][CONSUME-PROGRESS] NOW WE UPDATE CONSUMER GROUP AND TOPIC XREF : " + num);
     }
 }
