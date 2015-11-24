@@ -442,5 +442,6 @@
         SELECT topic,broker_name,queue_id,broker_offset,create_time
         FROM topic_progress
         WHERE create_time = #{date}
+        LIMIT 1
     </select>
 </mapper>
