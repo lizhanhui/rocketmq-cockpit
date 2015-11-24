@@ -11,9 +11,9 @@ public interface ConsumeProgressMapper {
 
     long create(@Param("group") String group);
 
-    long insert(ConsumeProgress consumeProgress);
+    long insert(List<ConsumeProgress> consumeProgress);
 
-    long insertPrivate(ConsumeProgress consumeProgress);
+    long insertPrivate(@Param("map") Map<String, Object> params);
 
     long updateTopicProgress(@Param("date") Date date);
 

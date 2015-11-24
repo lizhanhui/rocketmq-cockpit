@@ -17,14 +17,20 @@
         ) ENGINE = INNODB;
     </update>
 
-    <insert id="insert" parameterType="ConsumeProgress">
+    <insert id="insert" parameterType="list">
         INSERT INTO consume_progress(id, consumer_group, topic, broker_name, queue_id, broker_offset, consumer_offset, last_timestamp, diff, create_time)
-        VALUES (NULL, #{consumerGroup}, #{topic}, #{brokerName}, #{queueId}, #{brokerOffset}, #{consumerOffset}, #{lastTimestamp}, #{diff}, #{createTime})
+        VALUES 
+        <foreach collection="list" item="ConsumeProgress" separator=",">
+            (NULL, #{ConsumeProgress.consumerGroup}, #{ConsumeProgress.topic}, #{ConsumeProgress.brokerName}, #{ConsumeProgress.queueId}, #{ConsumeProgress.brokerOffset}, #{ConsumeProgress.consumerOffset}, #{ConsumeProgress.lastTimestamp}, #{ConsumeProgress.diff}, #{ConsumeProgress.createTime})
+        </foreach>
     </insert>
 
-    <insert id="insertPrivate" parameterType="ConsumeProgress">
-        INSERT INTO consume_progress_${tableID} (id, consumer_group, topic, broker_name, queue_id, broker_offset, consumer_offset, last_timestamp, diff, create_time)
-        VALUES (NULL, #{consumerGroup}, #{topic}, #{brokerName}, #{queueId}, #{brokerOffset}, #{consumerOffset}, #{lastTimestamp}, #{diff}, #{createTime})
+    <insert id="insertPrivate" parameterType="java.util.Map">
+        INSERT INTO consume_progress_${map.tableID} (id, consumer_group, topic, broker_name, queue_id, broker_offset, consumer_offset, last_timestamp, diff, create_time)
+        VALUES 
+        <foreach collection="map.consumeProgresses" item="ConsumeProgress" separator=",">
+            (NULL, #{ConsumeProgress.consumerGroup}, #{ConsumeProgress.topic}, #{ConsumeProgress.brokerName}, #{ConsumeProgress.queueId}, #{ConsumeProgress.brokerOffset}, #{ConsumeProgress.consumerOffset}, #{ConsumeProgress.lastTimestamp}, #{ConsumeProgress.diff}, #{ConsumeProgress.createTime})
+        </foreach>
     </insert>
 
     <update id="updateTopicProgress">
