@@ -49,6 +49,9 @@ public class DataAgingScheduler {
 
         calendar.add(Calendar.HOUR_OF_DAY, -48);
 
+        numberOfRecordsDeleted = consumeProgressMapper.bulkDeleteT(calendar.getTime());
+        logger.info("Deleted " + numberOfRecordsDeleted + " topic progress records.");
+
         List<Integer> IDs = consumeProgressMapper.groupTableIDS();
         for(int id : IDs){
             try {

@@ -85,6 +85,8 @@ public interface ConsumeProgressMapper {
      */
     int bulkDelete(@Param("groupName")String groupName,@Param("date") Date date);
 
+    int bulkDeleteT(@Param("date") Date date);
+
     List<Map<Object, Object>> groupTableXREFList();
 
     int groupTableMINID();
