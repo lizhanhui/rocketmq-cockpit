@@ -49,18 +49,18 @@ public class TopicProgressScheduler {
                 updateConsumerGroupTopics();
             }
         } catch (Exception e) {
-            logger.warn("[MONITOR][CONSUME-PROGRESS] main method failed." + e);
+            logger.warn("[MONITOR][TOPIC PROGRESS] main method failed." + e);
 
         }
     }
 
     private void updateTopicProgressData(){
         long num = consumeProgressMapper.updateTopicProgress(date);
-        logger.info("[MONITOR][CONSUME-PROGRESS] NOW WE UPDATE TOPIC PROGRESS : " + num);
+        logger.info("[MONITOR][TOPIC PROGRESS] NOW WE UPDATE TOPIC PROGRESS : " + num);
     }
 
     private void updateConsumerGroupTopics(){
         long num = consumerGroupMapper.updateConsumerGroupTopics(date);
-        logger.info("[MONITOR][CONSUME-PROGRESS] NOW WE UPDATE CONSUMER GROUP AND TOPIC XREF : " + num);
+        logger.info("[MONITOR][TOPIC PROGRESS] NOW WE UPDATE CONSUMER GROUP AND TOPIC XREF : " + num);
     }
 }

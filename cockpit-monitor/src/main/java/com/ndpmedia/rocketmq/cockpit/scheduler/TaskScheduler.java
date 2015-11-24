@@ -83,11 +83,14 @@ public class TaskScheduler {
                 for (ConsumeProgress cp : consumeProgressList) {
                     if (null == cp || null == cp.getTopic() || null == cp.getBrokerName()) {
                         logger.info("[MONITOR][CONSUME-PROGRESS] this group has no progress" + group);
+                        consumeProgressList.remove(cp);
                         continue;
+                    }else {
+                        cp.setCreateTime(date);
                     }
-
-                    updateConsumeProgressData(cp);
                 }
+
+                updateConsumeProgressData(consumeProgressList);
             }
         } catch (Exception e) {
             if (!e.getMessage().contains("offset table is empty")) {
@@ -112,10 +115,13 @@ public class TaskScheduler {
         logger.debug("[MONITOR][CONSUME-PROGRESS] UPDATE GROUP TABLES ALREADY DONE. TOTAL COUNTS: " + groupTableRel.size());
     }
 
-    private void updateConsumeProgressData(ConsumeProgress consumeProgress){
-        consumeProgress.setCreateTime(date);
-        consumeProgress.setTableID(groupTableRel.get(consumeProgress.getConsumerGroup()));
-        consumeProgressMapper.insert(consumeProgress);
-        consumeProgressMapper.insertPrivate(consumeProgress);
+    private void updateConsumeProgressData(List<ConsumeProgress> consumeProgress){
+        Map<String, Object> params = new HashMap<>();
+        if (consumeProgress.size() > 0) {
+            params.put("tableID", groupTableRel.get(consumeProgress.get(0).getConsumerGroup()));
+            params.put("consumeProgresses", consumeProgress);
+            consumeProgressMapper.insert(consumeProgress);
+            consumeProgressMapper.insertPrivate(params);
+        }
     }
 }
