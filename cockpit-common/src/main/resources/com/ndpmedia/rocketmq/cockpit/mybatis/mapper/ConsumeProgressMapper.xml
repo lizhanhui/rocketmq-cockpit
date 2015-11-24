@@ -53,6 +53,12 @@
         WHERE #{date} > create_time
     </delete>
 
+    <delete id="bulkDeleteT">
+        DELETE
+        FROM topic_progress
+        WHERE #{date} > create_time
+    </delete>
+
     <resultMap id="consumerGroupMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
         <id column="id" property="id" />
         <result column="cluster_name" property="clusterName" />
