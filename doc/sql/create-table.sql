@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS cockpit2 CHARACTER SET 'UTF8';
+CREATE DATABASE IF NOT EXISTS cockpit CHARACTER SET 'UTF8';
 
-USE cockpit2;
+USE cockpit;
 
 CREATE TABLE IF NOT EXISTS name_server (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -121,7 +121,6 @@ CREATE TABLE IF NOT EXISTS consume_progress (
   last_timestamp BIGINT NOT NULL DEFAULT 0,
   diff BIGINT NOT NULL DEFAULT 0,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
   KEY `consume_progress_topic` (`topic`),
   KEY `consume_progress_group` (`consumer_group`),
   KEY `consume_progress_group_t` (`consumer_group`,`create_time`)
@@ -148,7 +147,7 @@ CREATE TABLE IF NOT EXISTS name_server_kv (
 
 
 -- User
---SET sql_mode='NO_AUTO_VALUE_ON_ZERO';
+-- SET sql_mode='NO_AUTO_VALUE_ON_ZERO';
 CREATE TABLE IF NOT EXISTS team (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL

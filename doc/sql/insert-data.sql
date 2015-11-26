@@ -22,11 +22,13 @@ INSERT INTO data_center(id, name) VALUES (1, 'US East');
 INSERT INTO data_center(id, name) VALUES (2, 'Singapore');
 INSERT INTO data_center(id, name) VALUES (3, 'US West');
 INSERT INTO data_center(id, name) VALUES (5, 'South America');
+INSERT INTO data_center(id, name) VALUES (7, 'Ali Test');
 
 -- Insert name server list.
 INSERT INTO name_server(ip, port, create_time, update_time) VALUES ('54.173.39.198', 9876, now(), now());
 INSERT INTO name_server(ip, port, create_time, update_time) VALUES ('54.173.209.191', 9876, NOW(), NOW());
 INSERT INTO name_server(ip, port, create_time, update_time) VALUES ('172.30.50.54', 9876, NOW(), NOW());
+INSERT INTO name_server(ip, port, create_time, update_time) VALUES ('172.21.40.12', 9876, NOW(), NOW());
 
 INSERT INTO name_server_kv(id, name_space, `key`, `value`, status_id) VALUES (NULL , "DC_SELECTOR", "DC_DISPATCH_STRATEGY", "BY_RATIO", 2);
 INSERT INTO name_server_kv(id, name_space, `key`, `value`, status_id) VALUES (NULL , "DC_SELECTOR", "DC_DISPATCH_RATIO", "1:0.25,2:0.3,3:0.25,5:0.2", 2);
