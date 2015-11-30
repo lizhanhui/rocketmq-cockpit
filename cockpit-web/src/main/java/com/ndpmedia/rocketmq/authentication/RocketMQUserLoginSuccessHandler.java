@@ -92,6 +92,7 @@ public class RocketMQUserLoginSuccessHandler extends SavedRequestAwareAuthentica
             logger.error("Fatal error, principal should be a CockpitUser or sub-class instance");
         }
 
-        super.onAuthenticationSuccess(request, response, authentication);
+        clearAuthenticationAttributes(request);
+
     }
 }
