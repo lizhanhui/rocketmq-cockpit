@@ -157,8 +157,7 @@ public class TopicScheduler {
         Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
         for (String brokerAddress : brokerAddresses) {
             Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
-            List<TopicBrokerInfo> list =
-                    cockpitTopicDBService.queryEndangeredTopicBrokerInfoList(broker.getId());
+            List<TopicBrokerInfo> list = cockpitTopicDBService.queryEndangeredTopicBrokerInfoList(broker.getId());
             for (TopicBrokerInfo topicBrokerInfo : list) {
                 TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
                 try {

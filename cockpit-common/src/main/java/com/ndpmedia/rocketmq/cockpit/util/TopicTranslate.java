@@ -28,6 +28,10 @@ public class TopicTranslate {
 
         topicConfig.setTopicName(topicBrokerInfo.getTopicMetadata().getTopic());
 
+        topicConfig.setPerm(topicBrokerInfo.getPermission());
+
+        topicConfig.setOrder(topicBrokerInfo.getTopicMetadata().isOrder());
+
         return topicConfig;
     }
     /**
