@@ -91,6 +91,7 @@ public class TopicScheduler {
                         topicMetadata.setStatus(Status.ACTIVE);
                         topicMetadata.setCreateTime(new Date());
                         topicMetadata.setUpdateTime(new Date());
+                        // TODO decode and set order info here.
                         topicMetadata.setClusterName(getClusterName(topicRouteData.getBrokerDatas()));
                         cockpitTopicDBService.insert(topicMetadata);
 
