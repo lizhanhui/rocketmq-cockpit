@@ -173,7 +173,7 @@ function changeProject(projectId, projectName){
         $.ajax({
             async: false,
             url: "cockpit/api/project/" + projectId + "/topics",//查询该project对应的Topic
-            type: "POST",
+            type: "GET",
             data: projectId,
             dataType: "json",
             contentType: "application/json",

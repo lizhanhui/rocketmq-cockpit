@@ -11,7 +11,6 @@
     <security:http pattern="/css/**" security="none" />
     <security:http pattern="/fonts/**" security="none" />
     <security:http pattern="/images/**" security="none" />
-    <security:http pattern="/views/**" security="none" />
     <security:http pattern="/styles/**" security="none" />
     <security:http pattern="/scripts/**" security="none" />
 
@@ -19,23 +18,21 @@
     <security:http pattern="/console/**" security="none" />
     <security:http pattern="/**/captcha-image" security="none" />
     <security:http pattern="/cockpit/register" security="none" />
-    <security:http pattern="/cockpit/login" security="none" />
-    <security:http pattern="/error" security="none" />
 
     <security:http auto-config="true">
 
         <!-- Use https in projection -->
         <!--
-            <security:intercept-url pattern="/*" requires-channel="https" />
+            <security:intercept-url pattern="/**" requires-channel="https" />
         -->
 
         <!-- For debug only -->
-        <security:intercept-url pattern="/*" requires-channel="http" />
+        <security:intercept-url pattern="/**" requires-channel="http" />
 
         <security:custom-filter ref="rocketMQLoginFilter" before="FORM_LOGIN_FILTER" />
-        <security:intercept-url pattern="/favicon.ico" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-        <security:intercept-url pattern="/cockpit/login.jsp" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <security:intercept-url pattern="/index.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/views/base.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/views/login.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <security:intercept-url pattern="/cockpit/captcha-image.jsp" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <security:intercept-url pattern="/j_spring_security_check"  access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 
@@ -44,7 +41,7 @@
         <security:intercept-url pattern="/cockpit/ip/**" requires-channel="http" access="ROLE_ADMIN"/>
         <security:intercept-url pattern="/cockpit/name-server/**" requires-channel="http" access="ROLE_ADMIN"/>
 
-        <security:intercept-url pattern="/*"  access="ROLE_USER,ROLE_ADMIN"/>
+        <security:intercept-url pattern="/**"  access="ROLE_USER,ROLE_ADMIN"/>
 
         <security:form-login authentication-failure-handler-ref="rocketMQUserLoginFailedHandler"
                              authentication-success-handler-ref="rocketMQUserLoginSuccessHandler"
@@ -59,7 +56,7 @@
 
         <security:remember-me remember-me-parameter="remember-me" token-validity-seconds="604800" />
 
-        <security:logout logout-url="/logout" logout-success-url="/cockpit/login.jsp" delete-cookies="JSESSIONID" />
+        <security:logout logout-url="/logout" logout-success-url="/index.html" delete-cookies="JSESSIONID" />
     </security:http>
 
     <security:authentication-manager alias="authenticationManager">

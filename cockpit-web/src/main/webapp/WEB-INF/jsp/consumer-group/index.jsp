@@ -4,7 +4,7 @@
     <jsp:include page="../include/html-title.jsp">
         <jsp:param name="pageTitle" value="Consumer Group Management" />
     </jsp:include>
-    <script type="application/javascript" src="js/jquery.dataTables.min.js"></script>
+    <script type="application/javascript" src="js/jquery/jquery.dataTables.min.js"></script>
     <link type="text/css" href="css/jquery.dataTables.min.css" rel="stylesheet">
     <script src="js/consumer-group.js" type="application/javascript"></script>
     <script src="js/onloading.js" type="application/javascript"></script>

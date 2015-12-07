@@ -1,41 +1,57 @@
-"use strict";
+'use strict';
 
-angular.module("yapp",["ui.router","ngAnimate"]).config
-    ([
-        "$stateProvider",
-        "$urlRouterProvider",
-        function(r,t){
-            t.when("/dashboard","/dashboard/overview"),
-            t.otherwise("/login"),
-            r.state("base",{
-                "abstract":!0,
-                url:"",
-                templateUrl:"views/base.html"}).state("login",{
-                url:"/login",
-                parent:"base",
-                templateUrl:"views/login.html",
-                controller:"LoginCtrl"}).state("dashboard",{
-                url:"/dashboard",
-                parent:"base",
-                templateUrl:"views/dashboard.html",
-                controller:"DashboardCtrl"}).state("overview",{
-                url:"/overview",
-                parent:"dashboard",
-                templateUrl:"views/dashboard/overview.html"}).state("reports",{
-                url:"/reports",
-                parent:"dashboard",
-                templateUrl:"views/dashboard/reports.html"})
-        }
-    ]),
+/**
+ * @ngdoc 
+ * @name cockpit
+ * @description
+ * # cockpit
+ *
+ * Main module of the application.
+ */
+angular
+  .module('cockpit', [
+    'cockpitServices',
+    'highcharts-ng',
+    'ui.router',
+    'ngAnimate',
+   // 'ngStorage',
+   // 'ngCookies',
+    'ngResource'
+  ])
+  .config(function($stateProvider, $urlRouterProvider) {
 
-angular.module("yapp").controller("LoginCtrl",
-    ["$scope",
-    "$location",
-    function(r,t){
-        r.submit=function(){
-            return t.path("/dashboard"),!1
-           }
-    }
-    ]),
+    $urlRouterProvider.when('/dashboard', '/dashboard/message', '/dashboard/project');
+    $urlRouterProvider.otherwise('/login');
 
-angular.module("yapp").controller("DashboardCtrl",["$scope","$state",function(r,t){r.$state=t}]);
+    $stateProvider
+      .state('base', {
+        abstract: true,
+        url: '',
+        templateUrl: 'views/base.html'
+      })
+        .state('login', {
+          url: '/login',
+          parent: 'base',
+          templateUrl: 'views/login.html',
+          controller: 'LoginCtrl'
+        })
+        .state('dashboard', {
+          url: '/dashboard',
+          parent: 'base',
+          templateUrl: 'views/dashboard.html',
+          controller: 'DashboardCtrl'
+        })
+          .state('message', {
+            url: '/message',
+            parent: 'dashboard',
+            templateUrl: 'views/dashboard/message.html',
+            controller: 'MessageCtrl'
+          })
+          .state('project', {
+            url: '/project',
+            parent: 'dashboard',
+            templateUrl: 'views/dashboard/project.html',
+            controller: 'ProjectCtrl'
+          });
+
+  });

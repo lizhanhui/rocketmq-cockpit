@@ -100,7 +100,7 @@ public class CockpitProjectController {
         return cockpitProjectService.getConsumerGroups(projectId);
     }
 
-    @RequestMapping(value = "/{projectId}/topics", method = RequestMethod.POST)
+    @RequestMapping(value = "/{projectId}/topics", method = RequestMethod.GET)
     @ResponseBody
     public List<TopicMetadata> getTopics(@PathVariable("projectId") long projectId){
         return cockpitProjectService.getTopics(projectId);

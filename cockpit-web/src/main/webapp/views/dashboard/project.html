@@ -1,0 +1,51 @@
+<h3>
+   <div class="pull-right">
+      <div dropdown="" class="btn-group">
+         <select class="form-control"
+         	ng-model="project"
+         	ng-options="p.id as p.name for p in projects"
+            ng-change="set()">
+         </select>
+      </div>
+   </div>
+   Project
+   <small> !</small>
+</h3>
+
+<!-- END widgets box-->
+<div class="row">
+   <!-- START dashboard main content-->
+   <div class="col-lg-12">
+      <!-- START chart-->
+      <!-- START row-->
+	   <div class="row">
+	      <div class="col-lg-12">
+	         <div class="panel panel-default">
+	            <div class="panel-heading">ConsumerGroup</div>
+	            <div class="panel-body">
+	               <highchart id="chart1" config="chartConfig" ></highchart>
+	            </div>
+	         </div>
+	      </div>
+	   </div>
+	   <!-- END row-->
+      <!-- END chart-->
+   </div>
+   <div class="col-lg-12">
+      <!-- START chart-->
+      <!-- START row-->
+	   <div class="row">
+	      <div class="col-lg-12">
+	         <div class="panel panel-default">
+	            <div class="panel-heading">Topic</div>
+	            <div class="panel-body">
+	               <highchart id="chart2" config="chartConfig2" ></highchart>
+	            </div>
+	         </div>
+	      </div>
+	   </div>
+	   <!-- END row-->
+      <!-- END chart-->
+   </div>
+   <!-- END dashboard main content-->
+</div>

@@ -29,7 +29,7 @@ public class RocketMQUserLoginFailedHandler extends SimpleUrlAuthenticationFailu
         if (retryTime >= retryTimeMAX) {
             exception.addSuppressed(new Exception(" the user : [" + username + "] is locked !"));
         }
-        this.setDefaultFailureUrl("/cockpit/login");
+        this.setDefaultFailureUrl("/index.html");
         super.onAuthenticationFailure(request, response, exception);
     }
 }

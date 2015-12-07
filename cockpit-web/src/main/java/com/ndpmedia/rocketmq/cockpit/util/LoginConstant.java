@@ -19,7 +19,7 @@ public interface LoginConstant extends Constant {
 
     String LOGIN_PARAMETER_KAPTCHA = "kaptcha";
 
-    String LOGIN_PAGE_PATH = "/cockpit/login.jsp";
+    String LOGIN_PAGE_PATH = "/index.html";
 
     String LOGIN_SSO_KEY_USERNAME = "SSO_USER_DETAIL_USERNAME";
 
