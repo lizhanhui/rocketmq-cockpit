@@ -32,7 +32,7 @@ public class TopicProgressScheduler {
     @Autowired
     private CockpitConsumerGroupMQService cockpitConsumerGroupMQService;
 
-    private static Date date = new Date();
+    private Date date = new Date();
 
     /**
      * schedule:get consumer group and the topic offset.

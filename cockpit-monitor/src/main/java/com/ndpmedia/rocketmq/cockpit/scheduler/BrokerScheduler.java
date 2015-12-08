@@ -29,8 +29,7 @@ public class BrokerScheduler {
      */
     @Scheduled(fixedRate = 300000)
     public void synchronizeBrokers() {
-        DefaultMQAdminExt defaultMQAdminExt = null;
-        defaultMQAdminExt = new DefaultMQAdminExt(Helper.getInstanceName());
+        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
         } catch (MQClientException e) {

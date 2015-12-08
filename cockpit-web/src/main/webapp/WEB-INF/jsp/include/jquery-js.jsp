@@ -1,1 +1,1 @@
-  <script type="application/javascript" src="js/jquery.min.js"></script>
+  <script type="application/javascript" src="js/jquery/jquery.min.js"></script>

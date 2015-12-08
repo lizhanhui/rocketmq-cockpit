@@ -31,7 +31,6 @@ public class RocketMQLoginFilter implements Filter, LoginConstant {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
-        logger.debug("[personal filter]check verification code and retry times. ");
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpSession session = request.getSession();
