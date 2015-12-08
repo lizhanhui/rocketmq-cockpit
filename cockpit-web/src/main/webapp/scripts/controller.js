@@ -73,7 +73,7 @@
             responseType: 'json'
         }).success(function(data, status, headers, config) {
             $scope.projects=data;
-            $scope.project = $scope.projects[0].id;
+            $scope.project = $scope.projects[0];
             activate();
         }).error(function(data, status, headers, config) {
 
@@ -83,7 +83,7 @@
             $http({
                 method:'GET',
                 //headers: {'Content-type': 'application/json;charset=UTF-8'},
-                url: 'cockpit/api/project/' + $scope.project + "/consumer-groups",
+                url: 'cockpit/api/project/' + $scope.project.id + "/consumer-groups",
                 responseType: 'json'
             }).success(function(data, status, headers, config) {
 				var indexG = 0;
@@ -129,7 +129,7 @@
             });
 
             $http({
-                url: 'cockpit/api/project/' + $scope.project + '/topics',
+                url: 'cockpit/api/project/' + $scope.project.id + '/topics',
                 method: "GET",
                 responseType: 'json'
             }).success(function(data, status, headers, config) {
@@ -171,10 +171,6 @@
             });
         };
 
-        function showTopics (topic, indexT) {
-
-        };
-
         function activate1(x, y) {
 
             $scope.chartConfig = {
@@ -193,7 +189,7 @@
                     },
                     yAxis: {
                         title: {
-                            text: '(times)'
+                            text: 'diff(times)'
                         },
                         min: null,
                         startOnTick: false
@@ -210,7 +206,10 @@
                     data: y
                 }],
                 title: {
-                    text: $scope.project
+                    text: $scope.project.name
+                },
+                subtitle: {
+                    text: 'diff'
                 }
             }
         };
@@ -220,7 +219,6 @@
         };
 
         function activate2(x, y) {
-
             $scope.chartConfig2 = {
                 options: {
                     chart: {
@@ -237,7 +235,7 @@
                     },
                     yAxis: {
                         title: {
-                            text: '(times)'
+                            text: 'tps(times)'
                         },
                         min: null,
                         startOnTick: false
@@ -254,7 +252,10 @@
                     data: y
                 }],
                 title: {
-                    text: $scope.project
+                    text: $scope.project.name
+                },
+                subtitle: {
+                    text: 'tps'
                 }
             }
         };
@@ -271,7 +272,38 @@
     'use strict';
 
     angular.module('cockpit')
-    .controller('MessageCtrl', function(){
+    .controller('MessageCtrl', MessageController);
 
-    });
+    MessageController.$inject = [];
+    function MessageController(){
+
+    }
+})();
+
+(function() {
+    'use strict';
+
+    angular.module('cockpit')
+    .controller('ProjectAddCtrl', ProjectAddController);
+
+    ProjectAddController.$inject = ['$scope', '$http'];
+    function ProjectAddController($scope, $http) {
+        $scope.submit = function() {
+            var project = $scope.project;
+            $http({
+                url: 'cockpit/api/project',
+                method: 'PUT',
+                data: project,
+                responseType: 'json'
+            }).success(function(data, status, headers, config) {
+                if (data == 0) {
+                    $scope.message = "this project is already~~~~~exist";
+                }else{
+                    $scope.message = "";
+                }
+            }).error(function(data, status, headers, config) {
+
+            });
+        }
+    }
 })();

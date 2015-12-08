@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @ngdoc 
+ * @ngdoc
  * @name cockpit
  * @description
  * # cockpit
@@ -20,15 +20,15 @@ angular
   ])
   .config(function($stateProvider, $urlRouterProvider) {
 
-    $urlRouterProvider.when('/dashboard', '/dashboard/message', '/dashboard/project');
+    $urlRouterProvider.when('/dashboard', '/dashboard/message', '/dashboard/project','/dashboard/projectA');
     $urlRouterProvider.otherwise('/login');
 
     $stateProvider
-      .state('base', {
+        .state('base', {
         abstract: true,
         url: '',
         templateUrl: 'views/base.html'
-      })
+        })
         .state('login', {
           url: '/login',
           parent: 'base',
@@ -41,17 +41,22 @@ angular
           templateUrl: 'views/dashboard.html',
           controller: 'DashboardCtrl'
         })
-          .state('message', {
-            url: '/message',
+        .state('message', {
+        url: '/message',
+        parent: 'dashboard',
+        templateUrl: 'views/dashboard/message.html',
+        controller: 'MessageCtrl'
+        })
+        .state('project', {
+        url: '/project',
+        parent: 'dashboard',
+        templateUrl: 'views/dashboard/project.html',
+        controller: 'ProjectCtrl'
+        }).state('projectA', {
+            url: '/projectA',
             parent: 'dashboard',
-            templateUrl: 'views/dashboard/message.html',
-            controller: 'MessageCtrl'
-          })
-          .state('project', {
-            url: '/project',
-            parent: 'dashboard',
-            templateUrl: 'views/dashboard/project.html',
-            controller: 'ProjectCtrl'
-          });
+            templateUrl: 'views/dashboard/projectA.html',
+            controller: 'ProjectAddCtrl'
+        });
 
   });

@@ -8,8 +8,8 @@
     </insert>
 
     <insert id="insertTopicBrokerInfo">
-        INSERT INTO topic_broker_xref(broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, create_time, update_time)
-        VALUES (#{broker.id}, #{topicMetadata.id}, #{permission}, #{readQueueNum}, #{writeQueueNum}, #{status.ordinal}, #{createTime}, #{updateTime})
+        INSERT INTO topic_broker_xref(broker_id, topic_id, permission, write_queue_num, read_queue_num, status_id, create_time, update_time, sync_time)
+        VALUES (#{broker.id}, #{topicMetadata.id}, #{permission}, #{readQueueNum}, #{writeQueueNum}, #{status.ordinal}, #{createTime}, #{updateTime}, #{syncTime})
     </insert>
 
     <insert id="connectProject">

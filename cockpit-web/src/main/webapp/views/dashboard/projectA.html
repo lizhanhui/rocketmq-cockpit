@@ -1,0 +1,44 @@
+<h3>Add Your Project
+   <small>project need personal</small>
+</h3>
+<!-- START row-->
+<div ng-controller="ProjectAddCtrl as form" class="container-fluid">
+   <div class="row">
+      <div class="col-lg-6">
+         <form name="registerForm" novalidate="" class="form-validate" ng-submit="submit()">
+            <!-- START panel-->
+            <div class="panel panel-default">
+               <div class="panel-heading">
+                  <div class="panel-title">Create Project</div>
+               </div>
+               <div class="panel-body">
+                  <div class="form-group">
+                     <label class="control-label">Project Name: </label>
+                     <input type="text" placeholder="name" name="name" required="" ng-model="project.name" class="form-control" ng-pattern="/^[a-zA-Z0-9]{6,12}$/" />
+                     <span ng-show="registerForm.name.$dirty &amp;&amp; registerForm.name.$error.required" class="text-danger">This field is required</span>
+                     <span ng-show="registerForm.name.$dirty &amp;&amp; registerForm.name.$error.pattern" class="text-danger">Input should match 'a-zA-Z0-9' and 6-10 length</span>
+                  </div>
+                  <div class="form-group">
+                     <label class="control-label">Project Description</label>
+                     <input id="description" type="text" name="description" ng-model="project.description" ng-pattern="/^[a-zA-Z0-9]{6,10}$/" class="form-control" />
+                     <span ng-show="registerForm.description.$dirty &amp;&amp; registerForm.description.$error.pattern" class="text-danger">Input should match 'a-zA-Z0-9' and 6-10 length</span>
+                  </div>
+                  <div class="required">* Required fields</div>
+               </div>
+               <div class="panel-footer">
+                  <div class="clearfix">
+                     <div class="pull-right">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div>
+                <span class="text-danger"><label ng-model="message">{{message}}</label></span>
+            </div>
+            <!-- END panel-->
+         </form>
+      </div>
+   </div>
+   <!-- END row-->
+</div>
