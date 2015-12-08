@@ -216,10 +216,15 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
 
     @Override
     public boolean createOrUpdateTopic(MQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException {
+
+        boolean createAdmin = (null == adminExt);
+
         try {
-            if (null == adminExt)
+            if (createAdmin) {
                 adminExt = new DefaultMQAdminExt("CockpitMQAdmin");
-            adminExt.start();
+                adminExt.start();
+            }
+
             TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
             if (-1 != topicBrokerInfo.getBroker().getId())
                 adminExt.createAndUpdateTopicConfig(topicBrokerInfo.getBroker().getAddress(), topicConfig);
@@ -243,7 +248,8 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
         }catch (Exception e){
             throw new CockpitException(e.getMessage());
         }finally {
-            adminExt.shutdown();
+            if (createAdmin && adminExt != null)
+                adminExt.shutdown();
         }
 
         return true;
@@ -256,10 +262,14 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
     }
 
     public boolean deleteTopicByBroker(MQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException {
+
+        boolean createAdmin = (null == adminExt);
+
         try {
-            if (null == adminExt)
+            if (createAdmin) {
                 adminExt = new DefaultMQAdminExt();
-            adminExt.start();
+                adminExt.start();
+            }
             Set<String> addrs = new HashSet<>();
             addrs.add(topicBrokerInfo.getBroker().getAddress());
             adminExt.deleteTopicInBroker(addrs, topicBrokerInfo.getTopicMetadata().getTopic());
@@ -267,7 +277,8 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
             logger.warn(" " + e);
             return false;
         } finally {
-            adminExt.shutdown();
+            if (createAdmin && null != adminExt)
+                adminExt.shutdown();
         }
         return true;
     }

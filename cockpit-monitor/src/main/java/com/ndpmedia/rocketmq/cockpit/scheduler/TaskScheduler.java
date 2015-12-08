@@ -33,11 +33,11 @@ public class TaskScheduler {
     @Autowired
     private CockpitConsumerGroupMQService cockpitConsumerGroupMQService;
 
-    private static AtomicInteger counts = new AtomicInteger(0);
+    private AtomicInteger counts = new AtomicInteger(0);
 
-    private static ConcurrentMap<String, Integer> groupTableRel = new ConcurrentHashMap();
+    private ConcurrentMap<String, Integer> groupTableRel = new ConcurrentHashMap();
 
-    private static Date date = new Date();
+    private Date date = new Date();
 
     private void init(){
         try {
