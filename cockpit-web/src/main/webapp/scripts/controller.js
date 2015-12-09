@@ -172,7 +172,6 @@
         };
 
         function activate1(x, y) {
-
             $scope.chartConfig = {
                 options: {
                     chart: {
@@ -274,9 +273,114 @@
     angular.module('cockpit')
     .controller('MessageCtrl', MessageController);
 
-    MessageController.$inject = [];
-    function MessageController(){
+    MessageController.$inject = ['$scope', '$http'];
+    function MessageController($scope, $http){
+        $scope.searchID = function() {
+            var msgId = $scope.msgID;
+            if (msgId != "" && msgId.length === 32) {
+                $http({
+                    url: 'cockpit/api/message/' + msgId,
+                    method: 'GET',
+                    responseType: 'json'
+                }).success(function(data, status, headers, config) {
+                    $scope.message = data;
+                }).error(function(data, status, headers, config){
 
+                });
+
+                $http({
+                    url: 'cockpit/api/message/' + msgId,
+                    method: "POST",
+                    responseType: 'json'
+                }).success(function(data, status, headers, config) {
+                    $scope.statuses = data;
+                }).error();
+            }
+        };
+
+        $scope.findConnectConsumer =function() {
+            if (null != $scope.message.topic) {
+                $http({
+                    url: "cockpit/api/message/query/" + $scope.message.topic,
+                    method: "GET",
+                    responseType: "json"
+                }).success(function(data, status, headers, config) {
+                        $scope.consumerGroups = data;
+                }).error(function(data, status, headers, config) {
+
+                });
+            }
+        };
+
+        $scope.findConnectClient = function() {
+            if (null != $scope.consumerGroup) {
+                $http({
+                    url: "cockpit/api/consumer-group" + "/client/" + $scope.consumerGroup,
+                    method: "GET",
+                    responseType: "json"
+                }).success(function(data, status, headers, config) {
+                    $scope.clients = data;
+                }).error(function(data, status, headers, config) {
+
+                });
+            }
+        };
+
+        $scope.checkClient = function (){
+            $scope.client.clientId;
+        }
+    }
+})();
+
+(function() {
+    'use strict';
+
+    angular.module('cockpit')
+    .controller('MessageKEYCtrl', MessageKEYController);
+
+    MessageKEYController.$inject = ['$scope', '$http'];
+    function MessageKEYController($scope, $http){
+
+    }
+})();
+
+(function() {
+    'use strict';
+
+    angular.module('cockpit')
+    .controller('ProjectLCtrl', ProjectListController);
+
+    ProjectListController.$inject = ['$scope', '$http'];
+    function ProjectListController($scope, $http) {
+        $http({
+            url: 'cockpit/api/project',
+            method: 'GET',
+            responseType: 'json'
+        }).success(function(data, status, headers, config) {
+            $scope.projects = data;
+        }).error(function(data, status, headers, config) {
+
+        });
+
+        $scope.showGroups = function(consumerGroups) {
+            var resultString = "";
+
+            consumerGroups.forEach(function(consumerGroup) {
+                resultString = resultString + consumerGroup.groupName + " ";
+            });
+
+            return resultString;
+        };
+
+        $scope.showTopics = function(topics){
+            var resultString = "";
+
+            topics.forEach(function(topic){
+                resultString = resultString + topic.topic + " ";
+            });
+
+            return resultString;
+        }
     }
 })();
 

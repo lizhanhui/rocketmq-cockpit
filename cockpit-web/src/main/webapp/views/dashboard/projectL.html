@@ -1,0 +1,56 @@
+<h3>Project List
+   <small>add your consumer group and topic</small>
+</h3>
+<!-- START row-->
+<div ng-controller="ProjectAddCtrl as form" class="container-fluid">
+   <div class="row">
+      <div class="col-lg-6">
+          <table class="table table-bordered table-hover bg-white">
+               <tr style="font-weight: bold">
+                  <td style="width:35%">Name</td>
+                  <td style="width:20%">description</td>
+                  <td style="width:20%">Groups</td>
+                  <td style="width:25%">Topics</td>
+               </tr>
+               <tr ng-repeat="project in projects">
+                  <td>
+                     <!-- editable username (text with validation)-->
+                     <span editable-text="project.name" e-name="name" e-form="rowform" e-required="">{{ project.name || &apos;empty&apos; }}</span>
+                  </td>
+                  <td>
+                     <!-- editable status (text with validation)-->
+                     <span editable-text="project.description" e-name="description" e-form="rowform" >{{ project.description }}</span>
+                  </td>
+                  <td>
+                     <!-- editable group (text with validation)-->
+                     <span editable-text="project.consumerGroups" e-name="groups" e-form="rowform" >{{ showGroups(project.consumerGroups) }}</span>
+                  </td>
+                  <td>
+                     <!-- editable group (text with validation)-->
+                     <span editable-text="project.topics" e-name="topics" e-form="rowform" >{{ showTopics(project.topics) }}</span>
+                  </td>
+                  <td style="white-space: nowrap">
+                     <!-- form-->
+                     <form editable-form="" name="rowform" onbeforesave="table.saveUser($data, user.id)" ng-show="rowform.$visible" shown="table.inserted == user" class="form-buttons form-inline">
+                        <button type="submit" ng-disabled="rowform.$waiting" title="Save" class="btn btn-sm btn-info">
+                           <em class="fa fa-save"></em>
+                        </button>
+                        <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" title="Cancel" class="btn btn-sm btn-default">
+                           <em class="fa fa-times"></em>
+                        </button>
+                     </form>
+                     <div ng-show="!rowform.$visible" class="buttons">
+                        <button ng-click="rowform.$show()" title="Edit" class="btn btn-sm btn-info">
+                           <em class="fa fa-pencil"></em>
+                        </button>
+                        <button ng-click="table.removeUser($index)" title="Delete" class="btn btn-sm btn-danger">
+                           <em class="fa fa-trash"></em>
+                        </button>
+                     </div>
+                  </td>
+               </tr>
+            </table>
+      </div>
+   </div>
+   <!-- END row-->
+</div>
