@@ -305,7 +305,8 @@
                     method: "GET",
                     responseType: "json"
                 }).success(function(data, status, headers, config) {
-                        $scope.consumerGroups = data;
+                    $scope.consumerGroups = data;
+                    $scope.consumerGroup = data[0];
                 }).error(function(data, status, headers, config) {
 
                 });
@@ -320,6 +321,7 @@
                     responseType: "json"
                 }).success(function(data, status, headers, config) {
                     $scope.clients = data;
+                    $scope.client = data[0];
                 }).error(function(data, status, headers, config) {
 
                 });
@@ -340,7 +342,22 @@
 
     MessageKEYController.$inject = ['$scope', '$http'];
     function MessageKEYController($scope, $http){
+        $scope.searchKEY = function() {
+            var topic = $scope.messageTopic;
+            var key = $scope.messageKey;
+            if (null != topic && null != key) {
+                $http({
+                    url: "cockpit/api/message" + "/" + topic + "/" + key,
+                    method: "GET",
+                    responseType: "json"
+                }).success(function (data, status, headers, config) {
+                    $scope.messages = data;
+                }).error(function(data, status, headers, config) {
 
+                });
+
+            }
+        };
     }
 })();
 

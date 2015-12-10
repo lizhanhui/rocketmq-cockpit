@@ -17,7 +17,7 @@
          <!-- START table-responsive-->
          <div class="table-responsive">
             <table class="table table-striped table-bordered table-hover">
-               <tbody>
+
 				  <tr>
 					  <td  colspan='2'>
 						   Message ID :  <span ng-bind="message.msgId"></span>
@@ -65,7 +65,12 @@
 				   </tr>
 				   <tr>
 					   <td colspan='2'>
-						   Messagebody:[length] <span ng-bind="message.body.length"></span>
+						   Messagebody : [length] <span ng-bind="message.body.length"></span>
+					   </td>
+				   </tr>
+				   <tr>
+					   <td colspan='2'>
+						   Message Content : <span ng-bind="message.content"></span>
 					   </td>
 				   </tr>
 				   <tr>
@@ -98,7 +103,7 @@
 				   </tr>
 				   <tr><td colspan='2'>订阅了，而且消费了SUBSCRIBED_AND_CONSUMED,<br /> 订阅了，但是被过滤掉了 SUBSCRIBED_BUT_FILTERD, <br /> 订阅了，但是是PULL，结果未知 SUBSCRIBED_BUT_PULL, <br /> 订阅了，但是没有消费 SUBSCRIBED_AND_NOT_CONSUME_YET, <br /> 未知异常 UNKNOW_EXCEPTION,</td></tr>
 
-               </tbody>
+
             </table>
          </div>
       </div>
