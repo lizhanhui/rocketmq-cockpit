@@ -8,15 +8,24 @@
                     <!--a ui-sref=login class="btn btn-white btn-outline btn-rounded btn-sm">Logout</a -->
                 </div>
                 <ul class="nav nav-sidebar">
-                    <li ng-class="{active: $state.includes('project')}">
-                        <a ui-sref=project>Project Manage <span class=sr-only>(current)</span></a>
+                    <li>
+                        <a ui-sref=messageID>Query Message By ID</a>
                     </li>
-                    <li ng-class="{active: $state.includes('message')}">
-                        <a ui-sref=message>Query Message </a>
+                    <li>
+                        <a ui-sref=messageKEY>Query Message By KEY </a>
+                    </li>
+                    <li >
+                        <a ui-sref=projectA>Add UR Project</a>
+                    </li>
+                    <li >
+                        <a ui-sref=projectL>Projects Table</a>
+                    </li>
+                    <li ng-class="{active: $state.includes('project')}">
+                        <a ui-sref=project>Project Dashboard</a>
                     </li>
                 </ul>
             </div>
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" ui-view>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" auto-scroll="true" ui-view>
             </div>
         </div>
     </div>

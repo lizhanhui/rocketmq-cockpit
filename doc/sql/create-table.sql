@@ -282,6 +282,8 @@ CREATE INDEX idx_token ON login(token) USING HASH;
 
 ALTER TABLE topic ADD CONSTRAINT uniq_cluster_topic UNIQUE(cluster_name, topic);
 
+ALTER TABLE project ADD CONSTRAINT uniq_project UNIQUE(name);
+
 ALTER TABLE consumer_group ADD CONSTRAINT  uniq_cluster_consumer_group UNIQUE (cluster_name, group_name);
 
 ALTER TABLE broker ADD CONSTRAINT  uniq_cluster_broker_name_broker_id UNIQUE (cluster_name, broker_name, broker_id);

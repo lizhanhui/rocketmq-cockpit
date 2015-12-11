@@ -41,6 +41,7 @@ public class CockpitMessageServiceController {
     public CockpitMessage getMessageByID(@PathVariable("id") String id) {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         try {
+            defaultMQAdminExt.setInstanceName("CockpitMessageServiceController" + System.currentTimeMillis());
             defaultMQAdminExt.start();
             MessageExt messageExt = defaultMQAdminExt.viewMessage(id);
             return MessageTranslate.translateFrom(messageExt);
@@ -58,6 +59,7 @@ public class CockpitMessageServiceController {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         MessageExt messageExt = null;
         try {
+            defaultMQAdminExt.setInstanceName("CockpitMessageServiceController" + System.currentTimeMillis());
             defaultMQAdminExt.start();
             messageExt = defaultMQAdminExt.viewMessage(id);
             return defaultMQAdminExt.messageTrackDetail(messageExt);
@@ -75,6 +77,7 @@ public class CockpitMessageServiceController {
     public List<CockpitMessage> getMessageByKey(@PathVariable("topic") String topic, @PathVariable("key") String key) {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         try {
+            defaultMQAdminExt.setInstanceName("CockpitMessageServiceController" + System.currentTimeMillis());
             defaultMQAdminExt.start();
             QueryResult queryResult = defaultMQAdminExt.queryMessage(topic, key, 32, 0, Long.MAX_VALUE);
             List<CockpitMessage> result = new ArrayList<CockpitMessage>();
@@ -126,6 +129,7 @@ public class CockpitMessageServiceController {
     public Set<String> getLinkedConsumerByTopic(@PathVariable("topic") String topic){
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         try {
+            defaultMQAdminExt.setInstanceName("CockpitMessageServiceController" + System.currentTimeMillis());
             defaultMQAdminExt.start();
             return defaultMQAdminExt.queryTopicConsumeByWho(topic).getGroupList();
 
@@ -143,6 +147,7 @@ public class CockpitMessageServiceController {
                           @PathVariable("msgId") String msgId){
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         try {
+            defaultMQAdminExt.setInstanceName("CockpitMessageServiceController" + System.currentTimeMillis());
             defaultMQAdminExt.start();
             return defaultMQAdminExt.consumeMessageDirectly(consumerGroup, client, msgId).toString();
         } catch (MQClientException | InterruptedException | MQBrokerException | RemotingException e) {
