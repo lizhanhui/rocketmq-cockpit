@@ -12,6 +12,7 @@
     <security:http pattern="/fonts/**" security="none" />
     <security:http pattern="/images/**" security="none" />
     <security:http pattern="/styles/**" security="none" />
+    <security:http pattern="/views/**" security="none" />
     <security:http pattern="/scripts/**" security="none" />
 
     <security:http pattern="/rocketmq/**" security="none" />
@@ -33,7 +34,7 @@
         <security:intercept-url pattern="/index.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <security:intercept-url pattern="/views/base.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <security:intercept-url pattern="/views/login.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
-        <security:intercept-url pattern="/cockpit/captcha-image.jsp" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/cockpit/captcha-image" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <security:intercept-url pattern="/j_spring_security_check"  access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 
         <security:intercept-url pattern="/cockpit/manage/**"  access="ROLE_ADMIN"/>

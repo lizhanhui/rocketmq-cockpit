@@ -1,14 +1,13 @@
 <div class="row" ng-controller="MessageCtrl">
 	<a ui-sref=project class="pull-right btn btn-primary btn-outline btn-rounded">Project</a>
-	<h2>QueryMessage <small> By ID </small></h2>
+	<h3>QueryMessage <small> By ID </small></h3>
 
    <div class="col-lg-9">
       <div class="form-group mb-xl">
-         <input type="text" placeholder="message id" class="form-control mb" ng-model="msgID"/>
-         <div class="clearfix">
-            <button type="button" class="pull-left btn btn-default" ng-click="searchID()">Search</button>
-         </div>
+         <input type="search" placeholder="message id" class="form-search mb" ng-model="msgID" style="width: 80%"/>
+         <button type="button" class="pull-right btn btn-default" ng-click="searchID()">Search</button>
       </div>
+
       <!-- START panel-->
       <div class="panel panel-default">
          <div class="panel-heading">Search Results

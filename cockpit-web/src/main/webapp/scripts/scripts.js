@@ -10,7 +10,6 @@
  */
 angular
   .module('cockpit', [
-    'cockpitServices',
     'highcharts-ng',
     'ui.router',
     'ngAnimate',

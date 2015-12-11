@@ -1,14 +1,13 @@
 <div class="row" ng-controller="MessageKEYCtrl">
 	<a ui-sref=project class="pull-right btn btn-primary btn-outline btn-rounded">Project</a>
-	<h2>QueryMessage <small> By KEY </small></h2>
+	<h3>QueryMessage <small> By KEY </small></h3>
 
    <div class="col-lg-9">
       <div class="form-group mb-xl">
-         <input type="text" placeholder="message topic" class="form-control mb" ng-model="messageTopic"/>
-         <input type="text" placeholder="message key" class="form-control mb" ng-model="messageKey"/>
-         <div class="clearfix">
-            <button type="button" class="pull-left btn btn-default" ng-click="searchKEY()">Search</button>
-         </div>
+         <input type="search" placeholder="message topic" class="form-search" ng-model="messageTopic"/>
+         <input type="search" placeholder="message key" class="form-search" ng-model="messageKey"/>
+         <button type="button" class="pull-right btn btn-default" ng-click="searchKEY()">Search</button>
+
       </div>
 
       <!-- START panel-->
@@ -19,7 +18,7 @@
          <!-- START table-responsive-->
          <div class="table-responsive">
             <table class="table table-striped table-bordered table-hover">
-				<thead>
+				<thead style="font-weight: bold">
 					<th>Message ID</th>
 					<th>Tags</th>
 					<th>Born Time</th>
