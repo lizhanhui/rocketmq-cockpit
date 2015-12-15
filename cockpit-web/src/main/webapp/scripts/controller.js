@@ -308,15 +308,15 @@
                 }
             };
 
-            $scope.findConnectConsumer =function() {
-                if (null != $scope.message.topic) {
+            $scope.findConnectConsumer = function() {
+                if ("undefined" != typeof($scope.message) && "undedined" != typeof($scope.message.topic) && null != $scope.message.topic) {
                     $http({
                         url: "cockpit/api/message/query/" + $scope.message.topic,
                         method: "GET",
                         responseType: "json"
                     }).success(function(data, status, headers, config) {
                         $scope.consumerGroups = data;
-                        $scope.consumerGroup = data[0];
+                        document.getElementById("findConsumer").style.display = "block";
                     }).error(function(data, status, headers, config) {
 
                     });
@@ -331,7 +331,7 @@
                         responseType: "json"
                     }).success(function(data, status, headers, config) {
                         $scope.clients = data;
-                        $scope.client = data[0];
+                        document.getElementById("findClient").style.display = "block";
                     }).error(function(data, status, headers, config) {
 
                     });
@@ -339,7 +339,17 @@
             };
 
             $scope.checkClient = function (){
-                $scope.client.clientId;
+                if ("undefined" != typeof($scope.consumerGroup) && "undefined" != typeof($scope.client) && null != $scope.client.clientId) {
+                    $http({
+                        url: "cockpit/api/message" + "/resend/" + $scope.consumerGroup + "/" + $scope.client.clientId + "/" + $scope.msgID,
+                        method: "GET"
+                    }).success(function(data, status, headers, config) {
+                        alert(data);
+                    }).error(function(data, status, headers, config){
+
+                    });
+
+                }
             }
         }
     }

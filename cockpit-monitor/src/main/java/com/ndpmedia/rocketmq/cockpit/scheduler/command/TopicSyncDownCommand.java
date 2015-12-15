@@ -131,6 +131,7 @@ public class TopicSyncDownCommand implements SubCommand {
                         topicBrokerInfo.setSyncTime(new Date());
                         topicBrokerInfo.setCreateTime(new Date());
                         topicBrokerInfo.setUpdateTime(new Date());
+                        topicBrokerInfo.setSyncTime(new Date());
                         cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
                     }
                     //若获取到相同Topic Name，相同Broker地址的数据，但是该条数据状态不为ACTIVE，刷新该条数据状态

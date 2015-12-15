@@ -75,21 +75,26 @@
 				   <tr>
 					   <td colspan='2'>
 						   Connect Consumer : <a ng-click="findConnectConsumer()">find</a>
-					   </td>
-				   </tr>
-				   <tr>
-					   <td colspan='2'>
-						   <select class="form-control"
-					         	ng-model="consumerGroup"
-					         	ng-options="consumerGroup for consumerGroup in consumerGroups"
-					            ng-change="findConnectClient()">
-					         </select>
-
-							<select class="form-control"
-								ng-model="client"
-								ng-options="client.clientId for client in clients"
-								ng-change="checkClient()">
-							</select>
+						   <br />
+						   <div id="findConsumer" style="display: none">
+							   Consumer Groups:
+							   <select
+						         	ng-model="consumerGroup"
+						         	ng-options="consumerGroup for consumerGroup in consumerGroups"
+						            ng-change="findConnectClient()">
+									<option value="">----find--Consumer----</option>
+						         </select>
+							</div>
+							<br />
+							 <div  id="findClient"  style="display: none">
+								 Clients
+								<select
+									ng-model="client"
+									ng-options="client.clientId for client in clients"
+									ng-change="checkClient()">
+									<option value="">----choose--one--client--resend----</option>
+								</select>
+							</div>
 					   </td>
 				   </tr>
 				   <tr>
