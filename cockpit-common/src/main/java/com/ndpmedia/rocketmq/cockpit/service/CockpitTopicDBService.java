@@ -1,13 +1,16 @@
 package com.ndpmedia.rocketmq.cockpit.service;
 
-import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
-import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
+import com.ndpmedia.rocketmq.cockpit.model.*;
 
 import java.util.List;
 
 public interface CockpitTopicDBService extends CockpitTopicBaseService {
 
+    /**
+     * get topic list by different status
+     * @param statuses topic status
+     * @return topic list
+     */
     List<TopicMetadata> getTopics(Status... statuses);
 
     /**
@@ -17,6 +20,10 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
      * @return topic list
      */
     TopicMetadata getTopic(String clusterName, String topic);
+
+    TopicMetadata getTopic(long topicId);
+
+    List<TopicAvailability> queryTopicsAvailability(Status... statuses);
 
     /**
      * update topic status to active on database
@@ -73,7 +80,13 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
 
     void addDCAllowed(long topicId, long dcId, Status status);
 
+    List<DataCenter> queryAllowedDC(long topicId);
+
     List<TopicBrokerInfo> queryEndangeredTopicBrokerInfoList(long brokerId);
 
     List<TopicBrokerInfo> queryTopicBrokerInfoByTopic(long topicId, long brokerId, int dc);
+
+    List<TopicBrokerInfo> queryTopicBrokerInfo(long topicId, long brokerId, int dc);
+
+    List<Long> queryAssociatedConsumerGroup(long topicId);
 }

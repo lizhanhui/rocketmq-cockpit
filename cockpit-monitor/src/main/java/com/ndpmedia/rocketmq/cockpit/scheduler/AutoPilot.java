@@ -45,17 +45,15 @@ public class AutoPilot {
     private CockpitConsumerGroupDBService cockpitConsumerGroupDBService;
 
     @Autowired
-    private TopicMapper topicMapper;
-
-    @Autowired
-    private ConsumerGroupMapper consumerGroupMapper;
-
-    @Autowired
     private WarningMapper warningMapper;
 
-
+    /**
+     * 1.check topic ,get the nums of dc and the topic
+     * 2.check consumer group,if some broker have topic but do not have consumer group
+     */
     @Scheduled(fixedDelay = 30000)
     public void autoPilot() {
+        //get connection
         MQAdminExt adminExt = null;
         try {
             adminExt = new DefaultMQAdminExt(Helper.getInstanceName());
@@ -65,12 +63,13 @@ public class AutoPilot {
             return;
         }
 
-        List<TopicAvailability> topicAvailabilityList = topicMapper.queryTopicsAvailability(Status.APPROVED, Status.ACTIVE);
+        //get every topic nums in different dc
+        List<TopicAvailability> topicAvailabilityList = cockpitTopicDBService.queryTopicsAvailability(Status.APPROVED, Status.ACTIVE);
 
         if (null != topicAvailabilityList && !topicAvailabilityList.isEmpty()) {
             for (TopicAvailability topicAvailability : topicAvailabilityList) {
                 if (topicAvailability.getAvailability() < TOPIC_AVAILABILITY_THRESHOLD) {
-                    List<DataCenter> allowedDataCenters = topicMapper.queryAllowedDC(topicAvailability.getTopicId());
+                    List<DataCenter> allowedDataCenters = cockpitTopicDBService.queryAllowedDC(topicAvailability.getTopicId());
                     if (null == allowedDataCenters || allowedDataCenters.isEmpty()) {
                         continue;
                     } else {
@@ -107,7 +106,7 @@ public class AutoPilot {
 
                     // Find candidate brokers to create topic on.
                     List<Long> currentHostingBrokers = new ArrayList<>();
-                    List<TopicBrokerInfo> topicBrokerInfoList = topicMapper.queryTopicBrokerInfo(topicAvailability.getTopicId(), 0, topicAvailability.getDcId());
+                    List<TopicBrokerInfo> topicBrokerInfoList = cockpitTopicDBService.queryTopicBrokerInfo(topicAvailability.getTopicId(), 0, topicAvailability.getDcId());
                     for (TopicBrokerInfo topicBrokerInfo : topicBrokerInfoList) {
                         currentHostingBrokers.add(topicBrokerInfo.getBroker().getId());
                     }
@@ -123,7 +122,7 @@ public class AutoPilot {
                         }
                     }
 
-                    List<Long> consumerGroupIds = topicMapper.queryAssociatedConsumerGroup(topicAvailability.getTopicId());
+                    List<Long> consumerGroupIds = cockpitTopicDBService.queryAssociatedConsumerGroup(topicAvailability.getTopicId());
 
                     if (consumerGroupIds.isEmpty()) {
                         Warning warning = new Warning();
@@ -142,11 +141,11 @@ public class AutoPilot {
                         for (Long consumerGroupId : consumerGroupIds) {
                             // ensure broker has all consumer groups which are associated with topic under creation.
                             if (!brokerMapper.hasConsumerGroup(brokerId, consumerGroupId)) {
-                                ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId);
+                                ConsumerGroup consumerGroup = cockpitConsumerGroupDBService.get(consumerGroupId, null);
                                 try {
                                     // For each topic, create associated consumer group on the target, matched brokers.
                                     adminExt.createAndUpdateSubscriptionGroupConfig(broker.getAddress(),
-                                            CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup));
+                                            CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup), 20000);
                                     brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
 
                                 } catch (RemotingException | MQBrokerException | InterruptedException | MQClientException e) {
@@ -158,12 +157,12 @@ public class AutoPilot {
                         // create topic on broker.
                         List<TopicBrokerInfo> existingTopicBrokerInfo = null;
                         try {
-                            existingTopicBrokerInfo = topicMapper.queryTopicBrokerInfo(topicAvailability.getTopicId(), brokerId, 0);
+                            existingTopicBrokerInfo = cockpitTopicDBService.queryTopicBrokerInfo(topicAvailability.getTopicId(), brokerId, 0);
                             TopicBrokerInfo topicBrokerInfo = null;
                             if (existingTopicBrokerInfo.isEmpty()) {
                                 topicBrokerInfo = new TopicBrokerInfo();
                                 topicBrokerInfo.setBroker(broker);
-                                topicBrokerInfo.setTopicMetadata(topicMapper.getMetadata(topicAvailability.getTopicId()));
+                                topicBrokerInfo.setTopicMetadata(cockpitTopicDBService.getTopic(topicAvailability.getTopicId()));
                                 topicBrokerInfo.setCreateTime(new Date());
                                 topicBrokerInfo.setUpdateTime(new Date());
                                 topicBrokerInfo.setSyncTime(new Date());
@@ -180,7 +179,7 @@ public class AutoPilot {
                             adminExt.createAndUpdateTopicConfig(broker.getAddress(),
                                     TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo));
                             if (existingTopicBrokerInfo.isEmpty()) {
-                                topicMapper.insertTopicBrokerInfo(topicBrokerInfo);
+                                cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
                             }
                         } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
                             LOGGER.error("Failed to create topic", e);
@@ -238,7 +237,7 @@ public class AutoPilot {
                     }
                 }
             } catch (RemotingException | MQClientException | InterruptedException e) {
-                LOGGER.error("Failed to fetch topicMetadata route data: {}", topicMetadata.getTopic());
+                LOGGER.error("Failed to fetch topicMetadata route data: {}" + e, topicMetadata.getTopic());
             }
 
         }

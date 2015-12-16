@@ -1,5 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.util;
 
+import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.TopicConfig;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Topic;
@@ -55,5 +56,12 @@ public class TopicTranslate {
         topic.setUpdateTime(new Date());
 
         return topic;
+    }
+
+    public static boolean isGroup(String topic){
+        if (topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX)
+                || topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX))
+            return true;
+        return false;
     }
 }
