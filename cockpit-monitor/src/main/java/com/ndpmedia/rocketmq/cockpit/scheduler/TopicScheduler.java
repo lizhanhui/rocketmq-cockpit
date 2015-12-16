@@ -16,6 +16,7 @@ import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitBrokerMQService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
+import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,12 +53,12 @@ public class TopicScheduler {
 
 
     /**
-     * synchronize topics every 5 minutes
+     * synchronize topics every 10 minutes
      */
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 600000)
     public void synchronizeTopics() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
-        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+        defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
             syncDownTopics(defaultMQAdminExt);
@@ -65,7 +66,8 @@ public class TopicScheduler {
         } catch (MQClientException e) {
             logger.error("Failed to synchronize topics", e);
         } finally {
-            defaultMQAdminExt.shutdown();
+            if (null != defaultMQAdminExt)
+                defaultMQAdminExt.shutdown();
         }
     }
 
@@ -163,7 +165,7 @@ public class TopicScheduler {
             for (TopicBrokerInfo topicBrokerInfo : list) {
                 TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
                 try {
-                    defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddress, topicConfig);
+                    defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddress, topicConfig, 15000L);
                 } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
                     logger.error("Failed to create topic {} on broker {}", topicConfig.getTopicName(),
                             brokerAddress);

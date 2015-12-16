@@ -68,7 +68,7 @@ public class DataAgingScheduler {
      * period:30 second
      * span:old than 30 minutes
      */
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 60000)
     public void deleteDeprecatedLoginData() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -30);
