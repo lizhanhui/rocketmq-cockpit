@@ -58,7 +58,7 @@ public class CockpitBrokerMQServiceImpl implements CockpitBrokerMQService {
                 }
             }
         }
-        logger.info("[cockpit broker] now we get broker list , size : " + brokerList.size() + brokerList);
+        logger.info("[cockpit broker] now we get broker list, size : " + brokerList.size() + brokerList);
         return brokerList;
     }
 
@@ -99,7 +99,7 @@ public class CockpitBrokerMQServiceImpl implements CockpitBrokerMQService {
                 }
             }
         }
-        logger.info("[sync topic] now we get broker list , size : " + brokerToCluster.size() + " [] " + brokerToCluster);
+        logger.info("[sync topic] now we get broker list, size : " + brokerToCluster.size() + " [] " + brokerToCluster);
         return brokerToCluster;
     }
 

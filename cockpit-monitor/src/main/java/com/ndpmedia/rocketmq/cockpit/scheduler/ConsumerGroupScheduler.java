@@ -89,6 +89,8 @@ public class ConsumerGroupScheduler {
                 consumerGroup = new ConsumerGroup();
                 consumerGroup.setClusterName(broker.getClusterName());
                 consumerGroup.setGroupName(subscriptionGroupConfig.getGroupName());
+                consumerGroup.setConsumeEnable(subscriptionGroupConfig.isConsumeEnable());
+                consumerGroup.setConsumeBroadcastEnable(subscriptionGroupConfig.isConsumeBroadcastEnable());
                 consumerGroup.setConsumeFromBrokerId((int)subscriptionGroupConfig.getBrokerId());
                 consumerGroup.setWhichBrokerWhenConsumeSlowly((int)subscriptionGroupConfig.getWhichBrokerWhenConsumeSlowly());
                 consumerGroup.setCreateTime(new Date());
