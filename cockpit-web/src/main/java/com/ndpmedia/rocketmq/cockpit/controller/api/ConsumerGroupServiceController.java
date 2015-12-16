@@ -29,7 +29,8 @@ public class ConsumerGroupServiceController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> list(HttpServletRequest request) {
-        List<ConsumerGroup> consumerGroups = cockpitConsumerGroupDBService.list(getProjectId(request), null, null, 0, null);
+        //TODO get user project
+        List<ConsumerGroup> consumerGroups = cockpitConsumerGroupDBService.list(0, null, null, 0, null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", consumerGroups.size());

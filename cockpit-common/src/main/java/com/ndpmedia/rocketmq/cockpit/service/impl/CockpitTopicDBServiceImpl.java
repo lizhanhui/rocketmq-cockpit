@@ -1,8 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.service.impl;
 
-import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
-import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
+import com.ndpmedia.rocketmq.cockpit.model.*;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.TopicMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +43,18 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     }
 
     @Override
+    public List<TopicAvailability> queryTopicsAvailability(Status... statuses){
+        return topicMapper.queryTopicsAvailability(statuses);
+    }
+
+    @Override
     public TopicMetadata getTopic(String clusterName, String topic) {
         return topicMapper.getMetadataByTopic(clusterName, topic);
+    }
+
+    @Override
+    public TopicMetadata getTopic(long topicId){
+        return topicMapper.getMetadata(topicId);
     }
 
     @Override
@@ -195,11 +203,26 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     }
 
     @Override
+    public List<DataCenter> queryAllowedDC(long topicId){
+        return topicMapper.queryAllowedDC(topicId);
+    }
+
+    @Override
     public List<TopicBrokerInfo> queryEndangeredTopicBrokerInfoList(long brokerId) {
         return topicMapper.queryEndangeredTopicsByBroker(brokerId);
     }
 
+    @Override
     public List<TopicBrokerInfo> queryTopicBrokerInfoByTopic(long topicId, long brokerId, int dc){
-        return topicMapper.queryTopicBrokerInfo(topicId, 0L, 0);
+        return queryTopicBrokerInfo(topicId, 0L, 0);
+    }
+
+    @Override
+    public List<TopicBrokerInfo> queryTopicBrokerInfo(long topicId, long brokerId, int dc){
+        return topicMapper.queryTopicBrokerInfo(topicId, brokerId, dc);
+    }
+
+    public List<Long> queryAssociatedConsumerGroup(long topicId){
+        return topicMapper.queryAssociatedConsumerGroup(topicId);
     }
 }
