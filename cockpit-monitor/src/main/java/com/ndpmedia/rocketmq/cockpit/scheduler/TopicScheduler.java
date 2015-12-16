@@ -76,8 +76,7 @@ public class TopicScheduler {
                 for (String topic : topicList.getTopicList()) {
 
                     // We do not need to manage System topics.
-                    if (topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX)
-                            || topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
+                    if (TopicTranslate.isGroup(topic)) {
                         continue;
                     }
 
@@ -110,8 +109,10 @@ public class TopicScheduler {
                             topicBrokerInfo.setReadQueueNum(queueData.getReadQueueNums());
                             topicBrokerInfo.setWriteQueueNum(queueData.getWriteQueueNums());
                             topicBrokerInfo.setPermission(queueData.getPerm());
-                            topicBrokerInfo.setCreateTime(new Date());
-                            topicBrokerInfo.setUpdateTime(new Date());
+                            Date date = new Date();
+                            topicBrokerInfo.setCreateTime(date);
+                            topicBrokerInfo.setUpdateTime(date);
+                            topicBrokerInfo.setSyncTime(date);
                             cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
                             if (!cockpitTopicDBService.isDCAllowed(topicMetadata.getId(), broker.getDc())) {
                                 cockpitTopicDBService.addDCAllowed(topicMetadata.getId(), broker.getDc(), Status.ACTIVE);

@@ -269,7 +269,7 @@
             WHERE t.status IN (3, 5)
             AND tbx.status_id IN (3, 5)
             AND b.broker_id = 0
-            AND (tbx.sync_time IS NULL OR tbx.sync_time < CURRENT_TIMESTAMP - INTERVAL 600 SECOND)
+            AND (tbx.sync_time IS NULL OR tbx.sync_time > CURRENT_TIMESTAMP - INTERVAL 600 SECOND)
         ]]>
            <if test="brokerId > 0">
                AND b.id = #{brokerId}

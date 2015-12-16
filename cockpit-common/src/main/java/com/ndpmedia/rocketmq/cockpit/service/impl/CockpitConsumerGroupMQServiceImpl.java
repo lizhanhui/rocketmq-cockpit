@@ -16,6 +16,7 @@ import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -140,5 +141,22 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
         subscriptionGroupConfig.setRetryQueueNums(consumerGroup.getRetryQueueNum());
         subscriptionGroupConfig.setWhichBrokerWhenConsumeSlowly(consumerGroup.getWhichBrokerWhenConsumeSlowly());
         return subscriptionGroupConfig;
+    }
+
+    public static ConsumerGroup reWrap(SubscriptionGroupConfig subscriptionGroupConfig, String cluster) {
+        ConsumerGroup consumerGroup = new ConsumerGroup();
+        consumerGroup.setClusterName(cluster);
+        consumerGroup.setGroupName(subscriptionGroupConfig.getGroupName());
+        consumerGroup.setConsumeFromBrokerId((int) subscriptionGroupConfig.getBrokerId());
+        consumerGroup.setWhichBrokerWhenConsumeSlowly((int) subscriptionGroupConfig.getWhichBrokerWhenConsumeSlowly());
+        consumerGroup.setConsumeEnable(subscriptionGroupConfig.isConsumeEnable());
+        consumerGroup.setConsumeBroadcastEnable(subscriptionGroupConfig.isConsumeBroadcastEnable());
+        consumerGroup.setConsumeFromMinEnable(subscriptionGroupConfig.isConsumeFromMinEnable());
+        consumerGroup.setRetryQueueNum(subscriptionGroupConfig.getRetryQueueNums());
+        consumerGroup.setRetryMaxTimes(subscriptionGroupConfig.getRetryMaxTimes());
+        consumerGroup.setCreateTime(new Date());
+        consumerGroup.setUpdateTime(new Date());
+        consumerGroup.setStatus(Status.ACTIVE);
+        return consumerGroup;
     }
 }

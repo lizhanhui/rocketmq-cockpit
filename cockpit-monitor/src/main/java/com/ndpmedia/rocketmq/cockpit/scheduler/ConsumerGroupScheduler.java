@@ -86,16 +86,7 @@ public class ConsumerGroupScheduler {
             ConsumerGroup consumerGroup = cockpitConsumerGroupDBService.get(0, subscriptionGroupConfig.getGroupName());
             if (null == consumerGroup) {
                 // First create this consumer group in database.
-                consumerGroup = new ConsumerGroup();
-                consumerGroup.setClusterName(broker.getClusterName());
-                consumerGroup.setGroupName(subscriptionGroupConfig.getGroupName());
-                consumerGroup.setConsumeEnable(subscriptionGroupConfig.isConsumeEnable());
-                consumerGroup.setConsumeBroadcastEnable(subscriptionGroupConfig.isConsumeBroadcastEnable());
-                consumerGroup.setConsumeFromBrokerId((int)subscriptionGroupConfig.getBrokerId());
-                consumerGroup.setWhichBrokerWhenConsumeSlowly((int)subscriptionGroupConfig.getWhichBrokerWhenConsumeSlowly());
-                consumerGroup.setCreateTime(new Date());
-                consumerGroup.setUpdateTime(new Date());
-                consumerGroup.setStatus(Status.ACTIVE);
+                consumerGroup = CockpitConsumerGroupMQServiceImpl.reWrap(subscriptionGroupConfig, broker.getClusterName());
                 cockpitConsumerGroupDBService.insert(consumerGroup, 1);
             }
 
