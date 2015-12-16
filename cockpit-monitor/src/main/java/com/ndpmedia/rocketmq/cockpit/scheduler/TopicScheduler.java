@@ -90,6 +90,7 @@ public class TopicScheduler {
                         topicMetadata.setStatus(Status.ACTIVE);
                         topicMetadata.setCreateTime(new Date());
                         topicMetadata.setUpdateTime(new Date());
+                        // TODO decode and set order info here.
                         topicMetadata.setClusterName(getClusterName(topicRouteData.getBrokerDatas()));
                         cockpitTopicDBService.insert(topicMetadata);
 
@@ -112,7 +113,6 @@ public class TopicScheduler {
                             topicBrokerInfo.setCreateTime(date);
                             topicBrokerInfo.setUpdateTime(date);
                             topicBrokerInfo.setSyncTime(date);
-
                             cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
                             if (!cockpitTopicDBService.isDCAllowed(topicMetadata.getId(), broker.getDc())) {
                                 cockpitTopicDBService.addDCAllowed(topicMetadata.getId(), broker.getDc(), Status.ACTIVE);
@@ -159,8 +159,7 @@ public class TopicScheduler {
         Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
         for (String brokerAddress : brokerAddresses) {
             Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
-            List<TopicBrokerInfo> list =
-                    cockpitTopicDBService.queryEndangeredTopicBrokerInfoList(broker.getId());
+            List<TopicBrokerInfo> list = cockpitTopicDBService.queryEndangeredTopicBrokerInfoList(broker.getId());
             for (TopicBrokerInfo topicBrokerInfo : list) {
                 TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
                 try {
