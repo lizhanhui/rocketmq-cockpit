@@ -11,6 +11,7 @@ import com.ndpmedia.rocketmq.cockpit.model.*;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
 import com.ndpmedia.rocketmq.cockpit.service.*;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupMQServiceImpl;
+import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +48,12 @@ public class ConsumerGroupScheduler {
 
     /**
      * update consumer group to cluster
-     * period:one hour(20:24 of an hour)
+     * period:ten minutes
      */
-    @Scheduled(cron = "24 20 * * * *")
+    @Scheduled(fixedRate = 600000)
     public void synchronizeConsumerGroups() {
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
-        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+        defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
             Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
@@ -65,7 +66,8 @@ public class ConsumerGroupScheduler {
         } catch (Exception e) {
             logger.error("Failed to synchronizeConsumerGroups", e);
         } finally {
-            defaultMQAdminExt.shutdown();
+            if (null != defaultMQAdminExt)
+                defaultMQAdminExt.shutdown();
         }
     }
 
