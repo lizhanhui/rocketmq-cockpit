@@ -7,6 +7,7 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressService;
+import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +30,11 @@ public class CockpitConsumeProgressServiceImpl implements CockpitConsumeProgress
     public List<ConsumeProgress> queryConsumerProgress(String groupName, String topic, String broker) {
         List<ConsumeProgress> consumeProgressList = new ArrayList<ConsumeProgress>();
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
-        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+        defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
             // 查询特定consumer
-            ConsumeStats consumeStats = defaultMQAdminExt.examineConsumeStats(groupName);
+            ConsumeStats consumeStats = defaultMQAdminExt.examineConsumeStats(groupName, 15000L);
 
             List<MessageQueue> messageQueueList = new LinkedList<MessageQueue>();
             messageQueueList.addAll(consumeStats.getOffsetTable().keySet());
