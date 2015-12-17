@@ -121,6 +121,7 @@ CREATE TABLE IF NOT EXISTS consume_progress (
   last_timestamp BIGINT NOT NULL DEFAULT 0,
   diff BIGINT NOT NULL DEFAULT 0,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `create_time` (`create_time`),
   KEY `consume_progress_topic` (`topic`),
   KEY `consume_progress_group` (`consumer_group`),
   KEY `consume_progress_group_t` (`consumer_group`,`create_time`)
@@ -134,6 +135,7 @@ CREATE TABLE IF NOT EXISTS topic_progress (
   broker_offset BIGINT NOT NULL DEFAULT 0,
   last_timestamp BIGINT NOT NULL DEFAULT 0,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX `create_time` (`create_time`),
   INDEX `topic_progress_topic` (`topic`)
 ) ENGINE = INNODB;
 
@@ -289,3 +291,6 @@ ALTER TABLE consumer_group ADD CONSTRAINT  uniq_cluster_consumer_group UNIQUE (c
 ALTER TABLE broker ADD CONSTRAINT  uniq_cluster_broker_name_broker_id UNIQUE (cluster_name, broker_name, broker_id);
 
 ALTER TABLE resource_permission ADD CONSTRAINT uniq_resource_id_type_team UNIQUE (resource_id, resource_type_id, team_id);
+--新库无需执行
+ALTER TABLE topic_progress ADD INDEX create_time (create_time);
+ALTER TABLE consume_progress ADD INDEX create_time (create_time);
