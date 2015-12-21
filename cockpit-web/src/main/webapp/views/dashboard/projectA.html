@@ -14,14 +14,14 @@
                <div class="panel-body">
                   <div class="form-group">
                      <label class="control-label">Project Name: </label>
-                     <input type="text" placeholder="name" name="name" required="" ng-model="project.name" class="form-control" ng-pattern="/^[a-zA-Z0-9]{6,12}$/" />
+                     <input type="text" placeholder="name" name="name" required="" ng-model="project.name" class="form-control" ng-pattern="/^[a-zA-Z\s\d]{6,16}$/" />
                      <span ng-show="registerForm.name.$dirty &amp;&amp; registerForm.name.$error.required" class="text-danger">This field is required</span>
-                     <span ng-show="registerForm.name.$dirty &amp;&amp; registerForm.name.$error.pattern" class="text-danger">Input should match 'a-zA-Z0-9' and 6-10 length</span>
+                     <span ng-show="registerForm.name.$dirty &amp;&amp; registerForm.name.$error.pattern" class="text-danger">Input should 6-16 length</span>
                   </div>
                   <div class="form-group">
                      <label class="control-label">Project Description</label>
-                     <input id="description" type="text" name="description" ng-model="project.description" ng-pattern="/^[a-zA-Z0-9]{6,10}$/" class="form-control" />
-                     <span ng-show="registerForm.description.$dirty &amp;&amp; registerForm.description.$error.pattern" class="text-danger">Input should match 'a-zA-Z0-9' and 6-10 length</span>
+                     <input id="description" type="text" name="description" ng-model="project.description" ng-pattern="/^[^\n]{0,255}$/" class="form-control" />
+                     <span ng-show="registerForm.description.$dirty &amp;&amp; registerForm.description.$error.pattern" class="text-danger">Input any letter and 1-255 length</span>
                   </div>
                   <div class="required">* Required fields</div>
                </div>

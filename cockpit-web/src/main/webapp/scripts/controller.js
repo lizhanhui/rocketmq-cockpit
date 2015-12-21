@@ -12,30 +12,38 @@
     .module('cockpit')
     .controller('LoginCtrl', LoginController);
 
-    LoginController.$inject = ['$scope', '$location', '$http', '$window', 'UserService'];
-    function LoginController($scope, $location, $http, $window, UserService) {
-        $scope.kaptchaImage = function(){
-            document.getElementById("kaptchaImage").src = "cockpit/captcha-image?"  + Math.floor(Math.random() * 100);
-        };
-        $scope.message = "";
-
-        $scope.submit = function() {
-            var loginLoad = 'j_username=' + $scope.j_username + '&j_password=' + $scope.j_password + '&kaptcha=' + $scope.kaptcha;
-            var config = {
-                headers: {'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
-            };
-            $http.post('j_spring_security_check', loginLoad, config)
-            .success(function(data, status, headers, config){
-                UserService.isLogin = true;
-                $location.path('/dashboard');
-            }).error(function(data, status, headers, config){
-                delete $window.sessionStorage.token;
-                $scope.message = "login failed."
-            });
-
-            return false;
+    LoginController.$inject = ['$scope', '$location', '$http', '$window', 'UserService', '$cookieStore'];
+    function LoginController($scope, $location, $http, $window, UserService, $cookieStore) {
+        if ("yes" == $cookieStore.get("isLogin")) {
+            UserService.isLogin = true;
         }
 
+        if (UserService.isLogin) {
+            $location.path('/dashboard');
+        }else{
+            $scope.kaptchaImage = function(){
+                document.getElementById("kaptchaImage").src = "cockpit/captcha-image?"  + Math.floor(Math.random() * 100);
+            };
+            $scope.message = "";
+
+            $scope.submit = function() {
+                var loginLoad = 'j_username=' + $scope.j_username + '&j_password=' + $scope.j_password + '&kaptcha=' + $scope.kaptcha;
+                var config = {
+                    headers: {'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
+                };
+                $http.post('j_spring_security_check', loginLoad, config)
+                .success(function(data, status, headers, config){
+                    UserService.isLogin = true;
+                    $cookieStore.put("isLogin", "yes");
+                    $location.path('/dashboard');
+                }).error(function(data, status, headers, config){
+                    $cookieStore.remove("isLogin");
+                    $scope.message = "login failed."
+                });
+
+                return false;
+            }
+        }
     }
 })();
 
@@ -61,9 +69,9 @@
 
     angular.module('cockpit')
     .controller('ProjectCtrl', ProjectController);
-    ProjectController.$inject = ['$scope', '$http' , '$location', 'UserService'];
+    ProjectController.$inject = ['$scope', '$http' , '$location', 'UserService', '$cookieStore'];
 
-    function ProjectController($scope, $http, $location, UserService ){
+    function ProjectController($scope, $http, $location, UserService, $cookieStore ){
         if (!UserService.isLogin) {
             $location.path('/login');
         }else {
@@ -395,10 +403,11 @@
 
     ProjectListController.$inject = ['$scope', '$http', '$location', 'UserService'];
     function ProjectListController($scope, $http, $location, UserService) {
+        $scope.visibleG = false;
+        $scope.visibleT = false;
         if (!UserService.isLogin) {
             $location.path('/login');
         }else{
-
             $http({
                 url: 'cockpit/api/project',
                 method: 'GET',
@@ -409,24 +418,45 @@
 
             });
 
-            $scope.showGroups = function(consumerGroups) {
-                var resultString = "";
+            $scope.showGroups = function(projectId) {
+                $http({
+                    url: 'cockpit/api/project/' + projectId + "/unconsumer-groups",
+                    method: 'GET',
+                    responseType: 'json'
+                }).success(function(data, status, headers, config) {
+                    $scope.visibleG = true;
+                    $scope.consumerGroups = data;
+                    if (null != data) {
+                        $scope.consumerGroup = data[0];
+                    }
+                }).error(function(data, status, headers, config) {
 
-                consumerGroups.forEach(function(consumerGroup) {
-                    resultString = resultString + consumerGroup.groupName + " ";
                 });
-
-                return resultString;
             };
 
-            $scope.showTopics = function(topics){
-                var resultString = "";
+            $scope.showTopics = function(projectId){
+                $http({
+                    url: 'cockpit/api/project/' + projectId + "/untopics",
+                    method: 'GET',
+                    responseType: 'json'
+                }).success(function(data, status, headers, config) {
+                    $scope.visibleT = true;
+                    $scope.topics = data;
+                    if (null != data) {
+                        $scope.topic = data[0];
+                    }
 
-                topics.forEach(function(topic){
-                    resultString = resultString + topic.topic + " ";
+                }).error(function(data, status, headers, config) {
+
                 });
+            }
 
-                return resultString;
+            $scope.addGroup = function(){
+
+            }
+
+            $scope.addTopic = function(){
+
             }
         }
     }
@@ -443,7 +473,6 @@
         if (!UserService.isLogin) {
             $location.path('/login');
         }else{
-
             $scope.submit = function() {
                 var project = $scope.project;
                 $http({
@@ -455,7 +484,7 @@
                     if (data == 0) {
                         $scope.message = "this project is already~~~~~exist";
                     }else{
-                        $scope.message = "";
+                        $scope.message = "SUCCESS";
                     }
                 }).error(function(data, status, headers, config) {
 

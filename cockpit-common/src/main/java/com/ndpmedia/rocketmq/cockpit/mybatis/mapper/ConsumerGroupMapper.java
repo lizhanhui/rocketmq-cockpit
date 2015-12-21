@@ -19,6 +19,8 @@ public interface ConsumerGroupMapper {
 
     List<ConsumerGroup> listByProject(@Param("projectId") long projectId);
 
+    List<ConsumerGroup> listByOtherProject(@Param("projectId") long projectId);
+
     ConsumerGroup get(@Param("id") long id);
 
     ConsumerGroup getByName(@Param("groupName") String groupName);

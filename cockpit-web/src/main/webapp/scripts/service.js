@@ -3,7 +3,7 @@
 
     angular
         .module('cockpit')
-        .factory('UserService', UserService);
+        .service('UserService', UserService);
 
     UserService.$inject = [];
     function UserService() {

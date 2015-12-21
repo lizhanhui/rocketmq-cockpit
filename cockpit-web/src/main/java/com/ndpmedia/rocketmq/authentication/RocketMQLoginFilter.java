@@ -2,6 +2,7 @@ package com.ndpmedia.rocketmq.authentication;
 
 import com.google.code.kaptcha.Constants;
 import com.ndpmedia.rocketmq.cockpit.util.LoginConstant;
+import com.ndpmedia.rocketmq.cockpit.util.WebHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,8 @@ public class RocketMQLoginFilter implements Filter, LoginConstant {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpSession session = request.getSession();
 
+        if (!WebHelper.hasUser(request))
+            WebHelper.cookiesClear(request, response);
         //Check SSO.
         String redirectURL = request.getParameter(LoginConstant.REDIRECT_KEY);
         Object tokenObj = session.getAttribute(LoginConstant.TOKEN_IN_SESSION);

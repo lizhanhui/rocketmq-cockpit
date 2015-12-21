@@ -27,6 +27,7 @@ public interface TopicMapper {
                                      @Param("topic") String topic);
 
     List<TopicMetadata> listByProject(long projectId);
+    List<TopicMetadata> listByOtherProject(long projectId);
 
     /**
      * Refresh sync_time column to current timestamp.

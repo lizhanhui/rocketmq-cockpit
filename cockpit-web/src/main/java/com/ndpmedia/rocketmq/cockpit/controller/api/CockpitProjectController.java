@@ -100,9 +100,21 @@ public class CockpitProjectController {
         return cockpitProjectService.getConsumerGroups(projectId);
     }
 
+    @RequestMapping(value = "/{projectId}/unconsumer-groups", method = RequestMethod.GET)
+    @ResponseBody
+    public List<ConsumerGroup> getUnuseConsumerGroups(@PathVariable("projectId") long projectId){
+        return cockpitProjectService.getUnuseConsumerGroups(projectId);
+    }
+
     @RequestMapping(value = "/{projectId}/topics", method = RequestMethod.GET)
     @ResponseBody
     public List<TopicMetadata> getTopics(@PathVariable("projectId") long projectId){
         return cockpitProjectService.getTopics(projectId);
+    }
+
+    @RequestMapping(value = "/{projectId}/untopics", method = RequestMethod.GET)
+    @ResponseBody
+    public List<TopicMetadata> getUnuseTopics(@PathVariable("projectId") long projectId){
+        return cockpitProjectService.getUnuseTopics(projectId);
     }
 }

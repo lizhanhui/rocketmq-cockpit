@@ -35,6 +35,10 @@ public interface CockpitProjectService {
 
     List<ConsumerGroup> getConsumerGroups(long projectId);
 
+    List<ConsumerGroup> getUnuseConsumerGroups(long projectId);
+
     List<TopicMetadata> getTopics(long projectId);
+
+    List<TopicMetadata> getUnuseTopics(long projectId);
 
 }
