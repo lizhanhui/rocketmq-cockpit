@@ -13,8 +13,8 @@ angular
     'highcharts-ng',
     'ui.router',
     'ngAnimate',
-   // 'ngStorage',
-   // 'ngCookies',
+    //'ngStorage',
+    'ngCookies',
     'ngResource'
   ])
   .config(function($stateProvider, $urlRouterProvider) {

@@ -68,7 +68,17 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
     }
 
     @Override
+    public List<ConsumerGroup> getUnuseConsumerGroups(long projectId) {
+        return consumerGroupMapper.listByOtherProject(projectId);
+    }
+
+    @Override
     public List<TopicMetadata> getTopics(long projectId) {
         return topicMapper.list(projectId, null, null);
+    }
+
+    @Override
+    public List<TopicMetadata> getUnuseTopics(long projectId) {
+        return topicMapper.listByOtherProject(projectId);
     }
 }
