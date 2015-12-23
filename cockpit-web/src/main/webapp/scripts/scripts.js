@@ -13,7 +13,6 @@ angular
     'highcharts-ng',
     'ui.router',
     'ngAnimate',
-    //'ngStorage',
     'ngCookies',
     'ngResource'
   ])

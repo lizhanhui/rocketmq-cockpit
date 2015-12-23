@@ -103,6 +103,11 @@
         <if test="brokerAddress != null">
             AND b.address = #{brokerAddress}
         </if>
+
+        <if test="clusterName == null and brokerAddress == null and consumerGroupName == null and 1 > brokerId">
+            LIMIT 30
+        </if>
+
     </select>
 
     <select id="listByProject" resultMap="consumerGroupMap">
@@ -115,8 +120,8 @@
     <select id="listByOtherProject" resultMap="consumerGroupMap">
         SELECT cg.id, cg.cluster_name, cg.which_broker_when_consume_slowly, cg.group_name, cg.consume_enable, cg.consume_broadcast_enable, cg.retry_max_times, cg.retry_queue_num, cg.consume_from_min_enable, cg.status_id, cg.create_time, cg.update_time
         FROM consumer_group AS cg
-        JOIN project_consumer_group_xref AS pcgx ON pcgx.consumer_group_id = cg.id
-        WHERE pcgx.project_id != #{projectId}
+        LEFT JOIN (select * from project_consumer_group_xref where project_id = #{projectId}) pcgx ON pcgx.consumer_group_id = cg.id
+        WHERE pcgx.project_id IS NULL
     </select>
 
     <select id="get" resultMap="consumerGroupMap">

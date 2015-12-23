@@ -10,9 +10,9 @@
                <thead style="font-weight: bold">
                   <th>Name</th>
                   <th>description</th>
-                  <!-- <th>Groups</th>
-                  <th>Topics</th> -->
-                  <th>option</th>
+                  <th>Groups</th>
+                  <th>Topics</th>
+                  <!-- <th>option</th> -->
               </thead>
               <tbody>
                <tr ng-repeat="project in projects">
@@ -22,28 +22,13 @@
                   <td>
                      <span text="project.description" name="description" ><span ng-bind="project.description"></span></span>
                   </td>
-                  <!-- <td>
-                     <span editable-text="project.consumerGroups" e-name="groups" e-form="rowform" >{{ showGroups(project.consumerGroups) }}</span>
+                  <td>
+                     <span text="project.consumerGroups" name="groups"><span ng-bind="showGroups(project.consumerGroups)"></span></span>
                   </td>
                   <td>
                      <span editable-text="project.topics" e-name="topics" e-form="rowform" >{{ showTopics(project.topics) }}</span>
-                  </td> -->
+                  </td>
                   <td>
-                      <form name="groupForm" ng-show="visibleG" ng-submit="addGroup()">
-                          <select class="form-control" ng-model="consumerGroup" ng-options="consumerGroup.groupName for consumerGroup in consumerGroups">
-                          </select>
-                          <button type="submit" class="btn">add group</button>
-                      </form>
-                      <div class="btn-edit">
-                          <button type="button" ng-show="!visibleG" ng-click="showGroups(project.id)" class="btn btn-default">show group</button>
-                      </div>
-                      <form name="topicForm" ng-show="visibleT" ng-submit="addTopic()">
-                          <select class="form-control" ng-model="topic" ng-options="topic.topic for topic in topics"></select>
-                          <button type="submit" class="btn">add topic</button>
-                      </form>
-                      <div class="btn-edit">
-                          <button type="button" ng-show="!visibleT" ng-click="showTopics(project.id)" class="btn btn-default">show topic</button>
-                      </div>
                   </td>
                </tr>
            </tbody>
