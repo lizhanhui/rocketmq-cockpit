@@ -129,6 +129,11 @@
         <if test="cluster != null">
             AND t.cluster_name = #{cluster}
         </if>
+
+        <if test="statusIds == null and cluster == null">
+            LIMIT 30
+        </if>
+
     </select>
 
     <select id="queryTopicsAvailability" resultType="com.ndpmedia.rocketmq.cockpit.model.TopicAvailability">
@@ -263,8 +268,8 @@
     <select id="listByOtherProject" resultMap="topicMetadataResultMap">
         SELECT t.id, t.topic, t.cluster_name, t.`order`, t.status, t.create_time, t.update_time
         FROM topic AS t
-        JOIN project_topic_xref AS ptx ON ptx.topic_id = t.id
-        WHERE ptx.project_id != #{projectId}
+        LEFT JOIN (select * from project_topic_xref where project_id = #{projectId}) ptx ON ptx.topic_id = t.id
+        WHERE ptx.project_id IS NULL
     </select>
 
     <select id="queryEndangeredTopicsByBroker" resultMap="topicBrokerInfoResultMap">

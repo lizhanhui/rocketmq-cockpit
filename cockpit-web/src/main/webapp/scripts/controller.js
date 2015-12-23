@@ -76,8 +76,96 @@
             $location.path('/login');
         }else {
     		$scope.set = function() {
-    			activate();
+                reDrow();
     		};
+
+            function reDrow(){
+                initAdd();
+                clearGroups();
+                clearTopics();
+    			activate();
+            }
+
+            function initAdd() {
+                $scope.visibleG = false;
+                $scope.visibleT = false;
+                $scope.groupMessage = "";
+                $scope.topicMessage = "";
+                $scope.consumerGroups = null;
+                $scope.consumerGroup = null;
+                $scope.topics = null;
+                $scope.topic = null;
+            }
+
+            $scope.showGroups = function(projectId) {
+                $http({
+                    url: 'cockpit/api/project/' + projectId + "/unconsumer-groups",
+                    method: 'GET',
+                    responseType: 'json'
+                }).success(function(data, status, headers, config) {
+                    $scope.visibleG = !$scope.visibleG;
+                    $scope.consumerGroups = data;
+                    if (null != data) {
+                        $scope.consumerGroup = data[0];
+                    }
+                }).error(function(data, status, headers, config) {
+
+                });
+            };
+
+            $scope.showTopics = function(projectId){
+                $http({
+                    url: 'cockpit/api/project/' + projectId + "/untopics",
+                    method: 'GET',
+                    responseType: 'json'
+                }).success(function(data, status, headers, config) {
+                    $scope.visibleT = !$scope.visibleT;
+                    $scope.topics = data;
+                    if (null != data) {
+                        $scope.topic = data[0];
+                    }
+                }).error(function(data, status, headers, config) {
+
+                });
+            }
+
+            $scope.addGroup = function(projectId){
+                if (null != $scope.consumerGroup){
+                    $http({
+                        url: 'cockpit/api/project/' + projectId + "/" + $scope.consumerGroup.id + "/0",
+                        method: 'PUT'
+                    }).success(function (data, status, headers, config) {
+                        $scope.visibleG = !$scope.visibleG;
+                        $scope.groupMessage = 'add group ok.';
+                        reDrow();
+                    }).error(function (data, status, headers, config) {
+                        $scope.visibleG = !$scope.visibleG;
+                        $scope.groupMessage = 'add group error.';
+                    });
+                }else {
+                    $scope.visibleG = !$scope.visibleG;
+                    $scope.groupMessage = 'no group to add.';
+                }
+            }
+
+            $scope.addTopic = function(projectId){
+                if (null != $scope.topic) {
+                    $http({
+                        url: 'cockpit/api/project/' + projectId + "/0/" + $scope.topic.id,
+                        method: 'PUT'
+                    }).success(function (data, status, headers, config) {
+                        $scope.visibleT = !$scope.visibleT;
+                        $scope.topicMessage = 'add group ok.';
+                        reDrow();
+                    }).error(function (data, status, headers, config) {
+                        $scope.visibleT = !$scope.visibleT;
+                        $scope.topicMessage = 'add group error.';
+                    });
+                }else {
+                    $scope.visibleT = !$scope.visibleT;
+                    $scope.topicMessage = 'no topic to add';
+                }
+            }
 
             $http({
                 method:'GET',
@@ -230,6 +318,11 @@
                 $scope.chartConfig.series.push({name:x, data: y});
             };
 
+            function clearGroups(){
+                var series = [];
+                $scope.chartConfig.series = series;
+            }
+
             function activate2(x, y) {
                 $scope.chartConfig2 = {
                     options: {
@@ -274,6 +367,12 @@
 
             function addLine2(x, y){
                 $scope.chartConfig2.series.push({name:x, data: y});
+            }
+
+            function clearTopics() {
+                var series = [];
+                $scope.chartConfig2.series = series;
+
             }
         }
     }
@@ -401,10 +500,8 @@
     angular.module('cockpit')
     .controller('ProjectLCtrl', ProjectListController);
 
-    ProjectListController.$inject = ['$scope', '$http', '$location', 'UserService'];
-    function ProjectListController($scope, $http, $location, UserService) {
-        $scope.visibleG = false;
-        $scope.visibleT = false;
+    ProjectListController.$inject = ['$scope', '$http', '$location', 'UserService', '$element'];
+    function ProjectListController($scope, $http, $location, UserService, $element) {
         if (!UserService.isLogin) {
             $location.path('/login');
         }else{
@@ -418,45 +515,24 @@
 
             });
 
-            $scope.showGroups = function(projectId) {
-                $http({
-                    url: 'cockpit/api/project/' + projectId + "/unconsumer-groups",
-                    method: 'GET',
-                    responseType: 'json'
-                }).success(function(data, status, headers, config) {
-                    $scope.visibleG = true;
-                    $scope.consumerGroups = data;
-                    if (null != data) {
-                        $scope.consumerGroup = data[0];
-                    }
-                }).error(function(data, status, headers, config) {
+            $scope.showGroups = function(consumerGroups) {
+                var resultString = "";
 
+                consumerGroups.forEach(function(consumerGroup) {
+                    resultString = resultString + consumerGroup.groupName + '\r\n';
                 });
+
+                return resultString;
             };
 
-            $scope.showTopics = function(projectId){
-                $http({
-                    url: 'cockpit/api/project/' + projectId + "/untopics",
-                    method: 'GET',
-                    responseType: 'json'
-                }).success(function(data, status, headers, config) {
-                    $scope.visibleT = true;
-                    $scope.topics = data;
-                    if (null != data) {
-                        $scope.topic = data[0];
-                    }
+            $scope.showTopics = function(topics){
+                var resultString = "";
 
-                }).error(function(data, status, headers, config) {
-
+                topics.forEach(function(topic){
+                    resultString = resultString + topic.topic + " ";
                 });
-            }
 
-            $scope.addGroup = function(){
-
-            }
-
-            $scope.addTopic = function(){
-
+                return resultString;
             }
         }
     }

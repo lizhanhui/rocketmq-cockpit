@@ -41,12 +41,12 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
 
     @Override
     public void addTopic(long projectId, long topicId) {
-        topicMapper.connectProject(projectId, topicId);
+        topicMapper.connectProject(topicId, projectId);
     }
 
     @Override
     public void addConsumerGroup(long projectId, long consumerGroupId) {
-        consumerGroupMapper.connectProject(projectId, consumerGroupId);
+        consumerGroupMapper.connectProject(consumerGroupId, projectId);
     }
 
     @Transactional
