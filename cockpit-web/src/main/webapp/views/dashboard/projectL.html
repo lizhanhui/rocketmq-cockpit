@@ -4,8 +4,7 @@
 <!-- START row-->
 <div ng-controller="ProjectLCtrl as form" class="container-fluid">
    <div class="row">
-          <div class="panel panel-default">
-
+          <div class="panel panel-default" style="overflow-x:auto">
           <table class="table table-striped table-bordered table-hover ">
                <thead style="font-weight: bold">
                   <th>Name</th>
@@ -24,11 +23,9 @@
                   </td>
                   <td>
                      <span text="project.consumerGroups" name="groups"><span ng-bind="showGroups(project.consumerGroups)"></span></span>
-                  </td>
+                 </td>
                   <td>
                      <span editable-text="project.topics" e-name="topics" e-form="rowform" >{{ showTopics(project.topics) }}</span>
-                  </td>
-                  <td>
                   </td>
                </tr>
            </tbody>

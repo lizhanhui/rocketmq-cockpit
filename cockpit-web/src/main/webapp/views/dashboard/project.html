@@ -12,21 +12,21 @@
    <small> !</small>
 </h3>
 
+<div style="margin-bottom:4px">
+    <form name="groupForm" ng-show="visibleG" ng-submit="addGroup(project.id)" style="display:inline">
+        <select class="form-search" ng-model="consumerGroup" ng-options="consumerGroup.groupName for consumerGroup in consumerGroups"></select>
+        <button type="submit" class="btn btn-default">add group</button>
+    </form>
+        <button ng-show="!visibleG" type="button" ng-click="showGroups(project.id)" class="btn btn-default">show group</button>
+        <span class="text-danger" ng-bind="groupMessage"></span>
 
-<form name="groupForm" ng-show="visibleG" ng-submit="addGroup(project.id)" >
-    <select class="form-search" ng-model="consumerGroup" ng-options="consumerGroup.groupName for consumerGroup in consumerGroups"></select>
-    <button type="submit" class="btn btn-default">add group</button>
-</form>
-    <button ng-show="!visibleG" type="button" ng-click="showGroups(project.id)" class="btn btn-default">show group</button>
-    <span class="text-danger" ng-bind="groupMessage"></span>
-
-<form name="topicForm" ng-show="visibleT" ng-submit="addTopic(project.id)">
-    <select ng-model="topic" ng-options="topic.topic for topic in topics" class="form-search"></select>
-    <button type="submit" class="btn btn-default">add topic</button>
-</form>
-    <button ng-show="!visibleT" type="button" ng-click="showTopics(project.id)" class="btn btn-default">show topic</button>
-    <span class="text-danger" ng-bind="topicMessage"></span>
-<br />
+    <form name="topicForm" ng-show="visibleT" ng-submit="addTopic(project.id)" style="display:inline">
+        <select ng-model="topic" ng-options="topic.topic for topic in topics" class="form-search"></select>
+        <button type="submit" class="btn btn-default">add topic</button>
+    </form>
+        <button ng-show="!visibleT" type="button" ng-click="showTopics(project.id)" class="btn btn-default">show topic</button>
+        <span class="text-danger" ng-bind="topicMessage"></span>
+</div>
 <div class="row">
    <!-- START dashboard main content-->
    <div class="col-lg-12">

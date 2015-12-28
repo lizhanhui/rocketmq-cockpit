@@ -39,7 +39,8 @@ public final class WebHelper {
     public static void cookiesClear(HttpServletRequest request, HttpServletResponse response){
         List<Cookie> cookies = new ArrayList<>();
         List<Cookie> rm = new ArrayList<>();
-        cookies.addAll(Arrays.asList(request.getCookies()));
+        if (null != request.getCookies())
+            cookies.addAll(Arrays.asList(request.getCookies()));
         HttpSession session = request.getSession();
         for (Cookie cookie:cookies){
             if (cookie.getName() == "JSESSIONID" && cookie.getValue() == session.getId())
