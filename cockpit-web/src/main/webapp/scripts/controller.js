@@ -103,6 +103,7 @@
                     method: 'GET',
                     responseType: 'json'
                 }).success(function(data, status, headers, config) {
+                    $scope.groupMessage = "";
                     $scope.visibleG = !$scope.visibleG;
                     $scope.consumerGroups = data;
                     if (null != data) {
@@ -119,6 +120,7 @@
                     method: 'GET',
                     responseType: 'json'
                 }).success(function(data, status, headers, config) {
+                    $scope.topicMessage = "";
                     $scope.visibleT = !$scope.visibleT;
                     $scope.topics = data;
                     if (null != data) {

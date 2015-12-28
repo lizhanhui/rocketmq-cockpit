@@ -4,7 +4,6 @@
     <title>Producer Management</title>
     <%@include file="../include/base-path.jsp"%>
     <base href="<%=basePath%>%">
-    <link rel="shortcut icon" href="favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="http://libs.baidu.com/jquery/1.7.0/jquery.js"></script>
     <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
