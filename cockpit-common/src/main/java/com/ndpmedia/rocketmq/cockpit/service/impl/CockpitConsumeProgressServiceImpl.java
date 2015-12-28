@@ -67,6 +67,44 @@ public class CockpitConsumeProgressServiceImpl implements CockpitConsumeProgress
         }
         return consumeProgressList;
     }
+    @Override
+    public List<ConsumeProgress> queryConsumerProgress(DefaultMQAdminExt defaultMQAdminExt, String groupName, String topic, String broker) {
+        List<ConsumeProgress> consumeProgressList = new ArrayList<ConsumeProgress>();
+        try {
+            // 查询特定consumer
+            ConsumeStats consumeStats = defaultMQAdminExt.examineConsumeStats(groupName, 15000L);
+
+            List<MessageQueue> messageQueueList = new LinkedList<MessageQueue>();
+            messageQueueList.addAll(consumeStats.getOffsetTable().keySet());
+            Collections.sort(messageQueueList);
+
+            long diffTotal = 0L;
+
+            for (MessageQueue messageQueue : messageQueueList) {
+                OffsetWrapper offsetWrapper = consumeStats.getOffsetTable().get(messageQueue);
+                if (null != topic && !topic.equals(messageQueue.getTopic())) {
+                    continue;
+                }
+
+                if (null != broker && !broker.equals(messageQueue.getBrokerName())) {
+                    continue;
+                }
+
+                long diff = offsetWrapper.getBrokerOffset() - offsetWrapper.getConsumerOffset();
+                diffTotal += diff;
+
+                consumeProgressList.add(buildConsumeProgress(groupName, messageQueue, offsetWrapper, diff));
+            }
+
+//            consumeProgressList.add(new ConsumeProgress(consumerGroup, null, null, diffTotal));
+        } catch (Exception e) {
+            if (!e.getMessage().contains("offset table is empty"))
+                logger.warn("[MONITOR][CONSUME PROCESS] try to get " + groupName + " message diff failed." + e);
+        }
+
+        return consumeProgressList;
+    }
+
 
     private ConsumeProgress buildConsumeProgress(String consumerGroupName, MessageQueue messageQueue, OffsetWrapper offsetWrapper, long diff) {
         ConsumeProgress consumeProgress = new ConsumeProgress();

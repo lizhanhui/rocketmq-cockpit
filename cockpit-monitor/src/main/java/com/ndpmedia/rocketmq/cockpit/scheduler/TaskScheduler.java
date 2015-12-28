@@ -79,7 +79,7 @@ public class TaskScheduler {
 
             List<ConsumeProgress> consumeProgressList;
             for (String group : groupList) {
-                consumeProgressList = cockpitConsumeProgressService.queryConsumerProgress(group, null, null);
+                consumeProgressList = cockpitConsumeProgressService.queryConsumerProgress(defaultMQAdminExt, group, null, null);
                 for (ConsumeProgress cp : consumeProgressList) {
                     if (null == cp || null == cp.getTopic() || null == cp.getBrokerName()) {
                         logger.info("[MONITOR][CONSUME-PROGRESS] this group has no progress" + group);
