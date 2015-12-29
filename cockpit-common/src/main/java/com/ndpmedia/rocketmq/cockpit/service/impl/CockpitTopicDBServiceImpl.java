@@ -35,10 +35,10 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
                 statusIds[i++] = s.ordinal();
             }
 
-            return topicMapper.list(0, statusIds, null);
+            return topicMapper.list(0, statusIds, null, 0);
         }else {
 
-            return topicMapper.list(0, null, null);
+            return topicMapper.list(0, null, null, 0);
         }
     }
 

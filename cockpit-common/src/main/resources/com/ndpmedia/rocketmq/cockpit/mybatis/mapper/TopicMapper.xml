@@ -130,7 +130,7 @@
             AND t.cluster_name = #{cluster}
         </if>
 
-        <if test="statusIds == null and cluster == null">
+        <if test="limits > 0">
             LIMIT 30
         </if>
 

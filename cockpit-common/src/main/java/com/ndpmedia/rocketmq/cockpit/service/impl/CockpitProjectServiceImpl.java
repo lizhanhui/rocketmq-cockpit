@@ -74,7 +74,7 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
 
     @Override
     public List<TopicMetadata> getTopics(long projectId) {
-        return topicMapper.list(projectId, null, null);
+        return topicMapper.list(projectId, null, null, 30);
     }
 
     @Override
