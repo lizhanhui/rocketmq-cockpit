@@ -64,8 +64,6 @@ function initTable(){
             { "data": "groupName" },
             { "data": "consumeEnable" },
             { "data": "consumeBroadcastEnable" },
-            { "data": "brokerAddress" },
-            { "data": "brokerId" },
             { "data": "retryMaxTimes" },
             { "data": "retryQueueNum" },
             { "data": "consumeFromMinEnable" },
@@ -74,7 +72,7 @@ function initTable(){
             { "data": "id",
                 "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
                     if (oData.status != "ACTIVE"){
-                        $(nTd).html("<a href='javascript:void(0);' " + "onclick='_editFun(\"" + oData.id + "\",\"" + oData.clusterName + "\",\"" + oData.whichBrokerWhenConsumeSlowly + "\",\"" + oData.groupName + "\",\"" + oData.consumeEnable + "\",\"" + oData.consumeBroadcastEnable + "\",\"" + oData.brokerAddress + "\",\"" + oData.brokerId + "\",\"" + oData.retryMaxTimes + "\",\"" + oData.retryQueueNum + "\",\"" + oData.consumeFromMinEnable + "\")'>Approve</a>&nbsp;&nbsp;")
+                        $(nTd).html("<a href='javascript:void(0);' " + "onclick='_editFun(\"" + oData.id + "\",\"" + oData.clusterName + "\",\"" + oData.whichBrokerWhenConsumeSlowly + "\",\"" + oData.groupName + "\",\"" + oData.consumeEnable + "\",\"" + oData.consumeBroadcastEnable + "\",\"" + oData.retryMaxTimes + "\",\"" + oData.retryQueueNum + "\",\"" + oData.consumeFromMinEnable + "\")'>Approve</a>&nbsp;&nbsp;")
                             .append("<a href='javascript:void(0);' onclick='_deleteFun(\"" + oData.id + "\",\"" + oData.clusterName + "\",\"" + oData.groupName +  "\")'>Delete</a>");
                     }else {
                         $(nTd).html("&nbsp;&nbsp;")
@@ -162,4 +160,3 @@ function _editFun(id, clusterName, whichBrokerWhenConsumeSlowly, groupName, cons
         }
     });
 }
-

@@ -131,7 +131,7 @@
         </if>
 
         <if test="limits > 0">
-            LIMIT 30
+            LIMIT #{limits}
         </if>
 
     </select>

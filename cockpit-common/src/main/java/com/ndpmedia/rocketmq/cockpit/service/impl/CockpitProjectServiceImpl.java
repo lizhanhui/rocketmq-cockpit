@@ -64,7 +64,7 @@ public class CockpitProjectServiceImpl implements CockpitProjectService {
 
     @Override
     public List<ConsumerGroup> getConsumerGroups(long projectId) {
-        return consumerGroupMapper.list(projectId, null, null, 0, null);
+        return consumerGroupMapper.list(projectId, null, null, 0, null, 30);
     }
 
     @Override
