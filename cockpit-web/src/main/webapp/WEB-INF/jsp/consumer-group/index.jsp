@@ -28,8 +28,6 @@
                   <th>Group Name</th>
                   <th>Consume Enabled</th>
                   <th>Consume Broadcast Enabled</th>
-                  <th>Broker Address</th>
-                  <th>Broker ID</th>
                   <th>Retry Max Times</th>
                   <th>Retry Queue Number</th>
                   <th>Consume From Min</th>

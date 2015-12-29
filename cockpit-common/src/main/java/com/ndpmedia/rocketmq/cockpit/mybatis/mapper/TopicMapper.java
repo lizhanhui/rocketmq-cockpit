@@ -44,7 +44,8 @@ public interface TopicMapper {
      */
     List<TopicMetadata> list(@Param("projectId") long projectId,
                              @Param("statusIds") int[] statusIds,
-                             @Param("cluster") String cluster);
+                             @Param("cluster") String cluster,
+                             @Param("limits") int limits);
 
     List<Long> getProjects(long topicId, String topic);
 

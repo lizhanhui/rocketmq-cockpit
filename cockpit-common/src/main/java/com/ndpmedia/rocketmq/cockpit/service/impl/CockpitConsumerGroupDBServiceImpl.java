@@ -20,7 +20,7 @@ public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDB
 
     public List<ConsumerGroup> list(long projectId, String clusterName, String consumerGroupName, long brokerId,
                                     String brokerAddress){
-        return consumerGroupMapper.list(projectId, clusterName, consumerGroupName, brokerId, brokerAddress);
+        return consumerGroupMapper.list(projectId, clusterName, consumerGroupName, brokerId, brokerAddress, 0);
     }
 
     @Override

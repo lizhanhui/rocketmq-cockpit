@@ -104,8 +104,8 @@
             AND b.address = #{brokerAddress}
         </if>
 
-        <if test="clusterName == null and brokerAddress == null and consumerGroupName == null and 1 > brokerId">
-            LIMIT 30
+        <if test="limits > 0">
+            LIMIT #{limits}
         </if>
 
     </select>

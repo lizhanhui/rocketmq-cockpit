@@ -13,7 +13,8 @@ public interface ConsumerGroupMapper {
                              @Param("clusterName") String clusterName,
                              @Param("consumerGroupName") String consumerGroupName,
                              @Param("brokerId") long brokerId,
-                             @Param("brokerAddress") String brokerAddress);
+                             @Param("brokerAddress") String brokerAddress,
+                             @Param("limits") int limits);
 
     List<ConsumerGroup> listByTopic(@Param("topicId")long topicId);
 
