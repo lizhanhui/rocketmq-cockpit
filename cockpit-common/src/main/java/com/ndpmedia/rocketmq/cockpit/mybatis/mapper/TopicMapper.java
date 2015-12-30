@@ -79,6 +79,8 @@ public interface TopicMapper {
 
     List<TopicBrokerInfo> queryEndangeredTopicsByBroker(@Param("brokerId") long brokerId);
 
+    List<TopicBrokerInfo> queryApprovedTopicsByBroker(@Param("brokerId") long brokerId);
+
     void changeTopicDCStatus(@Param("topicId")long topicId,
                              @Param("dcId")long dcId,
                              @Param("status")Status status);

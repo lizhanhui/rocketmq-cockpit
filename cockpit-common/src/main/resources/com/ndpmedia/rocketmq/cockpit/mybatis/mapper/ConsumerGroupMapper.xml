@@ -22,6 +22,7 @@
             retry_max_times = #{retryMaxTimes}, retry_queue_num = #{retryQueueNum},
             consume_from_min_enable = #{consumeFromMinEnable}, status_id = #{status.id},
             create_time = #{createTime}, update_time = #{updateTime}
+        WHERE id = #{id}
     </update>
 
     <update id="refresh">
@@ -250,6 +251,18 @@
             AND (bcgx.sync_time IS NULL OR bcgx.sync_time > CURRENT_TIMESTAMP - INTERVAL 600 SECOND)
             AND (b.broker_id = 0 OR b.broker_id IS NULL)
         ]]>
+        <if test="brokerId > 0">
+            AND b.id = #{brokerId}
+        </if>
+    </select>
+
+    <select id="queryApprovedHosting" resultMap="consumerGroupHostingResultMap2">
+        SELECT b.id AS bid, cg.id AS cid, bcgx.create_time, bcgx.update_time, bcgx.sync_time
+        FROM consumer_group AS cg
+        LEFT JOIN broker_consumer_group_xref AS bcgx ON bcgx.consumer_group_id = cg.id
+        LEFT JOIN broker AS b ON b.id = bcgx.broker_id
+        WHERE cg.status_id = 3
+        AND (b.broker_id = 0 OR b.broker_id IS NULL)
         <if test="brokerId > 0">
             AND b.id = #{brokerId}
         </if>

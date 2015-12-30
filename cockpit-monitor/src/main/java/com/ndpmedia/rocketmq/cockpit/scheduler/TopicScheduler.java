@@ -161,11 +161,20 @@ public class TopicScheduler {
         Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
         for (String brokerAddress : brokerAddresses) {
             Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
-            List<TopicBrokerInfo> list = cockpitTopicDBService.queryEndangeredTopicBrokerInfoList(broker.getId());
+            List<TopicBrokerInfo> list = new ArrayList<>();
+            //add last update topic
+//            list.addAll(cockpitTopicDBService.queryEndangeredTopicBrokerInfoList(broker.getId()));
+            //add approved topic
+            list.addAll(cockpitTopicDBService.queryApprovedTopicsByBroker(broker.getId()));
             for (TopicBrokerInfo topicBrokerInfo : list) {
                 TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
                 try {
+                    logger.debug("About to create topic {} on broker {}",
+                            topicConfig.getTopicName(), brokerAddress);
                     defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddress, topicConfig, 15000L);
+                    cockpitTopicDBService.activate(topicBrokerInfo.getTopicMetadata().getId(), topicBrokerInfo.getBroker().getId());
+                    logger.info("Topic {} has been created on broker {}",
+                            topicConfig.getTopicName(), brokerAddress);
                 } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
                     logger.error("Failed to create topic {} on broker {}", topicConfig.getTopicName(),
                             brokerAddress);
