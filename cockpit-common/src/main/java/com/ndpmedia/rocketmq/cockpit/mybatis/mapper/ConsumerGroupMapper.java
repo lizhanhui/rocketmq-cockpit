@@ -50,6 +50,8 @@ public interface ConsumerGroupMapper {
 
     List<ConsumerGroupHosting> queryEndangeredHosting(@Param("brokerId") long brokerId);
 
+    List<ConsumerGroupHosting> queryApprovedHosting(@Param("brokerId") long brokerId);
+
     long updateConsumerGroupTopics(@Param("date") Date date);
 
 }

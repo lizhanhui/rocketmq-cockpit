@@ -212,6 +212,10 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
         return topicMapper.queryEndangeredTopicsByBroker(brokerId);
     }
 
+    public List<TopicBrokerInfo> queryApprovedTopicsByBroker(long brokerId) {
+        return topicMapper.queryApprovedTopicsByBroker(brokerId);
+    }
+
     @Override
     public List<TopicBrokerInfo> queryTopicBrokerInfoByTopic(long topicId, long brokerId, int dc){
         return queryTopicBrokerInfo(topicId, 0L, 0);

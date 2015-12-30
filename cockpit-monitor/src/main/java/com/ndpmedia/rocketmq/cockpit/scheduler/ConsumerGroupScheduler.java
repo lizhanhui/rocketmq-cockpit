@@ -82,7 +82,7 @@ public class ConsumerGroupScheduler {
             return;
         }
 
-        SubscriptionGroupWrapper subscriptionGroupWrapper = defaultMQAdminExt.fetchAllSubscriptionGroups(brokerAddress, 3000);
+        SubscriptionGroupWrapper subscriptionGroupWrapper = defaultMQAdminExt.fetchAllSubscriptionGroups(brokerAddress, 12000L);
 
         for (SubscriptionGroupConfig subscriptionGroupConfig : subscriptionGroupWrapper.getSubscriptionGroupTable().values()) {
             ConsumerGroup consumerGroup = cockpitConsumerGroupDBService.get(0, subscriptionGroupConfig.getGroupName());
@@ -102,13 +102,19 @@ public class ConsumerGroupScheduler {
 
     private void syncUpConsumerGroupsByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress) {
         Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
-        List<ConsumerGroupHosting> endangeredConsumerGroupHostingList = cockpitConsumerGroupDBService.listEndangeredConsumerGroupsByBroker(broker.getId());
+        List<ConsumerGroupHosting> endangeredConsumerGroupHostingList = new ArrayList<>();
+        //add last update consumer group
+//        endangeredConsumerGroupHostingList.addAll(cockpitConsumerGroupDBService.listEndangeredConsumerGroupsByBroker(broker.getId()));
+        //add approved consumer group
+        endangeredConsumerGroupHostingList.addAll(cockpitConsumerGroupDBService.listApprovedConsumerGroupsByBroker(broker.getId()));
+
         for (ConsumerGroupHosting hosting : endangeredConsumerGroupHostingList) {
             SubscriptionGroupConfig subscriptionGroupConfig = CockpitConsumerGroupMQServiceImpl.wrap(hosting.getConsumerGroup());
             try {
                 logger.debug("About to create consumer group {} on broker {}",
                         subscriptionGroupConfig.getGroupName(), brokerAddress);
-                defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress, subscriptionGroupConfig);
+                defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress, subscriptionGroupConfig, 15000L);
+                cockpitConsumerGroupDBService.activate(hosting.getConsumerGroup().getId());
                 logger.info("Consumer Group {} has been created on broker {}",
                         subscriptionGroupConfig.getGroupName(), brokerAddress);
             } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {

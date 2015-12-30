@@ -79,4 +79,8 @@ public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDB
     public List<ConsumerGroupHosting> listEndangeredConsumerGroupsByBroker(long brokerId) {
         return consumerGroupMapper.queryEndangeredHosting(brokerId);
     }
+
+    public List<ConsumerGroupHosting> listApprovedConsumerGroupsByBroker(long brokerId) {
+        return consumerGroupMapper.queryApprovedHosting(brokerId);
+    }
 }

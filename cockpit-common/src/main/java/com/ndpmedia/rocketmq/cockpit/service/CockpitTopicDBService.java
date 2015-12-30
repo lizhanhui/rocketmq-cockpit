@@ -84,6 +84,8 @@ public interface CockpitTopicDBService extends CockpitTopicBaseService {
 
     List<TopicBrokerInfo> queryEndangeredTopicBrokerInfoList(long brokerId);
 
+    List<TopicBrokerInfo> queryApprovedTopicsByBroker(long brokerId);
+
     List<TopicBrokerInfo> queryTopicBrokerInfoByTopic(long topicId, long brokerId, int dc);
 
     List<TopicBrokerInfo> queryTopicBrokerInfo(long topicId, long brokerId, int dc);

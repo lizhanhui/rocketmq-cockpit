@@ -287,4 +287,16 @@
                AND b.id = #{brokerId}
            </if>
     </select>
+
+    <select id="queryApprovedTopicsByBroker" resultMap="topicBrokerInfoResultMap">
+        SELECT tbx.broker_id, tbx.topic_id, tbx.permission, tbx.write_queue_num, tbx.read_queue_num, tbx.status_id, tbx.create_time, tbx.update_time, tbx.sync_time
+        FROM topic_broker_xref AS tbx
+        JOIN topic AS t ON t.id = tbx.topic_id
+        JOIN broker AS b ON b.id = tbx.broker_id
+        WHERE tbx.status_id = 3
+        AND b.broker_id = 0
+        <if test="brokerId > 0" >
+            AND b.id = #{brokerId}
+        </if>
+    </select>
 </mapper>

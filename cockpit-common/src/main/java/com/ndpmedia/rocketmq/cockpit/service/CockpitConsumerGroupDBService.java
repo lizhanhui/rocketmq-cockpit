@@ -25,4 +25,6 @@ public interface CockpitConsumerGroupDBService {
     void refresh(long brokerId, long consumerGroupId);
 
     List<ConsumerGroupHosting> listEndangeredConsumerGroupsByBroker(long brokerId);
+
+    List<ConsumerGroupHosting> listApprovedConsumerGroupsByBroker(long brokerId);
 }
