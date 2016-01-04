@@ -397,6 +397,13 @@
         if (!UserService.isLogin) {
             $location.path('/login');
         }else {
+            $scope.showProperties = function(properties) {
+                var resultString = "";
+                for (var key in properties) {
+                    resultString = resultString + "[" + key + "]-[" + properties[key] + "]  " ;
+                }
+                return resultString;
+            }
 
             $scope.searchID = function() {
                 var msgId = $scope.msgID;
@@ -407,17 +414,19 @@
                         responseType: 'json'
                     }).success(function(data, status, headers, config) {
                         $scope.message = data;
+
+                        $http({
+                            url: 'cockpit/api/message/' + msgId,
+                            method: "POST",
+                            responseType: 'json'
+                        }).success(function(data, status, headers, config) {
+                            $scope.statuses = data;
+                        }).error(function(data, status, headers, config) {
+
+                        });
                     }).error(function(data, status, headers, config){
 
                     });
-
-                    $http({
-                        url: 'cockpit/api/message/' + msgId,
-                        method: "POST",
-                        responseType: 'json'
-                    }).success(function(data, status, headers, config) {
-                        $scope.statuses = data;
-                    }).error();
                 }
             };
 
