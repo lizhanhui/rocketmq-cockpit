@@ -3,7 +3,7 @@
         <div class=row>
             <div class="col-sm-3 col-md-2 sidebar">
                 <div class=text-center>
-                    <h2 class=brand>Welcome <small></small></h2>
+                    <h2 class=brand>Welcome <small><a href="logout" style="color:red">Logout</a></small></h2>
                     <img src=images/login1.jpg class=user-avatar><br>
                     <!--a ui-sref=login class="btn btn-white btn-outline btn-rounded btn-sm">Logout</a -->
                 </div>
@@ -14,10 +14,10 @@
                     <li>
                         <a ui-sref=messageKEY>Query Message By KEY </a>
                     </li>
-                    <li >
+                    <li>
                         <a ui-sref=projectA>Add UR Project</a>
                     </li>
-                    <li >
+                    <li>
                         <a ui-sref=projectL>Projects Table</a>
                     </li>
                     <li ng-class="{active: $state.includes('project')}">
