@@ -75,6 +75,13 @@
         if (!UserService.isLogin) {
             $location.path('/login');
         }else {
+            var dateB = new Date();
+            var offset = dateB.getTimezoneOffset() * 60000;
+            Highcharts.setOptions({
+                global : {
+                    useUTC : false
+                }
+            });
     		$scope.set = function() {
                 reDrow();
     		};
@@ -189,13 +196,11 @@
                     url: 'cockpit/api/project/' + $scope.project.id + "/consumer-groups",
                     responseType: 'json'
                 }).success(function(data, status, headers, config) {
-    				var indexG = 0;
     				if (data != null) {
     					data.forEach(function(consumerGroup){
     			            var x = [];
     			            var y = [];
     			            var yin = []
-    			            if (indexG < 20) {
     			                $http({
     			                    method:'GET',
     			                    //headers: {'Content-type': 'application/json;charset=UTF-8'},
@@ -206,25 +211,25 @@
     									data.forEach(function (consumeProgress) {
     				                        var temp = [];
     				                        var time = consumeProgress.createTime.replace(new RegExp("-", "gm"), "/");
-    				                        temp.push((new Date(time)).getTime());
+    				                        temp.push((new Date(time)).getTime() -  offset);
     				                        temp.push(consumeProgress.diff);
     				                        yin.push(temp);
     				                    });
     				                    if (yin.length > 0 ) {
-    				                        yin.reverse();
-    				                        if (indexG === 0){
+            								yin.reverse();
+    				                        if ("undefined" ===  typeof($scope.chartConfig) ){
     				                            activate1(consumerGroup.groupName, yin);
+                                            }else if($scope.chartConfig.series.length === 0) {
+                                                activate1(consumerGroup.groupName, yin);
     				                        }else {
     				                            addLine(consumerGroup.groupName, yin);
     				                        }
-
-    				                        indexG++;
     				                    }
     			                    }
     			                }).error(function(data, status, headers, config) {
 
     			                });
-    			            }
+
     	                });
     				}
                 }).error(function(data, status, headers, config) {
@@ -236,7 +241,6 @@
                     method: "GET",
                     responseType: 'json'
                 }).success(function(data, status, headers, config) {
-    				var indexT = 0;
                     data.forEach(function(topicMetadata) {
     					var x = [];
     					var y = [];
@@ -255,13 +259,13 @@
     							});
     							if (yin.length > 0 ) {
     								yin.reverse();
-    								if (indexT === 0){
+    								if ("undefined" ===  typeof($scope.chartConfig2) ){
     									activate2(topicMetadata.topic, yin);
+    								}else if ($scope.chartConfig2.series.length === 0) {
+    								    activate2(topicMetadata.topic, yin);
     								}else {
     									addLine2(topicMetadata.topic, yin);
     								}
-
-    								indexT++;
     							}
 
     						}).error(function(data, status, headers, config) {

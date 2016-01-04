@@ -18,7 +18,8 @@
     <security:http pattern="/rocketmq/**" security="none" />
     <security:http pattern="/console/**" security="none" />
     <security:http pattern="/**/captcha-image" security="none" />
-    <security:http pattern="/cockpit/register" security="none" />
+    <security:http pattern="/cockpit/register/" security="none" />
+    <security:http pattern="/cockpit/register.jsp" security="none" />
 
     <security:http auto-config="true">
 
@@ -35,6 +36,7 @@
         <security:intercept-url pattern="/views/base.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <security:intercept-url pattern="/views/login.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <security:intercept-url pattern="/cockpit/captcha-image" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/cockpit/register" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <security:intercept-url pattern="/j_spring_security_check"  access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 
         <security:intercept-url pattern="/cockpit/manage/**"  access="ROLE_ADMIN"/>
