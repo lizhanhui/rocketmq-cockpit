@@ -391,12 +391,17 @@
     angular.module('cockpit')
     .controller('MessageCtrl', MessageController);
 
-    MessageController.$inject = ['$scope', '$http', '$location', 'UserService'];
-    function MessageController($scope, $http, $location, UserService){
+    MessageController.$inject = ['$scope', '$http', '$location', 'UserService', '$stateParams'];
+    function MessageController($scope, $http, $location, UserService, $stateParams){
 
         if (!UserService.isLogin) {
             $location.path('/login');
         }else {
+            if (null != $stateParams.msgId) {
+                $scope.msgID = $stateParams.msgId;
+                searchMsg();
+            }
+
             $scope.showProperties = function(properties) {
                 var resultString = "";
                 for (var key in properties) {
@@ -406,8 +411,12 @@
             }
 
             $scope.searchID = function() {
+                searchMsg();
+            };
+
+            function searchMsg(){
                 var msgId = $scope.msgID;
-                if (msgId != "" && msgId.length === 32) {
+                if ("undedined" != typeof(msgId) && msgId != "" && msgId.length === 32) {
                     $http({
                         url: 'cockpit/api/message/' + msgId,
                         method: 'GET',
@@ -472,7 +481,7 @@
                     });
 
                 }
-            }
+            };
         }
     }
 })();
@@ -483,11 +492,14 @@
     angular.module('cockpit')
     .controller('MessageKEYCtrl', MessageKEYController);
 
-    MessageKEYController.$inject = ['$scope', '$http', '$location', 'UserService'];
-    function MessageKEYController($scope, $http, $location, UserService){
+    MessageKEYController.$inject = ['$scope', '$http', '$location', 'UserService', '$state'];
+    function MessageKEYController($scope, $http, $location, UserService, $state){
         if (!UserService.isLogin) {
             $location.path('/login');
         }else {
+            $scope.jumpDetail = function(msgId) {
+                $state.go('messageID', {'msgId': msgId});
+            };
 
             $scope.searchKEY = function() {
                 var topic = $scope.messageTopic;

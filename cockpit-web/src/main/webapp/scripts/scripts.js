@@ -43,6 +43,7 @@ angular
             url: '/messageID',
             parent: 'dashboard',
             templateUrl: 'views/dashboard/message.html',
+            params: {'msgId': ''},
             controller: 'MessageCtrl'
         })
         .state('messageKEY', {
