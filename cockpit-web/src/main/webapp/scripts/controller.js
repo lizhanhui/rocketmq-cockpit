@@ -414,7 +414,6 @@
                 searchMsg();
             };
 
-
             function searchMsg(){
                 var msgId = $scope.msgID;
                 if ("undedined" != typeof(msgId) && msgId != "" && msgId.length === 32) {
