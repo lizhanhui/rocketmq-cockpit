@@ -12,6 +12,7 @@ import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
 import com.ndpmedia.rocketmq.cockpit.service.*;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupMQServiceImpl;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
+import com.ndpmedia.rocketmq.cockpit.util.WarnMsgHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class ConsumerGroupScheduler {
             }
 
         } catch (Exception e) {
-            logger.error("Failed to synchronizeConsumerGroups", e);
+            logger.error("[MONITOR][CONSUMER-GROUP-SCHEDULER]Failed to synchronizeConsumerGroups", e);
         } finally {
             if (null != defaultMQAdminExt)
                 defaultMQAdminExt.shutdown();
@@ -78,7 +79,7 @@ public class ConsumerGroupScheduler {
 
         Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
         if (null == broker) {
-            logger.error("Broker Sync may has error. Detecting a non-existing broker");
+            logger.error("[MONITOR][CONSUMER-GROUP-SCHEDULER]Broker Sync may has error. Detecting a non-existing broker");
             return;
         }
 
@@ -111,20 +112,16 @@ public class ConsumerGroupScheduler {
         for (ConsumerGroupHosting hosting : endangeredConsumerGroupHostingList) {
             SubscriptionGroupConfig subscriptionGroupConfig = CockpitConsumerGroupMQServiceImpl.wrap(hosting.getConsumerGroup());
             try {
-                logger.debug("About to create consumer group {} on broker {}",
+                logger.debug("[MONITOR][CONSUMER-GROUP-SCHEDULER]About to create consumer group {} on broker {}",
                         subscriptionGroupConfig.getGroupName(), brokerAddress);
                 defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress, subscriptionGroupConfig, 15000L);
                 cockpitConsumerGroupDBService.activate(hosting.getConsumerGroup().getId());
-                logger.info("Consumer Group {} has been created on broker {}",
+                logger.info("[MONITOR][CONSUMER-GROUP-SCHEDULER]Consumer Group {} has been created on broker {}",
                         subscriptionGroupConfig.getGroupName(), brokerAddress);
             } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
-                logger.error("Failed to create subscription group", e);
-                Warning warning = new Warning();
-                warning.setCreateTime(new Date());
-                warning.setStatus(Status.ACTIVE);
-                warning.setLevel(Level.CRITICAL);
-                warning.setMsg("Failed to create consumer group " + hosting.getConsumerGroup().getGroupName() + " on broker " +  brokerAddress);
-                warningMapper.create(warning);
+                logger.error("[MONITOR][CONSUMER-GROUP-SCHEDULER]Failed to create subscription group", e);
+                String msg = "Failed to create consumer group " + hosting.getConsumerGroup().getGroupName() + " on broker " +  brokerAddress;
+                warningMapper.create(WarnMsgHelper.makeWarning(Level.CRITICAL, msg));
             }
         }
     }

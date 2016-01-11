@@ -18,6 +18,7 @@ import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
+import com.ndpmedia.rocketmq.cockpit.util.WarnMsgHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,13 +88,8 @@ public class TopicScheduler {
                     // For now, we only handle DefaultCluster.
                     TopicMetadata topicMetadata = cockpitTopicDBService.getTopic(Constants.DEFAULT_CLUSTER, topic);
                     if (null == topicMetadata) {
-                        topicMetadata = new TopicMetadata();
-                        topicMetadata.setTopic(topic);
-                        topicMetadata.setStatus(Status.ACTIVE);
-                        topicMetadata.setCreateTime(new Date());
-                        topicMetadata.setUpdateTime(new Date());
-                        // TODO decode and set order info here.
-                        topicMetadata.setClusterName(getClusterName(topicRouteData.getBrokerDatas()));
+                        topicMetadata = TopicTranslate.createTopicMetadata(topic, getClusterName(topicRouteData.getBrokerDatas()));
+
                         cockpitTopicDBService.insert(topicMetadata);
 
                         // Add it to default project for now.
@@ -104,17 +100,9 @@ public class TopicScheduler {
                         Broker broker = getBroker(topicRouteData, queueData);
 
                         if (null != broker && !cockpitBrokerDBService.hasTopic(broker.getId(), topicMetadata.getId())) {
-                            TopicBrokerInfo topicBrokerInfo = new TopicBrokerInfo();
-                            topicBrokerInfo.setBroker(broker);
-                            topicBrokerInfo.setStatus(Status.ACTIVE);
-                            topicBrokerInfo.setTopicMetadata(topicMetadata);
-                            topicBrokerInfo.setReadQueueNum(queueData.getReadQueueNums());
-                            topicBrokerInfo.setWriteQueueNum(queueData.getWriteQueueNums());
-                            topicBrokerInfo.setPermission(queueData.getPerm());
-                            Date date = new Date();
-                            topicBrokerInfo.setCreateTime(date);
-                            topicBrokerInfo.setUpdateTime(date);
-                            topicBrokerInfo.setSyncTime(date);
+                            TopicBrokerInfo topicBrokerInfo = TopicTranslate.createTopicBrokerInfo(broker, topicMetadata,
+                                    queueData.getReadQueueNums(), queueData.getWriteQueueNums(), queueData.getPerm());
+
                             cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
                             if (!cockpitTopicDBService.isDCAllowed(topicMetadata.getId(), broker.getDc())) {
                                 cockpitTopicDBService.addDCAllowed(topicMetadata.getId(), broker.getDc(), Status.ACTIVE);
@@ -127,7 +115,7 @@ public class TopicScheduler {
             }
 
         } catch (Exception e) {
-            logger.error("Failed to sync topic", e);
+            logger.error("[MONITOR][TOPIC-SCHEDULER]Failed to sync topic", e);
         }
     }
 
@@ -169,21 +157,17 @@ public class TopicScheduler {
             for (TopicBrokerInfo topicBrokerInfo : list) {
                 TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
                 try {
-                    logger.debug("About to create topic {} on broker {}",
+                    logger.debug("[MONITOR][TOPIC-SCHEDULER]About to create topic {} on broker {}",
                             topicConfig.getTopicName(), brokerAddress);
                     defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddress, topicConfig, 15000L);
                     cockpitTopicDBService.activate(topicBrokerInfo.getTopicMetadata().getId(), topicBrokerInfo.getBroker().getId());
-                    logger.info("Topic {} has been created on broker {}",
+                    logger.info("[MONITOR][TOPIC-SCHEDULER]Topic {} has been created on broker {}",
                             topicConfig.getTopicName(), brokerAddress);
                 } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
-                    logger.error("Failed to create topic {} on broker {}", topicConfig.getTopicName(),
+                    logger.error("[MONITOR][TOPIC-SCHEDULER]Failed to create topic {} on broker {}", topicConfig.getTopicName(),
                             brokerAddress);
-                    Warning warning = new Warning();
-                    warning.setCreateTime(new Date());
-                    warning.setLevel(Level.CRITICAL);
-                    warning.setStatus(Status.ACTIVE);
-                    warning.setMsg(String.format("Failed to create topic %s on broker %s", topicConfig.getTopicName(), brokerAddress));
-                    warningMapper.create(warning);
+                    String msg = String.format("Failed to create topic %s on broker %s", topicConfig.getTopicName(), brokerAddress);
+                    warningMapper.create(WarnMsgHelper.makeWarning(Level.CRITICAL, msg));
                 }
             }
 

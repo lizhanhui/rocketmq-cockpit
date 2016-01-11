@@ -5,7 +5,6 @@ import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
-import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,18 +53,6 @@ public class TopicProgressScheduler {
             logger.warn("[MONITOR][TOPIC PROGRESS] main method failed." + e);
 
         }
-    }
-
-    private Void query() {
-        DefaultMQAdminExt adminExt = new DefaultMQAdminExt();
-        adminExt.setInstanceName(Helper.getInstanceName());
-        try {
-            adminExt.start();
-
-        }catch (Exception e){
-
-        }
-        return null;
     }
 
     private void updateTopicProgressData(){

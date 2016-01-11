@@ -7,7 +7,9 @@ import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.google.common.base.Preconditions;
 import com.ndpmedia.rocketmq.cockpit.model.*;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.BrokerMapper;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.WarningMapper;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
+import com.ndpmedia.rocketmq.cockpit.util.WarnMsgHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class BrokerScheduler {
     @Autowired
     private BrokerMapper brokerMapper;
 
+    @Autowired
+    private WarningMapper warningMapper;
+
     /**
      * Check broker status every 5 minutes.
      */
@@ -33,7 +38,7 @@ public class BrokerScheduler {
         try {
             defaultMQAdminExt.start();
         } catch (MQClientException e) {
-            LOGGER.warn("Failed to start defaultMQAdminExt", e);
+            LOGGER.warn("[MONITOR][BROKER-SCHEDULER]Failed to start defaultMQAdminExt", e);
             return;
         }
 
@@ -76,7 +81,7 @@ public class BrokerScheduler {
             }
 
         } catch (Throwable e) {
-            LOGGER.warn("Failed to update broker status", e);
+            LOGGER.warn("[MONITOR][BROKER-SCHEDULER]Failed to update broker status", e);
         } finally {
             defaultMQAdminExt.shutdown();
         }
@@ -96,7 +101,7 @@ public class BrokerScheduler {
 
         String[] segments = brokerName.split("_");
         if (segments.length < 3) {
-            LOGGER.warn("Broker Name is not normalized. If it's developing environment, please ignore this warning; otherwise, please contact admin to fix this issue");
+            LOGGER.warn("[MONITOR][BROKER-SCHEDULER]Broker Name is not normalized. If it's developing environment, please ignore this warning; otherwise, please contact admin to fix this issue");
             return 100;
         }
         return Integer.parseInt(segments[1]);
@@ -105,11 +110,8 @@ public class BrokerScheduler {
     private void warnDeprecatedBrokers() {
         List<Broker> deprecatedBrokers = brokerMapper.queryDeprecatedBrokers(null, 0);
         for (Broker broker : deprecatedBrokers) {
-            Warning warning = new Warning();
-            warning.setCreateTime(new Date());
-            warning.setLevel(Level.CRITICAL);
-            warning.setStatus(Status.ACTIVE);
-            warning.setMsg("Broker is not responding in the last 10 min: " + broker);
+            String msg = "Broker is not responding in the last 10 min: " + broker;
+            warningMapper.create(WarnMsgHelper.makeWarning(Level.CRITICAL, msg));
         }
     }
 }
