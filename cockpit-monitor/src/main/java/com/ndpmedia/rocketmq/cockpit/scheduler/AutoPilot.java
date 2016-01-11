@@ -254,9 +254,9 @@ public class AutoPilot {
     private boolean isLegal(TopicAvailability topicAvailability, List<DataCenter> allowedDataCenters) {
         for (DataCenter dataCenter : allowedDataCenters) {
             if (dataCenter.getId() == topicAvailability.getDcId()) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }
