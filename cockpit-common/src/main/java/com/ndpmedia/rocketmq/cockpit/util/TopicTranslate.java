@@ -2,9 +2,7 @@ package com.ndpmedia.rocketmq.cockpit.util;
 
 import com.alibaba.rocketmq.common.MixAll;
 import com.alibaba.rocketmq.common.TopicConfig;
-import com.ndpmedia.rocketmq.cockpit.model.Status;
-import com.ndpmedia.rocketmq.cockpit.model.Topic;
-import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
+import com.ndpmedia.rocketmq.cockpit.model.*;
 
 import java.util.Date;
 
@@ -56,6 +54,40 @@ public class TopicTranslate {
         topic.setUpdateTime(new Date());
 
         return topic;
+    }
+
+    public static TopicBrokerInfo createTopicBrokerInfo(Broker broker, TopicMetadata topicMetadata){
+        return createTopicBrokerInfo(broker, topicMetadata, TopicConfig.DefaultReadQueueNums, TopicConfig.DefaultWriteQueueNums);
+    }
+
+    public static TopicBrokerInfo createTopicBrokerInfo(Broker broker, TopicMetadata topicMetadata, int readQueueNum, int writeQueueNum){
+        return createTopicBrokerInfo(broker, topicMetadata, readQueueNum, writeQueueNum, 6);
+    }
+
+    public static TopicBrokerInfo createTopicBrokerInfo(Broker broker, TopicMetadata topicMetadata, int readQueueNum,
+                                                        int writeQueueNum, int perm){
+        TopicBrokerInfo topicBrokerInfo = new TopicBrokerInfo();
+        topicBrokerInfo.setBroker(broker);
+        topicBrokerInfo.setTopicMetadata(topicMetadata);
+        topicBrokerInfo.setCreateTime(new Date());
+        topicBrokerInfo.setUpdateTime(new Date());
+        topicBrokerInfo.setSyncTime(new Date());
+        topicBrokerInfo.setPermission(perm);
+        topicBrokerInfo.setReadQueueNum(readQueueNum);
+        topicBrokerInfo.setWriteQueueNum(writeQueueNum);
+        topicBrokerInfo.setStatus(Status.ACTIVE);
+        return topicBrokerInfo;
+    }
+
+    public static TopicMetadata createTopicMetadata(String topic, String clusterName){
+        TopicMetadata topicMetadata = new TopicMetadata();
+        topicMetadata.setTopic(topic);
+        topicMetadata.setStatus(Status.ACTIVE);
+        topicMetadata.setCreateTime(new Date());
+        topicMetadata.setUpdateTime(new Date());
+        // TODO decode and set order info here.
+        topicMetadata.setClusterName(clusterName);
+        return topicMetadata;
     }
 
     public static boolean isGroup(String topic){

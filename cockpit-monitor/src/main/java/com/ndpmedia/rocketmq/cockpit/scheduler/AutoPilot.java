@@ -3,7 +3,6 @@ package com.ndpmedia.rocketmq.cockpit.scheduler;
 import com.alibaba.rocketmq.client.exception.MQBrokerException;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.MixAll;
-import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.common.protocol.body.SubscriptionGroupWrapper;
 import com.alibaba.rocketmq.common.protocol.route.BrokerData;
 import com.alibaba.rocketmq.common.protocol.route.TopicRouteData;
@@ -20,6 +19,7 @@ import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import com.ndpmedia.rocketmq.cockpit.service.impl.CockpitConsumerGroupMQServiceImpl;
 import com.ndpmedia.rocketmq.cockpit.util.Helper;
 import com.ndpmedia.rocketmq.cockpit.util.TopicTranslate;
+import com.ndpmedia.rocketmq.cockpit.util.WarnMsgHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,10 +68,9 @@ public class AutoPilot {
             // for each topic-broker pair, make sure its associated consumer group is there.
             autoPilotConsumerGroup(adminExt);
         } catch (MQClientException e) {
-            LOGGER.error("Fatal Error: Failed to start admin tool", e);
+            LOGGER.error("[MONITOR][AUTO-PILOT]Fatal Error: Failed to start admin tool", e);
             return;
         } finally {
-
             if (null != adminExt) {
                 adminExt.shutdown();
             }
@@ -83,52 +82,58 @@ public class AutoPilot {
 
         List<TopicMetadata> topicMetadataList = cockpitTopicDBService.getTopics(Status.ACTIVE, Status.APPROVED);
         for (TopicMetadata topicMetadata : topicMetadataList) {
+            TopicRouteData topicRouteData = null;
+            List<BrokerData> brokerDataList = new ArrayList<>();
             try {
-                TopicRouteData topicRouteData = adminExt.examineTopicRouteInfo(topicMetadata.getTopic());
-                // fetch associated consumer groups from DB.
-                List<ConsumerGroup> associatedConsumerGroups = cockpitConsumerGroupDBService.listByTopic(topicMetadata.getId());
-
-                List<BrokerData> brokerDataList = topicRouteData.getBrokerDatas();
-                for (BrokerData brokerData : brokerDataList) {
-                    for (Map.Entry<Long, String> brokerAddress : brokerData.getBrokerAddrs().entrySet()) {
-
-                        // We only need to handle master broker node
-                        if (brokerAddress.getKey() != MixAll.MASTER_ID) {
-                            continue;
-                        }
-
-                        if (!brokerAddressConsumerGroupCache.containsKey(brokerAddress.getValue())) {
-                            Set<String> consumerGroups = new HashSet<String>();
-                            try {
-                                SubscriptionGroupWrapper subscriptionGroups = adminExt.fetchAllSubscriptionGroups(brokerAddress.getValue(), 3000);
-                                for (SubscriptionGroupConfig subscriptionGroupConfig : subscriptionGroups.getSubscriptionGroupTable().values()) {
-                                    consumerGroups.add(subscriptionGroupConfig.getGroupName());
-                                }
-                            } catch (MQBrokerException e) {
-                                LOGGER.error("Failed to get subscription group info from broker: {}", brokerAddress.getValue());
-                                LOGGER.error("", e);
-                            }
-                            brokerAddressConsumerGroupCache.put(brokerAddress.getValue(), consumerGroups);
-                        }
-                        Set<String> consumerGroupsOnBroker = brokerAddressConsumerGroupCache.get(brokerAddress.getValue());
-
-                        for (ConsumerGroup consumerGroup : associatedConsumerGroups) {
-                            if (!consumerGroupsOnBroker.contains(consumerGroup.getGroupName())) {
-                                try {
-                                    adminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress.getValue(),
-                                            CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup), 15000L);
-                                } catch (MQBrokerException e) {
-                                    LOGGER.error("Broker {} does not have consumer group: {} and trying to creating such consumer group fails!", brokerAddress.getValue(), consumerGroup.getGroupName());
-                                    LOGGER.error("", e);
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (RemotingException | MQClientException | InterruptedException e) {
-                LOGGER.error("Failed to fetch topicMetadata route data: {}" + e, topicMetadata.getTopic());
+                topicRouteData = adminExt.examineTopicRouteInfo(topicMetadata.getTopic());
+                brokerDataList.addAll(topicRouteData.getBrokerDatas());
+            } catch (Exception e) {
+                LOGGER.warn("[MONITOR][AUTO_PILOT] get topic route failed!" + topicMetadata.getTopic());
             }
 
+            for (BrokerData brokerData : brokerDataList) {
+                for (Map.Entry<Long, String> brokerAddress : brokerData.getBrokerAddrs().entrySet()) {
+
+                    // We only need to handle master broker node
+                    if (brokerAddress.getKey() != MixAll.MASTER_ID) {
+                        continue;
+                    }
+
+                    getGroupByBroker(adminExt, brokerAddressConsumerGroupCache, brokerAddress);
+                    fetchConsumerGroup(adminExt, topicMetadata.getId(), brokerAddress, brokerAddressConsumerGroupCache);
+                }
+            }
+        }
+    }
+
+    private void getGroupByBroker(MQAdminExt adminExt, Map<String, Set<String>> brokerAddressConsumerGroupCache, Map.Entry<Long, String> brokerAddress) {
+        if (!brokerAddressConsumerGroupCache.containsKey(brokerAddress.getValue())) {
+            Set<String> consumerGroups = new HashSet<String>();
+            try {
+                SubscriptionGroupWrapper subscriptionGroups = adminExt.fetchAllSubscriptionGroups(brokerAddress.getValue(), 3000);
+                for (SubscriptionGroupConfig subscriptionGroupConfig : subscriptionGroups.getSubscriptionGroupTable().values()) {
+                    consumerGroups.add(subscriptionGroupConfig.getGroupName());
+                }
+            } catch (Exception e) {
+                LOGGER.error("[MONITOR][AUTO-PILOT]Failed to get subscription group info from broker: {}", brokerAddress.getValue());
+            }
+            brokerAddressConsumerGroupCache.put(brokerAddress.getValue(), consumerGroups);
+        }
+    }
+
+    private void fetchConsumerGroup(MQAdminExt adminExt, long topicId, Map.Entry<Long, String> brokerAddress, Map<String, Set<String>> brokerAddressConsumerGroupCache) {
+        Set<String> consumerGroupsOnBroker = brokerAddressConsumerGroupCache.get(brokerAddress.getValue());
+        // fetch associated consumer groups from DB.
+        List<ConsumerGroup> associatedConsumerGroups = cockpitConsumerGroupDBService.listByTopic(topicId);
+        for (ConsumerGroup consumerGroup : associatedConsumerGroups) {
+            if (!consumerGroupsOnBroker.contains(consumerGroup.getGroupName())) {
+                try {
+                    adminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress.getValue(),
+                            CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup), 15000L);
+                } catch (Exception e) {
+                    LOGGER.error("[MONITOR][AUTO-PILOT]Broker {} does not have consumer group: {} and trying to creating such consumer group fails!", brokerAddress.getValue(), consumerGroup.getGroupName());
+                }
+            }
         }
     }
 
@@ -139,46 +144,15 @@ public class AutoPilot {
             for (TopicAvailability topicAvailability : topicAvailabilityList) {
                 if (topicAvailability.getAvailability() < TOPIC_AVAILABILITY_THRESHOLD) {
                     List<DataCenter> allowedDataCenters = cockpitTopicDBService.queryAllowedDC(topicAvailability.getTopicId());
-                    if (null == allowedDataCenters || allowedDataCenters.isEmpty()) {
+                    if (null == allowedDataCenters || allowedDataCenters.isEmpty() || isLegal(topicAvailability, allowedDataCenters)) {
                         continue;
-                    } else {
-                        boolean legal = false;
-                        for (DataCenter dataCenter : allowedDataCenters) {
-                            if (dataCenter.getId() == topicAvailability.getDcId()) {
-                                legal = true;
-                                break;
-                            }
-                        }
-                        if (!legal) {
-                            continue;
-                        }
                     }
-                    Calendar calender = Calendar.getInstance();
-                    calender.add(Calendar.HOUR, -2);
-                    List<Broker> brokers = brokerMapper.list(null, null, 0, topicAvailability.getDcId(), calender.getTime());
-                    if (topicAvailability.getAvailability() > brokers.size()) {
-                        // We do not have more brokers.
-                        // TODO auto add broker.
-                        String msgTemplate = "Availability of topic: %s in DC: %s is %s, but we have no more brokers in this DC";
-                        String msg = String.format(msgTemplate, topicAvailability.getTopicId(), topicAvailability.getDcId(), topicAvailability.getAvailability());
-                        LOGGER.warn(msg);
 
-                        // Add a warning
-                        Warning warning = new Warning();
-                        warning.setLevel(Level.WARN);
-                        warning.setStatus(Status.ACTIVE);
-                        warning.setCreateTime(new Date());
-                        warning.setMsg(msg);
-                        warningMapper.create(warning);
+                    if (needMoreBroker(topicAvailability))
                         continue;
-                    }
 
                     // Find candidate brokers to create topic on.
-                    List<Long> currentHostingBrokers = new ArrayList<Long>();
-                    List<TopicBrokerInfo> topicBrokerInfoList = cockpitTopicDBService.queryTopicBrokerInfo(topicAvailability.getTopicId(), 0, topicAvailability.getDcId());
-                    for (TopicBrokerInfo topicBrokerInfo : topicBrokerInfoList) {
-                        currentHostingBrokers.add(topicBrokerInfo.getBroker().getId());
-                    }
+                    List<Long> currentHostingBrokers = getBrokers(topicAvailability);
 
                     List<BrokerLoad> brokerLoadList = brokerMapper.queryBrokerLoad(topicAvailability.getDcId(), 0);
                     List<Long> candidateBrokers = new ArrayList<>();
@@ -194,68 +168,95 @@ public class AutoPilot {
                     List<Long> consumerGroupIds = cockpitTopicDBService.queryAssociatedConsumerGroup(topicAvailability.getTopicId());
 
                     if (consumerGroupIds.isEmpty()) {
-                        Warning warning = new Warning();
-                        warning.setLevel(Level.CRITICAL);
-                        warning.setCreateTime(new Date());
-                        warning.setStatus(Status.ACTIVE);
-                        warning.setMsg(String.format("Trying to create topic[ID: %s] but it does not have associated consumer groups. ", topicAvailability.getTopicId()));
-                        warningMapper.create(warning);
+                        String msg = String.format("Trying to create topic[ID: %s] but it does not have associated consumer groups. ", topicAvailability.getTopicId());
+                        warningMapper.create(WarnMsgHelper.makeWarning(Level.CRITICAL, msg));
 
                         // Will NOT create topic without associated consumer groups.
                         continue;
                     }
 
-                    for (Long brokerId : candidateBrokers) {
-                        Broker broker = brokerMapper.get(brokerId);
-                        for (Long consumerGroupId : consumerGroupIds) {
-                            // ensure broker has all consumer groups which are associated with topic under creation.
-                            if (!brokerMapper.hasConsumerGroup(brokerId, consumerGroupId)) {
-                                ConsumerGroup consumerGroup = cockpitConsumerGroupDBService.get(consumerGroupId, null);
-                                try {
-                                    // For each topic, create associated consumer group on the target, matched brokers.
-                                    adminExt.createAndUpdateSubscriptionGroupConfig(broker.getAddress(),
-                                            CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup), 20000);
-                                    brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
-
-                                } catch (RemotingException | MQBrokerException | InterruptedException | MQClientException e) {
-                                    LOGGER.error("Failed to create consumer group {} on broker {}", consumerGroup.getGroupName(), broker.getAddress());
-                                }
-                            }
-                        }
-
-                        // create topic on broker.
-                        List<TopicBrokerInfo> existingTopicBrokerInfo = null;
-                        try {
-                            existingTopicBrokerInfo = cockpitTopicDBService.queryTopicBrokerInfo(topicAvailability.getTopicId(), brokerId, 0);
-                            TopicBrokerInfo topicBrokerInfo = null;
-                            if (existingTopicBrokerInfo.isEmpty()) {
-                                topicBrokerInfo = new TopicBrokerInfo();
-                                topicBrokerInfo.setBroker(broker);
-                                topicBrokerInfo.setTopicMetadata(cockpitTopicDBService.getTopic(topicAvailability.getTopicId()));
-                                topicBrokerInfo.setCreateTime(new Date());
-                                topicBrokerInfo.setUpdateTime(new Date());
-                                topicBrokerInfo.setSyncTime(new Date());
-                                topicBrokerInfo.setPermission(6);
-                                topicBrokerInfo.setReadQueueNum(TopicConfig.DefaultReadQueueNums);
-                                topicBrokerInfo.setWriteQueueNum(TopicConfig.DefaultWriteQueueNums);
-                                topicBrokerInfo.setStatus(Status.ACTIVE);
-                            } else {
-                                assert existingTopicBrokerInfo.size() == 1;
-                                topicBrokerInfo = existingTopicBrokerInfo.get(0);
-                            }
-
-                            // Create topic on matched brokers or update topic read/write queue number.
-                            adminExt.createAndUpdateTopicConfig(broker.getAddress(),
-                                    TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo), 15000L);
-                            if (existingTopicBrokerInfo.isEmpty()) {
-                                cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
-                            }
-                        } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
-                            LOGGER.error("Failed to create topic", e);
-                        }
-                    }
+                    addTopics(adminExt, topicAvailability, candidateBrokers, consumerGroupIds);
                 }
             }
         }
+    }
+
+    private void addTopics(MQAdminExt adminExt, TopicAvailability topicAvailability, List<Long> candidateBrokers, List<Long> consumerGroupIds) {
+        for (Long brokerId : candidateBrokers) {
+            Broker broker = brokerMapper.get(brokerId);
+            for (Long consumerGroupId : consumerGroupIds) {
+                // ensure broker has all consumer groups which are associated with topic under creation.
+                if (!brokerMapper.hasConsumerGroup(brokerId, consumerGroupId)) {
+                    ConsumerGroup consumerGroup = cockpitConsumerGroupDBService.get(consumerGroupId, null);
+                    try {
+                        // For each topic, create associated consumer group on the target, matched brokers.
+                        adminExt.createAndUpdateSubscriptionGroupConfig(broker.getAddress(),
+                                CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup), 20000);
+                        brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
+
+                    } catch (RemotingException | MQBrokerException | InterruptedException | MQClientException e) {
+                        LOGGER.error("Failed to create consumer group {} on broker {}", consumerGroup.getGroupName(), broker.getAddress());
+                    }
+                }
+            }
+
+            // create topic on broker.
+            List<TopicBrokerInfo> existingTopicBrokerInfo = null;
+            try {
+                existingTopicBrokerInfo = cockpitTopicDBService.queryTopicBrokerInfo(topicAvailability.getTopicId(), brokerId, 0);
+                TopicBrokerInfo topicBrokerInfo = null;
+                if (existingTopicBrokerInfo.isEmpty()) {
+                    topicBrokerInfo = TopicTranslate.createTopicBrokerInfo(broker, cockpitTopicDBService.getTopic(topicAvailability.getTopicId()));
+                } else {
+                    assert existingTopicBrokerInfo.size() == 1;
+                    topicBrokerInfo = existingTopicBrokerInfo.get(0);
+                }
+
+                // Create topic on matched brokers or update topic read/write queue number.
+                adminExt.createAndUpdateTopicConfig(broker.getAddress(),
+                        TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo), 15000L);
+                if (existingTopicBrokerInfo.isEmpty()) {
+                    cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
+                }
+            } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
+                LOGGER.error("[MONITOR][AUTO-PILOT]Failed to create topic", e);
+            }
+        }
+    }
+
+    private List<Long> getBrokers(TopicAvailability topicAvailability) {
+        List<Long> currentHostingBrokers = new ArrayList<Long>();
+        List<TopicBrokerInfo> topicBrokerInfoList = cockpitTopicDBService.queryTopicBrokerInfo(topicAvailability.getTopicId(), 0, topicAvailability.getDcId());
+        for (TopicBrokerInfo topicBrokerInfo : topicBrokerInfoList) {
+            currentHostingBrokers.add(topicBrokerInfo.getBroker().getId());
+        }
+        return currentHostingBrokers;
+    }
+
+    private boolean needMoreBroker(TopicAvailability topicAvailability) {
+        Calendar calender = Calendar.getInstance();
+        calender.add(Calendar.HOUR, -2);
+        List<Broker> brokers = brokerMapper.list(null, null, 0, topicAvailability.getDcId(), calender.getTime());
+        if (topicAvailability.getAvailability() > brokers.size()) {
+            // We do not have more brokers.
+            // TODO auto add broker.
+            String msgTemplate = "Availability of topic: %s in DC: %s is %s, but we have no more brokers in this DC";
+            String msg = String.format(msgTemplate, topicAvailability.getTopicId(), topicAvailability.getDcId(), topicAvailability.getAvailability());
+            LOGGER.warn(msg);
+
+            warningMapper.create(WarnMsgHelper.makeWarning(Level.WARN, msg));
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isLegal(TopicAvailability topicAvailability, List<DataCenter> allowedDataCenters) {
+        for (DataCenter dataCenter : allowedDataCenters) {
+            if (dataCenter.getId() == topicAvailability.getDcId()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

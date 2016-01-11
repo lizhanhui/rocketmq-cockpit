@@ -1,5 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
+import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumeProgress;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
@@ -69,37 +70,47 @@ public class TaskScheduler {
 
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(Long.toString(System.currentTimeMillis()) + "taskScheduler");
         defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+
         try {
             defaultMQAdminExt.start();
-            Set<String> groupList = cockpitConsumerGroupMQService.getGroups(defaultMQAdminExt);
+        } catch (MQClientException e) {
+            logger.warn("[MONITOR][CONSUMER-PROGRESS] start mqadmin failed!");
+        }
 
-            if (groupList.size() > groupTableRel.size()){
-                createPrivateTable(groupList);
-            }
+        Set<String> groupList = cockpitConsumerGroupMQService.getGroups(defaultMQAdminExt);
 
-            List<ConsumeProgress> consumeProgressList;
-            for (String group : groupList) {
-                consumeProgressList = cockpitConsumeProgressService.queryConsumerProgress(defaultMQAdminExt, group, null, null);
-                for (ConsumeProgress cp : consumeProgressList) {
-                    if (null == cp || null == cp.getTopic() || null == cp.getBrokerName()) {
-                        logger.info("[MONITOR][CONSUME-PROGRESS] this group has no progress" + group);
-                        consumeProgressList.remove(cp);
-                        continue;
-                    }else {
-                        cp.setCreateTime(date);
-                    }
+        if (groupList.size() > groupTableRel.size()){
+            createPrivateTable(groupList);
+        }
+
+        for (String group : groupList) {
+            getConsumerProgress(defaultMQAdminExt, group);
+        }
+
+        defaultMQAdminExt.shutdown();
+    }
+
+    private void getConsumerProgress(DefaultMQAdminExt defaultMQAdminExt, String group) {
+        List<ConsumeProgress> consumeProgressList;
+        try {
+            consumeProgressList = cockpitConsumeProgressService.queryConsumerProgress(defaultMQAdminExt, group, null, null);
+            for (ConsumeProgress cp : consumeProgressList) {
+                if (null == cp || null == cp.getTopic() || null == cp.getBrokerName()) {
+                    logger.info("[MONITOR][CONSUME-PROGRESS] this group has no progress" + group);
+                    consumeProgressList.remove(cp);
+                    continue;
+                } else {
+                    cp.setCreateTime(date);
                 }
-
-                updateConsumeProgressData(consumeProgressList);
             }
-        } catch (Exception e) {
+
+            updateConsumeProgressData(consumeProgressList);
+        }catch (Exception e){
             if (!e.getMessage().contains("offset table is empty")) {
                 logger.warn("[MONITOR][CONSUME-PROGRESS] main method failed." + e);
             }else {
-                logger.warn("[MONITOR][CONSUME-PROGRESS] main method failed." + e);
+                logger.warn("[MONITOR][CONSUME-PROGRESS] no offset in server." + e);
             }
-        } finally {
-            defaultMQAdminExt.shutdown();
         }
     }
 
