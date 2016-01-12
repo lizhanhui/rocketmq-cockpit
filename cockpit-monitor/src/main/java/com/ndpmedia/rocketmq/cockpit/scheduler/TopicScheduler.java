@@ -58,6 +58,7 @@ public class TopicScheduler {
      */
     @Scheduled(fixedRate = 600000)
     public void synchronizeTopics() {
+        logger.info("[MONITOR][TOPIC-SCHEDULER] scheduler start");
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
@@ -65,11 +66,13 @@ public class TopicScheduler {
             syncDownTopics(defaultMQAdminExt);
             syncUpTopics(defaultMQAdminExt);
         } catch (MQClientException e) {
-            logger.error("Failed to synchronize topics", e);
+            logger.error("[MONITOR][TOPIC-SCHEDULER]Failed to synchronize topics", e);
         } finally {
             if (null != defaultMQAdminExt)
                 defaultMQAdminExt.shutdown();
         }
+
+        logger.info("[MONITOR][TOPIC-SCHEDULER] scheduler end");
     }
 
     private void syncDownTopics(DefaultMQAdminExt defaultMQAdminExt) {
@@ -79,7 +82,7 @@ public class TopicScheduler {
                 for (String topic : topicList.getTopicList()) {
 
                     // We do not need to manage System topics.
-                    if (TopicTranslate.isGroup(topic)) {
+                    if (TopicTranslate.isGroup(topic) || TopicTranslate.isDefault(topic)) {
                         continue;
                     }
 

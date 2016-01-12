@@ -63,6 +63,7 @@ public class TaskScheduler {
      */
     @Scheduled(fixedRate = 300000)
     public void queryAccumulation() {
+        logger.info("[MONITOR][CONSUMER-PROGRESS] scheduler Start");
         if (groupTableRel.size() == 0 )
             init();
         date = new Date(System.currentTimeMillis()/1000 * 1000);
@@ -88,6 +89,8 @@ public class TaskScheduler {
         }
 
         defaultMQAdminExt.shutdown();
+
+        logger.info("[MONITOR][CONSUMER-PROGRESS] scheduler end");
     }
 
     private void getConsumerProgress(DefaultMQAdminExt defaultMQAdminExt, String group) {

@@ -34,6 +34,7 @@ public class BrokerScheduler {
      */
     @Scheduled(fixedRate = 300000)
     public void synchronizeBrokers() {
+        LOGGER.info("[MONITOR][BROKER-SCHEDULER]  schedule start");
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
@@ -51,32 +52,7 @@ public class BrokerScheduler {
 
             if (null != clusterBrokerTable && !clusterBrokerTable.isEmpty()) {
                 for (Map.Entry<String, Set<String>> entry : clusterBrokerTable.entrySet()) {
-                    String clusterName = entry.getKey();
-                    TreeSet<String> brokerNameSet = new TreeSet<String>();
-                    brokerNameSet.addAll(entry.getValue());
-
-                    for (String brokerName : brokerNameSet) {
-                        BrokerData brokerData = brokerDataMap.get(brokerName);
-                        if (null != brokerData) {
-                            for (Map.Entry<Long, String> brokerEntry : brokerData.getBrokerAddrs().entrySet()) {
-                                Broker broker = new Broker();
-                                broker.setClusterName(clusterName);
-                                broker.setBrokerName(brokerName);
-                                broker.setDc(parseDC(brokerName));
-                                broker.setBrokerId(brokerEntry.getKey().intValue());
-                                broker.setAddress(brokerEntry.getValue());
-                                broker.setCreateTime(new Date());
-                                broker.setUpdateTime(new Date());
-                                broker.setSyncTime(new Date());
-                                if (!brokerMapper.exists(broker)) {
-                                    brokerMapper.insert(broker);
-                                } else {
-                                    brokerMapper.refresh(broker.getId(), broker.getAddress());
-                                }
-                            }
-
-                        }
-                    }
+                    updateBroker(brokerDataMap, entry);
                 }
             }
 
@@ -87,6 +63,37 @@ public class BrokerScheduler {
         }
 
         warnDeprecatedBrokers();
+
+        LOGGER.info("[MONITOR][BROKER-SCHEDULER]  schedule end");
+    }
+
+    private void updateBroker(Map<String, BrokerData> brokerDataMap, Map.Entry<String, Set<String>> entry) {
+        String clusterName = entry.getKey();
+        TreeSet<String> brokerNameSet = new TreeSet<String>();
+        brokerNameSet.addAll(entry.getValue());
+
+        for (String brokerName : brokerNameSet) {
+            BrokerData brokerData = brokerDataMap.get(brokerName);
+            if (null != brokerData) {
+                for (Map.Entry<Long, String> brokerEntry : brokerData.getBrokerAddrs().entrySet()) {
+                    Broker broker = new Broker();
+                    broker.setClusterName(clusterName);
+                    broker.setBrokerName(brokerName);
+                    broker.setDc(parseDC(brokerName));
+                    broker.setBrokerId(brokerEntry.getKey().intValue());
+                    broker.setAddress(brokerEntry.getValue());
+                    broker.setCreateTime(new Date());
+                    broker.setUpdateTime(new Date());
+                    broker.setSyncTime(new Date());
+                    if (!brokerMapper.exists(broker)) {
+                        brokerMapper.insert(broker);
+                    } else {
+                        brokerMapper.refresh(broker.getId(), broker.getAddress());
+                    }
+                }
+
+            }
+        }
     }
 
     /**

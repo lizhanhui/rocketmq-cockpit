@@ -53,6 +53,7 @@ public class ConsumerGroupScheduler {
      */
     @Scheduled(fixedRate = 600000)
     public void synchronizeConsumerGroups() {
+        logger.info("[MONITOR][CONSUMER-GROUP-SCHEDULER]  schedule start");
         DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
         defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
@@ -70,6 +71,8 @@ public class ConsumerGroupScheduler {
             if (null != defaultMQAdminExt)
                 defaultMQAdminExt.shutdown();
         }
+
+        logger.info("[MONITOR][CONSUMER-GROUP-SCHEDULER]  schedule end");
     }
 
     private void syncDownConsumerGroupsByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress)
