@@ -1,6 +1,5 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
-import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumeProgressService;
@@ -41,6 +40,7 @@ public class TopicProgressScheduler {
      */
     @Scheduled(fixedRate = 120000)
     public void queryAccumulation() {
+        logger.info("[MONITOR][TOPIC PROGRESS] scheduler Start");
         try {
             date = consumeProgressMapper.lastrow().get(1).getCreateTime();
             if (consumeProgressMapper.topicReady(date).size() > 0) {
@@ -53,6 +53,8 @@ public class TopicProgressScheduler {
             logger.warn("[MONITOR][TOPIC PROGRESS] main method failed." + e);
 
         }
+
+        logger.info("[MONITOR][TOPIC PROGRESS] scheduler end");
     }
 
     private void updateTopicProgressData(){

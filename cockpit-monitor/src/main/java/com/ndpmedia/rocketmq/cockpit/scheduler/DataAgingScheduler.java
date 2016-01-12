@@ -39,7 +39,7 @@ public class DataAgingScheduler {
      */
     @Scheduled(cron = "0 0 * * * *")
     public void deleteDeprecatedData() {
-        logger.info("Start to clean deprecated data");
+        logger.info("[MONITOR][OLD DATA DELETE] Start to clean deprecated data");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, -24);
         int numberOfRecordsDeleted = consumeProgressMapper.bulkDelete("", calendar.getTime());
@@ -61,6 +61,8 @@ public class DataAgingScheduler {
                 logger.warn("[MONITOR][OLD DATA DELETE] some table already deleted.");
             }
         }
+
+        logger.info("[MONITOR][OLD DATA DELETE]  clean deprecated data end");
     }
 
     /**
@@ -70,8 +72,10 @@ public class DataAgingScheduler {
      */
     @Scheduled(fixedRate = 60000)
     public void deleteDeprecatedLoginData() {
+        logger.info("[MONITOR][LOGIN DELETE] Start to clean login data");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -30);
         loginMapper.delete(calendar.getTime());
+        logger.info("[MONITOR][LOGIN DELETE] clean login data end");
     }
 }

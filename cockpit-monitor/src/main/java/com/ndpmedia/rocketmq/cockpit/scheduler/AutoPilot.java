@@ -56,6 +56,7 @@ public class AutoPilot {
      */
     @Scheduled(fixedDelay = 600000)
     public void autoPilot() {
+        LOGGER.info("[MONITOR][AUTO-PILOT]  schedule start");
         //get connection
         MQAdminExt adminExt = null;
         try {
@@ -75,6 +76,8 @@ public class AutoPilot {
                 adminExt.shutdown();
             }
         }
+
+        LOGGER.info("[MONITOR][AUTO-PILOT]  schedule end");
     }
 
     private void autoPilotConsumerGroup(MQAdminExt adminExt) {
@@ -195,7 +198,7 @@ public class AutoPilot {
                         brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
 
                     } catch (RemotingException | MQBrokerException | InterruptedException | MQClientException e) {
-                        LOGGER.error("Failed to create consumer group {} on broker {}", consumerGroup.getGroupName(), broker.getAddress());
+                        LOGGER.error("[MONITOR][AUTO-PILOT]Failed to create consumer group {} on broker {}", consumerGroup.getGroupName(), broker.getAddress());
                     }
                 }
             }
