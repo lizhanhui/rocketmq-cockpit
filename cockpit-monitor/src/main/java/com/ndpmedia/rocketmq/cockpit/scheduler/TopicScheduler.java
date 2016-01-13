@@ -53,6 +53,7 @@ public class TopicScheduler {
     private WarningMapper warningMapper;
 
     private Set<String> brokerAddresses;
+    private Set<String> serverNames;
 
     /**
      * synchronize topics every 10 minutes
@@ -66,6 +67,7 @@ public class TopicScheduler {
             defaultMQAdminExt.start();
 
             brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
+            serverNames = cockpitBrokerMQService.getAllNames(defaultMQAdminExt);
             syncDownTopics(defaultMQAdminExt);
             syncUpTopics(defaultMQAdminExt);
         } catch (MQClientException e) {
@@ -194,7 +196,7 @@ public class TopicScheduler {
     }
 
     public boolean isDefault(String topic) {
-        if (brokerAddresses.contains(topic))
+        if (serverNames.contains(topic))
             return true;
         return false;
     }
