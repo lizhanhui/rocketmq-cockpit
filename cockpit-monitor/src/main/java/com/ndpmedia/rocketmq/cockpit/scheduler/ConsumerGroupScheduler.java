@@ -59,10 +59,14 @@ public class ConsumerGroupScheduler {
         try {
             defaultMQAdminExt.start();
             Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
-
+            Set<Long> groupIds = new HashSet<>();
             for (String brokerAddress : brokerAddresses) {
                 syncDownConsumerGroupsByBroker(defaultMQAdminExt, brokerAddress);
-                syncUpConsumerGroupsByBroker(defaultMQAdminExt, brokerAddress);
+                syncUpConsumerGroupsByBroker(defaultMQAdminExt, brokerAddress, groupIds);
+            }
+
+            for (long groupId:groupIds){
+                cockpitConsumerGroupDBService.activate(groupId);
             }
 
         } catch (Exception e) {
@@ -104,7 +108,7 @@ public class ConsumerGroupScheduler {
         }
     }
 
-    private void syncUpConsumerGroupsByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress) {
+    private void syncUpConsumerGroupsByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress, Set<Long> groupIds) {
         Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
         List<ConsumerGroupHosting> endangeredConsumerGroupHostingList = new ArrayList<>();
         //add last update consumer group
@@ -118,7 +122,7 @@ public class ConsumerGroupScheduler {
                 logger.debug("[MONITOR][CONSUMER-GROUP-SCHEDULER]About to create consumer group {} on broker {}",
                         subscriptionGroupConfig.getGroupName(), brokerAddress);
                 defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress, subscriptionGroupConfig, 15000L);
-                cockpitConsumerGroupDBService.activate(hosting.getConsumerGroup().getId());
+                groupIds.add(hosting.getConsumerGroup().getId());
                 logger.info("[MONITOR][CONSUMER-GROUP-SCHEDULER]Consumer Group {} has been created on broker {}",
                         subscriptionGroupConfig.getGroupName(), brokerAddress);
             } catch (RemotingException | MQBrokerException | MQClientException | InterruptedException e) {
