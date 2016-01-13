@@ -5,25 +5,11 @@ import com.alibaba.rocketmq.common.TopicConfig;
 import com.ndpmedia.rocketmq.cockpit.model.*;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by robert on 2015/6/11.
  */
 public class TopicTranslate {
-
-    private static final Set<String> DEFAULT_TOPICS = new HashSet<>();
-
-    {
-        DEFAULT_TOPICS.add("DefaultCluster");
-        DEFAULT_TOPICS.add("DefaultCluster_3_broker1");
-        DEFAULT_TOPICS.add("DefaultCluster_3_broker2");
-        DEFAULT_TOPICS.add("DefaultCluster_2_broker1");
-        DEFAULT_TOPICS.add("DefaultCluster_2_broker2");
-        DEFAULT_TOPICS.add("DefaultCluster_1_broker1");
-        DEFAULT_TOPICS.add("DefaultCluster_1_broker2");
-    }
 
     public static TopicConfig wrapTopicToTopicConfig(TopicBrokerInfo topicBrokerInfo) {
         TopicConfig topicConfig = new TopicConfig();
@@ -107,13 +93,6 @@ public class TopicTranslate {
         if (topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX)
                 || topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX))
             return true;
-        return false;
-    }
-
-    public static boolean isDefault(String topic){
-        if (DEFAULT_TOPICS.contains(topic))
-            return true;
-
         return false;
     }
 }

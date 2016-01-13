@@ -52,6 +52,7 @@ public class TopicScheduler {
     @Autowired
     private WarningMapper warningMapper;
 
+    private Set<String> brokerAddresses;
 
     /**
      * synchronize topics every 10 minutes
@@ -63,6 +64,8 @@ public class TopicScheduler {
         defaultMQAdminExt.setInstanceName(Helper.getInstanceName());
         try {
             defaultMQAdminExt.start();
+
+            brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
             syncDownTopics(defaultMQAdminExt);
             syncUpTopics(defaultMQAdminExt);
         } catch (MQClientException e) {
@@ -82,7 +85,7 @@ public class TopicScheduler {
                 for (String topic : topicList.getTopicList()) {
 
                     // We do not need to manage System topics.
-                    if (TopicTranslate.isGroup(topic) || TopicTranslate.isDefault(topic)) {
+                    if (TopicTranslate.isGroup(topic) || isDefault(topic)) {
                         continue;
                     }
 
@@ -149,7 +152,6 @@ public class TopicScheduler {
     }
 
     private void syncUpTopics(DefaultMQAdminExt defaultMQAdminExt) {
-        Set<String> brokerAddresses = cockpitBrokerMQService.getALLBrokers(defaultMQAdminExt);
         for (String brokerAddress : brokerAddresses) {
             Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
             List<TopicBrokerInfo> list = new ArrayList<>();
@@ -189,5 +191,11 @@ public class TopicScheduler {
             }
         }
         throw new RuntimeException("Unable to figure out cluster name by broker address");
+    }
+
+    public boolean isDefault(String topic) {
+        if (brokerAddresses.contains(topic))
+            return true;
+        return false;
     }
 }
