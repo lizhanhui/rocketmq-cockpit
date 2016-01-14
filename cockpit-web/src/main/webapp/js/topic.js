@@ -81,6 +81,36 @@ $(document).ready(function() {
 
     });
 
+    $(".addTopicM").click(function() {
+        var topic = $("input.topicA").val();
+        var cluster = $("input.clusterA").val();
+        var order = $("input.orderA").val();
+        var topicMeta = {"topic":topic, "clusterName":cluster, "order" :order};
+        if ($.trim(topic) === "" || $.trim(cluster) === "") {
+            alert("need topic and cluster");
+            return false;
+        }else {
+            $.ajax({
+                async: false,
+                url: "cockpit/api/topic/" + 1,
+                type: "PUT",
+                dataType: "json",
+                contentType : "application/json; charset=utf-8",
+                data: topicMeta,
+                success: function(){
+                    location.reload(true);
+                },
+                error: function() {
+
+                }
+            });
+        }
+    });
+
+    $(".cancelTopicM").click(function() {
+        document.getElementById("addTopicMeta").style.display="none";
+    });
+
     $(".cancelTopic").click(function() {
         document.getElementById("addTopicDIV").style.display="none";
         document.getElementById("topicDetailButton").style.display="block";
@@ -362,4 +392,8 @@ function addDetail(){
     document.getElementById("addTopicDIV").style.display="block";
     document.getElementById("topicDetailButton").style.display="none";
     document.getElementById("topicDetailTable").style.display="none";
+}
+
+function addTopic(){
+    document.getElementById("addTopicMeta").style.display="block";
 }

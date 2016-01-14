@@ -39,6 +39,7 @@
         </tr>
     </table>
 </div>
+<button id="addTopicM" onclick="addTopic();">add topic</button>
 <div id="topicDIV">
       <table cellspacing="0" class="display" id="topic" width="100%">
         <thead>
@@ -54,6 +55,16 @@
         <tbody>
         </tbody>
       </table>
+</div>
+<div id="addTopicMeta" class="col-xs-8 col-xs-offset-2 text-left table-responsive" style="padding:5px;display:none">
+    <table cellspacing="1" class="" id="addTopicMetaTable" style="padding-left: 50px;">
+        <tr><td>Topic:</td><td><input type="text" class="form-control topicA" placeholder="Topic name"></input></td></tr>
+        <tr><td>Cluster:</td><td><input type="text" class="form-control clusterA" placeholder="Which Cluster ?"></input></td></tr>
+        <tr><td>Order:</td><td><input type="text" class="form-control orderA" placeholder="order or not ?"></input></td></tr>
+        <tr><td colspan="2"><button type="submit" class="btn btn-primary addTopicM"> add topic meta</button>
+        <button type="submit" class="btn btn-primary cancelTopicM">cancel</button>
+    </td></tr>
+    </table>
 </div>
 <div id="topicDetailDIV" class="col-xs-8 col-xs-offset-2 text-left table-responsive" style="padding:20px">
 <div id="topicDetailButton" style="padding:5px">
@@ -84,7 +95,7 @@
             </tr>
             <tr>
                 <td>Permission:</td>
-                <td>  <input type="text" class="form-control permission" placeholder="Read: 2/Write: 4/Read&Write: 6"></td>
+                <td>  <input type="text" class="form-control permission" placeholder="Read: 2/Write: 4/Read&amp;Write: 6"></td>
             </tr>
 
             <tr>
