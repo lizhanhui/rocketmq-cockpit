@@ -61,8 +61,11 @@ public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDB
     @Transactional
     @Override
     public void delete(long consumerGroupId) {
-        consumerGroupMapper.disconnectProject(consumerGroupId, 0);
-        consumerGroupMapper.delete(consumerGroupId);
+        ConsumerGroup consumerGroup = consumerGroupMapper.get(consumerGroupId);
+        if (null != consumerGroup) {
+            consumerGroup.setStatus(Status.DELETED);
+            consumerGroupMapper.update(consumerGroup);
+        }
     }
 
     @Override

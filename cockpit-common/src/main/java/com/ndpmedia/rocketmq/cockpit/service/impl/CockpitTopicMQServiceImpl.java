@@ -252,9 +252,32 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
     }
 
     @Override
-    public boolean deleteTopic(MQAdminExt adminExt, TopicMetadata topic) throws CockpitException {
+    public boolean deleteTopic(DefaultMQAdminExt adminExt, TopicMetadata topic) throws CockpitException {
+        boolean createAdmin = (null == adminExt);
 
-        throw new CockpitException("Not Implemented");
+        try {
+            if (createAdmin) {
+                adminExt = new DefaultMQAdminExt();
+                adminExt.start();
+            }
+            Set<String> adders = CommandUtil.fetchMasterAddrByClusterName(adminExt, topic.getClusterName());
+
+            adminExt.deleteTopicInBroker(adders, topic.getTopic(), 15000L);
+            // 删除 NameServer 上的 topic 信息
+            Set<String> nameServerSet = null;
+            if (adminExt.getNamesrvAddr() != null) {
+                String[] ns = adminExt.getNamesrvAddr().trim().split(";");
+                nameServerSet = new HashSet(Arrays.asList(ns));
+            }
+            adminExt.deleteTopicInNameServer(nameServerSet, topic.getTopic(), null);
+        } catch (Exception e) {
+            logger.warn("[MANAGE][DELETE_TOPIC]" + e);
+            return false;
+        } finally {
+            if (createAdmin && null != adminExt)
+                adminExt.shutdown();
+        }
+        return true;
     }
 
     public boolean deleteTopicByBroker(DefaultMQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException {

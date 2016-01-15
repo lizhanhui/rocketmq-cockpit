@@ -54,7 +54,7 @@ public interface CockpitTopicMQService extends CockpitTopicBaseService {
      * @param topicMetadata topic
      * @return result
      */
-    boolean deleteTopic(MQAdminExt adminExt, TopicMetadata topicMetadata) throws CockpitException;
+    boolean deleteTopic(DefaultMQAdminExt adminExt, TopicMetadata topicMetadata) throws CockpitException;
 
     boolean deleteTopicByBroker(DefaultMQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException;
 

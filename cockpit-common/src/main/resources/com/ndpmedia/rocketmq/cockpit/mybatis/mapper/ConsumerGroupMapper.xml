@@ -21,7 +21,7 @@
             consume_from_broker_id = #{consumeFromBrokerId},
             retry_max_times = #{retryMaxTimes}, retry_queue_num = #{retryQueueNum},
             consume_from_min_enable = #{consumeFromMinEnable}, status_id = #{status.id},
-            create_time = #{createTime}, update_time = #{updateTime}
+            create_time = #{createTime}, update_time = CURRENT_TIMESTAMP
         WHERE id = #{id}
     </update>
 
