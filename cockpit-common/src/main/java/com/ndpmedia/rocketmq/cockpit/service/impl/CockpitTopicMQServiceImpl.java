@@ -22,11 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service("cockpitTopicMQService")
 public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
@@ -227,7 +223,7 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
 
             TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
             if (-1 != topicBrokerInfo.getBroker().getId())
-                adminExt.createAndUpdateTopicConfig(topicBrokerInfo.getBroker().getAddress(), topicConfig);
+                adminExt.createAndUpdateTopicConfig(topicBrokerInfo.getBroker().getAddress(), topicConfig, 20000L);
             else{
                 Set<String> masterSet =
                         CommandUtil.fetchMasterAddrByClusterName(adminExt, topicBrokerInfo.getTopicMetadata().getClusterName());
@@ -235,7 +231,7 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
                     int retry = 0;
                     while (retry < 5) {
                         try {
-                            adminExt.createAndUpdateTopicConfig(addr, topicConfig);
+                            adminExt.createAndUpdateTopicConfig(addr, topicConfig, 15000L);
                             break;
                         } catch (Exception e) {
                             logger.warn("createAndUpdateTopicConfig faild:" + addr + e);
@@ -261,7 +257,7 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
         throw new CockpitException("Not Implemented");
     }
 
-    public boolean deleteTopicByBroker(MQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException {
+    public boolean deleteTopicByBroker(DefaultMQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException {
 
         boolean createAdmin = (null == adminExt);
 
@@ -272,9 +268,16 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
             }
             Set<String> addrs = new HashSet<>();
             addrs.add(topicBrokerInfo.getBroker().getAddress());
-            adminExt.deleteTopicInBroker(addrs, topicBrokerInfo.getTopicMetadata().getTopic());
+            adminExt.deleteTopicInBroker(addrs, topicBrokerInfo.getTopicMetadata().getTopic(), 15000L);
+            // 删除 NameServer 上的 topic 信息
+            Set<String> nameServerSet = null;
+            if (adminExt.getNamesrvAddr() != null) {
+                String[] ns = adminExt.getNamesrvAddr().trim().split(";");
+                nameServerSet = new HashSet(Arrays.asList(ns));
+            }
+            adminExt.deleteTopicInNameServer(nameServerSet, topicBrokerInfo.getTopicMetadata().getTopic(), topicBrokerInfo.getBroker().getAddress().trim());
         } catch (Exception e) {
-            logger.warn(" " + e);
+            logger.warn("[MANAGE][DELETE_TOPIC_BROKER]" + e);
             return false;
         } finally {
             if (createAdmin && null != adminExt)

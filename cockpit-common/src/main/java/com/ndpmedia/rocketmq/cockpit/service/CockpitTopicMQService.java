@@ -2,6 +2,7 @@ package com.ndpmedia.rocketmq.cockpit.service;
 
 import com.alibaba.rocketmq.common.TopicConfig;
 import com.alibaba.rocketmq.tools.admin.MQAdminExt;
+import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
@@ -55,6 +56,6 @@ public interface CockpitTopicMQService extends CockpitTopicBaseService {
      */
     boolean deleteTopic(MQAdminExt adminExt, TopicMetadata topicMetadata) throws CockpitException;
 
-    boolean deleteTopicByBroker(MQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException;
+    boolean deleteTopicByBroker(DefaultMQAdminExt adminExt, TopicBrokerInfo topicBrokerInfo) throws CockpitException;
 
 }
