@@ -1,8 +1,6 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.CockpitMessageMapper;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumeProgressMapper;
-import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.LoginMapper;
+import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +29,32 @@ public class DataAgingScheduler {
 
     @Autowired
     private ConsumeProgressMapper consumeProgressMapper;
+
+    @Autowired
+    private ConsumerGroupMapper consumerGroupMapper;
+
+    @Autowired
+    private TopicMapper topicMapper;
+
+    /**
+     *
+     */
+//    @Scheduled(cron = "0 0 0 * * *")
+    public void deleteDeletedConsumerGroup(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -3);
+//        consumerGroupMapper
+    }
+
+    /**
+     *
+     */
+//    @Scheduled(cron = "0 2 0 * * *")
+    public void deleteDeletedTopic(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -3);
+
+    }
 
     /**
      * schedule:delete old comsume progress 、message flow records.

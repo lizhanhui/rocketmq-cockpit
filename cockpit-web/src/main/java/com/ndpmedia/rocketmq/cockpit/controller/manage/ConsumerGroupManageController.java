@@ -1,8 +1,12 @@
 package com.ndpmedia.rocketmq.cockpit.controller.manage;
 
+import com.alibaba.rocketmq.common.MixAll;
+import com.ndpmedia.rocketmq.cockpit.exception.CockpitException;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
+import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupMQService;
+import com.ndpmedia.rocketmq.cockpit.service.CockpitTopicMQService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,9 @@ public class ConsumerGroupManageController {
     @Autowired
     private CockpitConsumerGroupMQService cockpitConsumerGroupMQService;
 
+    @Autowired
+    private CockpitTopicMQService cockpitTopicMQService;
+
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public boolean update(@ModelAttribute ConsumerGroup consumerGroup) {
@@ -29,7 +36,19 @@ public class ConsumerGroupManageController {
         ConsumerGroup consumerGroup = new ConsumerGroup();
         consumerGroup.setClusterName(clusterName);
         consumerGroup.setGroupName(groupName);
-        return cockpitConsumerGroupMQService.clear(consumerGroup);
+
+        TopicMetadata topicMetadataR = new TopicMetadata();
+        topicMetadataR.setTopic(MixAll.getRetryTopic(groupName));
+
+        TopicMetadata topicMetadataD = new TopicMetadata();
+        topicMetadataD.setTopic(MixAll.getDLQTopic(groupName));
+        try {
+            return cockpitConsumerGroupMQService.clear(consumerGroup)&&cockpitTopicMQService.deleteTopic(null , topicMetadataR)
+                    &&cockpitTopicMQService.deleteTopic(null, topicMetadataD);
+        } catch (CockpitException e) {
+            System.out.println(e);
+        }
+        return false;
     }
 
 }
