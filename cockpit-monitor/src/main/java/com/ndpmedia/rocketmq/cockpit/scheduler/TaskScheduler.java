@@ -80,9 +80,7 @@ public class TaskScheduler {
 
         Set<String> groupList = cockpitConsumerGroupMQService.getGroups(defaultMQAdminExt);
 
-        if (groupList.size() > groupTableRel.size()){
-            createPrivateTable(groupList);
-        }
+        createPrivateTable(groupList);
 
         for (String group : groupList) {
             getConsumerProgress(defaultMQAdminExt, group);
