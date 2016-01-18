@@ -7,6 +7,7 @@ import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.model.TopicMetadata;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TopicMapper {
@@ -15,7 +16,12 @@ public interface TopicMapper {
 
     void insertTopicBrokerInfo(TopicBrokerInfo topicBrokerInfo);
 
-    void delete(long id);
+    int delete(long id);
+    int deleteTB(@Param("topicId") long topicId, @Param("brokerId") long brokerId);
+    int deleteTDX(long id);
+    int deleteTCGX(long id);
+    int deleteTS(long id);
+    int deleteTTX(long id);
 
     void update(TopicMetadata topicMetadata);
 
@@ -84,4 +90,6 @@ public interface TopicMapper {
     void changeTopicDCStatus(@Param("topicId")long topicId,
                              @Param("dcId")long dcId,
                              @Param("status")Status status);
+
+    List<TopicBrokerInfo> listToDEL(@Param("syncTime") Date syncTime);
 }

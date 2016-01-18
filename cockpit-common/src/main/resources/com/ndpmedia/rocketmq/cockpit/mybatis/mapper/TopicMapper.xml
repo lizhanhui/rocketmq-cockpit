@@ -98,6 +98,37 @@
         WHERE id = #{id}
     </delete>
 
+    <delete id="deleteTB">
+        DELETE
+        FROM topic_broker_xref
+        WHERE topic_id = #{topicId}
+            AND broker_id = #{brokerId}
+    </delete>
+
+    <delete id="deleteTDX" parameterType="long">
+        DELETE
+        FROM topic_dc_xref
+        WHERE topic_id = #{id}
+    </delete>
+
+    <delete id="deleteTCGX" parameterType="long">
+        DELETE
+        FROM topic_consumer_group_xref
+        WHERE topic_id = #{id}
+    </delete>
+
+    <delete id="deleteTS" parameterType="long">
+        DELETE
+        FROM topic_stat
+        WHERE topic_id = #{id}
+    </delete>
+
+    <delete id="deleteTTX" parameterType="long">
+        DELETE
+        FROM topic_team_xref
+        WHERE topic_id = #{id}
+    </delete>
+
     <resultMap id="topicMap" type="com.ndpmedia.rocketmq.cockpit.model.TopicMetadata">
         <id column="id" property="id" />
         <result column="topic" property="topic" />
@@ -297,6 +328,17 @@
         AND b.broker_id = 0
         <if test="brokerId > 0" >
             AND b.id = #{brokerId}
+        </if>
+    </select>
+
+    <select id="listToDEL" resultMap="topicBrokerInfoResultMap">
+        SELECT tbx.broker_id, tbx.topic_id, tbx.permission, tbx.write_queue_num, tbx.read_queue_num, tbx.status_id, tbx.create_time, tbx.update_time, tbx.sync_time
+        FROM topic_broker_xref AS tbx
+        JOIN topic AS t ON t.id = tbx.topic_id
+        JOIN broker AS b ON b.id = tbx.broker_id
+        WHERE tbx.status_id = 6
+        <if test="syncTime != null">
+            AND #{syncTime} > tbx.sync_time
         </if>
     </select>
 </mapper>

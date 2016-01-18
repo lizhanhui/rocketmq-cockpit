@@ -100,6 +100,11 @@ public class ConsumerGroupScheduler {
                 cockpitConsumerGroupDBService.insert(consumerGroup, 1);
             }
 
+            if (consumerGroup.getStatus() == Status.DELETED) {
+                cockpitConsumerGroupDBService.activate(consumerGroup.getId());
+                warningMapper.create(WarnMsgHelper.makeWarning(Level.CRITICAL, "this group is create by nobody, broker not delete it? group:" + consumerGroup.getGroupName()));
+            }
+
             if (cockpitBrokerDBService.hasConsumerGroup(broker.getId(), consumerGroup.getId())) {
                 cockpitConsumerGroupDBService.refresh(broker.getId(), consumerGroup.getId());
             } else {

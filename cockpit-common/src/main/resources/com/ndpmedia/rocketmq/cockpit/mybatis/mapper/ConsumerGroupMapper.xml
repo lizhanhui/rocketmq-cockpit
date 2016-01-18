@@ -51,6 +51,24 @@
         </if>
     </delete>
 
+    <delete id="deleteTCG" parameterType="long">
+        DELETE
+        FROM topic_consumer_group_xref
+        WHERE consumer_group_id = #{id}
+    </delete>
+
+    <delete id="deleteCGT">
+        DELETE
+        FROM consumer_group_table_xref
+        WHERE group_name = #{groupName}
+    </delete>
+
+    <delete id="deleteBCG" parameterType="long">
+        DELETE
+        FROM broker_consumer_group_xref
+        WHERE consumer_group_id = #{id}
+    </delete>
+
     <resultMap id="consumerGroupMap" type="com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup">
         <id column="id" property="id" />
         <result column="cluster_name" property="clusterName" />
@@ -123,6 +141,16 @@
         FROM consumer_group AS cg
         LEFT JOIN (select * from project_consumer_group_xref where project_id = #{projectId}) pcgx ON pcgx.consumer_group_id = cg.id
         WHERE pcgx.project_id IS NULL
+    </select>
+
+    <select id="listToDEL" resultMap="consumerGroupMap">
+        SELECT cg.id, cg.cluster_name, cg.which_broker_when_consume_slowly, cg.group_name, cg.consume_enable, cg.consume_broadcast_enable, cg.retry_max_times, cg.retry_queue_num, cg.consume_from_min_enable, cg.status_id, cg.create_time, cg.update_time
+        FROM consumer_group AS cg
+        LEFT JOIN broker_consumer_group_xref bcgx on cg.id = bcgx.consumer_group_id
+        WHERE cg.status_id = 6
+        <if test="syncTime != null">
+            AND #{syncTime} > bcgx.sync_time
+        </if>
     </select>
 
     <select id="get" resultMap="consumerGroupMap">
@@ -207,7 +235,7 @@
         LEFT JOIN consumer_group AS cg ON tcgx.consumer_group_id = cg.id
         LEFT JOIN broker_consumer_group_xref AS bcgx ON bcgx.consumer_group_id = cg.id
         LEFT JOIN broker AS b on b.id = bcgx.broker_id
-        WHERE topic_id = #{topicId}
+        WHERE topic_id = #{topicId} AND cg.id IS NOT NULL
     </select>
 
     <update id="updateConsumerGroupTopics">
