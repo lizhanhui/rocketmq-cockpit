@@ -1,5 +1,7 @@
 package com.ndpmedia.rocketmq.cockpit.scheduler;
 
+import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
+import com.ndpmedia.rocketmq.cockpit.model.TopicBrokerInfo;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.*;
 
 import org.slf4j.Logger;
@@ -7,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.List;
@@ -37,23 +40,30 @@ public class DataAgingScheduler {
     private TopicMapper topicMapper;
 
     /**
-     *
+     * delete consumer group
      */
-//    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void deleteDeletedConsumerGroup(){
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -3);
-//        consumerGroupMapper
+        List<ConsumerGroup> consumerGroups = consumerGroupMapper.listToDEL(calendar.getTime());
+        for (ConsumerGroup consumerGroup:consumerGroups){
+            deleteConsumerGroup(consumerGroup);
+        }
     }
 
     /**
-     *
+     * delete topic
      */
-//    @Scheduled(cron = "0 2 0 * * *")
+    @Scheduled(cron = "31 0 0 * * *")
     public void deleteDeletedTopic(){
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -3);
-
+        System.out.println(calendar.getTime());
+        List<TopicBrokerInfo> topicBrokerInfos = topicMapper.listToDEL(calendar.getTime());
+        for (TopicBrokerInfo topicBrokerInfo:topicBrokerInfos){
+            deleteTopic(topicBrokerInfo);
+        }
     }
 
     /**
@@ -101,5 +111,65 @@ public class DataAgingScheduler {
         calendar.add(Calendar.MINUTE, -30);
         loginMapper.delete(calendar.getTime());
         logger.info("[MONITOR][LOGIN DELETE] clean login data end");
+    }
+
+    @Transactional
+    private void deleteConsumerGroup(ConsumerGroup consumerGroup){
+        try {
+            long nums = 0;
+            logger.info("[MONITOR][CONSUMER GROUP DELETE] START TO DELETE :" + consumerGroup.getGroupName());
+            //delete from consumer_group
+            nums = consumerGroupMapper.delete(consumerGroup.getId());
+            logger.info("[MONITOR][CONSUMER GROUP DELETE] DELETE FROM consumer_group :" + nums);
+            //delete from topic_consumer_group_xref
+            nums = consumerGroupMapper.deleteTCG(consumerGroup.getId());
+            logger.info("[MONITOR][CONSUMER GROUP DELETE] DELETE FROM topic_consumer_group_xref :" + nums);
+            //delete from consumer_group_table_xref
+            nums = consumerGroupMapper.deleteCGT(consumerGroup.getGroupName());
+            logger.info("[MONITOR][CONSUMER GROUP DELETE] DELETE FROM consumer_group_table_xref :" + nums);
+            //delete from broker_consumer_group_xref
+            nums = consumerGroupMapper.deleteBCG(consumerGroup.getId());
+            logger.info("[MONITOR][CONSUMER GROUP DELETE] DELETE FROM broker_consumer_group_xref :" + nums);
+            //delete from project_consumer_group_xref
+            consumerGroupMapper.disconnectProject(consumerGroup.getId(), 0);
+        }catch (Exception e){
+            logger.error("[MONITOR][CONSUMER GROUP DELETE] DELETE FAILED! group:" + consumerGroup.getGroupName());
+        }
+    }
+
+    @Transactional
+    private void deleteTopic(TopicBrokerInfo topicBrokerInfo){
+        try {
+            long nums = 0;
+            logger.info("[MONITOR][TOPIC DELETE] START TO DELETE :" + topicBrokerInfo.getTopicMetadata().getTopic());
+            //delete from topic_broker_info
+            nums = topicMapper.deleteTB(topicBrokerInfo.getTopicMetadata().getId(), topicBrokerInfo.getBroker().getId());
+            logger.info("[MONITOR][TOPIC DELETE] delete from topic_broker_info :" + nums);
+            //check this topic has other broker
+            if (topicMapper.queryTopicBrokerInfo(topicBrokerInfo.getTopicMetadata().getId(), 0, 0).size() > 0){
+                logger.info("[MONITOR][TOPIC DELETE] just delete the topic :" + topicBrokerInfo.getTopicMetadata().getTopic() + " on broker :"
+                    + topicBrokerInfo.getBroker().getBrokerName());
+            }else {
+                //delete from project_topic_xref
+                topicMapper.disconnectProject(topicBrokerInfo.getTopicMetadata().getId(), 0);
+                //delete from topic
+                nums = topicMapper.delete(topicBrokerInfo.getTopicMetadata().getId());
+                logger.info("[MONITOR][TOPIC DELETE] delete from topic : " + nums);
+                //delete from topic_dc_xref
+                nums = topicMapper.deleteTDX(topicBrokerInfo.getTopicMetadata().getId());
+                logger.info("[MONITOR][TOPIC DELETE] delete from topic_dc_xref :" + nums);
+                //delete from topic_consumer_group_xref
+                nums = topicMapper.deleteTCGX(topicBrokerInfo.getTopicMetadata().getId());
+                logger.info("[MONITOR][TOPIC DELETE] delete from topic_consumer_group_xref :" + nums);
+                //delete from topic_stat
+                nums = topicMapper.deleteTS(topicBrokerInfo.getTopicMetadata().getId());
+                logger.info("[MONITOR][TOPIC DELETE] delete from topic_stat :" + nums);
+                //delete from topic_team_xref
+                nums = topicMapper.deleteTTX(topicBrokerInfo.getTopicMetadata().getId());
+                logger.info("[MONITOR][TOPIC DELETE] delete from topic_team_xref :" + nums);
+            }
+        }catch (Exception e){
+            logger.error("[MONITOR][TOPIC DELETE]DELETE FAILED! topic:" + topicBrokerInfo.getTopicMetadata().getTopic());
+        }
     }
 }

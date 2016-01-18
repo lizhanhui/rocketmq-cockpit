@@ -22,6 +22,8 @@ public interface ConsumerGroupMapper {
 
     List<ConsumerGroup> listByOtherProject(@Param("projectId") long projectId);
 
+    List<ConsumerGroup> listToDEL(@Param("syncTime") Date syncTime);
+
     ConsumerGroup get(@Param("id") long id);
 
     ConsumerGroup getByName(@Param("groupName") String groupName);
@@ -33,7 +35,13 @@ public interface ConsumerGroupMapper {
 
     void update(ConsumerGroup consumerGroup);
 
-    void delete(long id);
+    int delete(long id);
+
+    int deleteTCG(long id);
+
+    int deleteCGT(@Param("groupName") String groupName);
+
+    int deleteBCG(long id);
 
     List<ConsumerGroupHosting> queryHosting(@Param("consumerGroupId") long consumerGroupId,
                                             @Param("statuses") int[] status,
