@@ -5,7 +5,6 @@ import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroupHosting;
 import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.mybatis.mapper.ConsumerGroupMapper;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +53,8 @@ public class CockpitConsumerGroupDBServiceImpl implements CockpitConsumerGroupDB
     @Override
     @Transactional
     public void insert(ConsumerGroup consumerGroup, long projectId) {
+        if (consumerGroupMapper.list(projectId, consumerGroup.getClusterName(), consumerGroup.getGroupName(), 0, null, 0).size() > 0)
+            return;
         consumerGroupMapper.insert(consumerGroup);
         consumerGroupMapper.connectProject(consumerGroup.getId(), projectId);
     }

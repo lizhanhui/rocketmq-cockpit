@@ -108,7 +108,7 @@
         </if>
 
         <if test="clusterName != null">
-            AND b.cluster_name = #{clusterName}
+            AND cg.cluster_name = #{clusterName}
         </if>
 
         <if test="consumerGroupName != null">
@@ -149,7 +149,7 @@
         LEFT JOIN broker_consumer_group_xref bcgx on cg.id = bcgx.consumer_group_id
         WHERE cg.status_id = 6
         <if test="syncTime != null">
-            AND #{syncTime} > bcgx.sync_time
+            AND ( #{syncTime} > bcgx.sync_time OR bcgx.sync_time IS NULL )
         </if>
     </select>
 

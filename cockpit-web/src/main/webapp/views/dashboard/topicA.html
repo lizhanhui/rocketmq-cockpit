@@ -1,0 +1,51 @@
+<h3>Add Your Topic
+   <small>topic may personal</small>
+</h3>
+<!-- START row-->
+<div ng-controller="TopicAddCtrl" class="container-fluid">
+   <div class="row">
+      <div class="col-lg-8">
+         <form name="registerForm" class="form-validate" ng-submit="submit()">
+            <!-- START panel-->
+            <div class="panel panel-default">
+               <div class="panel-heading">
+                  <div class="panel-title">Create Topic</div>
+               </div>
+               <div class="panel-body">
+                  <div class="form-group">
+                     <label class="control-label">Topic Name: * </label>
+                     <input type="text" placeholder="topic name" name="topic" required="required" ng-model="topicMetadata.topic" class="form-control" ng-pattern="/^[\w]{3,128}$/" />
+                     <span ng-show="registerForm.topic.$dirty &amp;&amp; registerForm.topic.$error.required" class="text-danger">This field is required</span>
+                     <span ng-show="registerForm.topic.$dirty &amp;&amp; registerForm.topic.$error.pattern" class="text-danger">Input should 3-128 length with \w</span>
+                  </div>
+                  <div class="form-group">
+                     <label class="control-label">Order Description * </label>
+                     <input type="text" name="order" ng-model="topicMetadata.order" required="required" ng-pattern="/^[^\n]{4,5}$/" class="form-control" />
+                     <span ng-show="registerForm.order.$dirty &amp;&amp; registerForm.order.$error.required" class="text-danger">this field is required</span>
+                     <span ng-show="registerForm.order.$dirty &amp;&amp; registerForm.order.$error.pattern" class="text-danger">true  or false ? </span>
+                  </div>
+                  <div class="form-group">
+                     <label class="control-label">cluster * </label>
+                     <input type="text" name="clusterName" ng-model="topicMetadata.clusterName" required="required" ng-pattern="/^[^\n]{1,255}$/" class="form-control"/>
+                     <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.required" class="text-danger">this field is required</span>
+                     <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.pattern" class="text-danger">DefaultCluster?</span>
+                  </div>
+                  <div class="required">* Required fields</div>
+               </div>
+               <div class="panel-footer">
+                  <div class="clearfix">
+                     <div class="pull-right">
+                        <input type="submit" id="sub" value="submit"/>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div>
+                <span class="text-danger"><label ng-model="message">{{message}}</label></span>
+            </div>
+            <!-- END panel-->
+         </form>
+      </div>
+   </div>
+   <!-- END row-->
+</div>

@@ -3,6 +3,7 @@ package com.ndpmedia.rocketmq.cockpit.controller.api;
 import com.alibaba.rocketmq.common.protocol.body.Connection;
 import com.alibaba.rocketmq.tools.admin.DefaultMQAdminExt;
 import com.ndpmedia.rocketmq.cockpit.model.ConsumerGroup;
+import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.service.CockpitConsumerGroupDBService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +67,10 @@ public class ConsumerGroupServiceController {
 
     @RequestMapping(value = "/{projectId}",method = RequestMethod.PUT)
     @ResponseBody
-    public ConsumerGroup add(@RequestBody ConsumerGroup consumerGroup, @PathVariable("projectId") long projectId) {
+    public long add(@RequestBody ConsumerGroup consumerGroup, @PathVariable("projectId") long projectId) {
+        consumerGroup.setStatus(Status.DRAFT);
         cockpitConsumerGroupDBService.insert(consumerGroup, projectId);
-        return consumerGroup;
+        return consumerGroup.getId();
     }
 
     @RequestMapping(method = RequestMethod.POST)

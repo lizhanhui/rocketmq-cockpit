@@ -596,3 +596,69 @@
         }
     }
 })();
+
+(function() {
+    'use strict';
+
+    angular.module('cockpit')
+    .controller('TopicAddCtrl', TopicAddController);
+
+    TopicAddController.$inject = ['$scope', '$http', '$location', 'UserService'];
+    function TopicAddController($scope, $http, $location, UserService) {
+        if (!UserService.isLogin) {
+            $location.path('/login');
+        }else {
+            $scope.submit = function() {
+                var topicMetadata = $scope.topicMetadata;
+
+                $http({
+                    url: 'cockpit/api/topic/1',
+                    method: 'PUT',
+                    data: topicMetadata,
+                    responseType: 'json'
+                }).success(function(data, status, headers, config) {
+                    if (0 === data) {
+                        alert("please check your topic. maybe exist.");
+                    }else {
+                        alert(" success ");
+                    }
+                }).error(function(data, status, headers, config) {
+                    alert("there is some error.");
+                });
+            }
+        }
+    }
+})();
+
+(function() {
+    'use strict';
+
+    angular.module('cockpit')
+    .controller('ConsumerGroupAddCtrl', ConsumerGroupAddController);
+
+    ConsumerGroupAddController.$inject = ['$scope', '$http', '$location', 'UserService'];
+    function ConsumerGroupAddController($scope, $http, $location, UserService){
+        if (!UserService.isLogin) {
+            $location.path('/login');
+        }else {
+            $scope.submit = function() {
+                var consumerGroup = $scope.consumerGroup;
+
+                $http({
+                    url: 'cockpit/api/consumer-group/1',
+                    method: 'PUT',
+                    data: consumerGroup,
+                    responseType: 'json'
+                }).success(function(data, status, headers, config) {
+                    if (0 === data) {
+                        alert("this group maybe exist");
+                    }else {
+                        alert(" success ");
+                    }
+                }).error(function(data, status, headers, config) {
+                    alert("something wrong");
+                });
+            }
+        }
+    }
+})();
