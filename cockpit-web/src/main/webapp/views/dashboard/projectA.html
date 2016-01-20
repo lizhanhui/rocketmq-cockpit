@@ -5,7 +5,7 @@
 <div ng-controller="ProjectAddCtrl as form" class="container-fluid">
    <div class="row">
       <div class="col-lg-8">
-         <form name="registerForm" novalidate="" class="form-validate" ng-submit="submit()">
+         <form name="registerForm" class="form-validate" ng-submit="submit()">
             <!-- START panel-->
             <div class="panel panel-default">
                <div class="panel-heading">
@@ -14,7 +14,7 @@
                <div class="panel-body">
                   <div class="form-group">
                      <label class="control-label">Project Name: </label>
-                     <input type="text" placeholder="name" name="name" required="" ng-model="project.name" class="form-control" ng-pattern="/^[a-zA-Z\s\d]{6,16}$/" />
+                     <input type="text" placeholder="name" name="name" required="required" ng-model="project.name" class="form-control" ng-pattern="/^[a-zA-Z\s\d]{6,16}$/" />
                      <span ng-show="registerForm.name.$dirty &amp;&amp; registerForm.name.$error.required" class="text-danger">This field is required</span>
                      <span ng-show="registerForm.name.$dirty &amp;&amp; registerForm.name.$error.pattern" class="text-danger">Input should 6-16 length</span>
                   </div>

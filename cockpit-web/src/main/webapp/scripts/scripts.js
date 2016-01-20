@@ -69,6 +69,18 @@ angular
             parent: 'dashboard',
             templateUrl: 'views/dashboard/projectL.html',
             controller: 'ProjectLCtrl'
+        })
+        .state('consumerGroupA', {
+            url: 'consumerGroupA',
+            parent: 'dashboard',
+            templateUrl: 'views/dashboard/consumerGroupA.html',
+            controller: 'ConsumerGroupAddCtrl'
+        })
+        .state('topicA', {
+            url: 'topicA',
+            parent: 'dashboard',
+            templateUrl: 'views/dashboard/topicA.html',
+            controller: 'TopicAddCtrl'
         });
 
   });

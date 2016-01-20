@@ -183,8 +183,7 @@ public class CockpitTopicDBServiceImpl implements CockpitTopicDBService {
     @Override
     public boolean exists(String clusterName, String topic) {
         TopicMetadata topicMetadata = topicMapper.getMetadataByTopic(clusterName, topic);
-        return null != topicMetadata
-                && topicMetadata.getStatus() != Status.DELETED;
+        return null != topicMetadata;
     }
 
     @Override

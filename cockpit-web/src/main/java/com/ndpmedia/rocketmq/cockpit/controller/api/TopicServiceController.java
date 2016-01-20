@@ -64,9 +64,10 @@ public class TopicServiceController {
 
     @RequestMapping(value = "/{projectId}",method = RequestMethod.PUT)
     @ResponseBody
-    public TopicMetadata add(@RequestBody TopicMetadata topicMetadata, @PathVariable("projectId") long projectId, HttpServletRequest request) {
+    public long add(@RequestBody TopicMetadata topicMetadata, @PathVariable("projectId") long projectId, HttpServletRequest request) {
+        topicMetadata.setStatus(Status.DRAFT);
         cockpitTopicDBService.insert(topicMetadata, projectId);
-        return topicMetadata;
+        return topicMetadata.getId();
     }
 
     @RequestMapping(value = "/activate", method = RequestMethod.POST)
