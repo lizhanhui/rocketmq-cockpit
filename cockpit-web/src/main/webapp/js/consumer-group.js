@@ -101,7 +101,7 @@ function _deleteFun(id, clusterName, groupName) {
     showCloud();
     $.ajax({
         async: false,
-        url: "cockpit/manage/consumer-group/" + clusterName + "/" + groupName,
+        url: "cockpit/manage/consumerGroup/" + clusterName + "/" + groupName,
         type: "DELETE",
         dataType: "json",
         contentType: "application/json",
@@ -139,16 +139,15 @@ function _editFun(id, clusterName, whichBrokerWhenConsumeSlowly, groupName, cons
 
     $.ajax({
         async: false,
-        data: ob,
-        url: "cockpit/manage/consumer-group",
-        type: "POST",
+        url: 'cockpit/manage/consumerGroup/' + groupName,
+        type: "GET",
         dataType: "json",
-        contentType: "application/json",
+        contentType: "application/json; charset=utf-8",
         success: function() {
             $.ajax({
                 async: false,
                 url: "cockpit/api/consumer-group/" + id,
-                type: "POST",
+                type: "GET",
                 dataType: "json",
                 contentType: "application/json",
                 complete: function() {

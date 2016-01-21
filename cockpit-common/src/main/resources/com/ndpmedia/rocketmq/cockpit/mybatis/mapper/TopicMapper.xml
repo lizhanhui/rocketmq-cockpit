@@ -55,6 +55,7 @@
         SET topic = #{topic},
             cluster_name = #{clusterName},
             `order` = #{order},
+            status = #{status.ordinal},
             create_time = #{createTime},
             update_time = #{updateTime}
         WHERE id = #{id}

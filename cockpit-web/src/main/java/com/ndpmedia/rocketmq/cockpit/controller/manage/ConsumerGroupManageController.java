@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping(value = "/manage/consumer-group")
+@RequestMapping(value = "/manage/consumerGroup")
 public class ConsumerGroupManageController {
 
     @Autowired
@@ -24,9 +24,10 @@ public class ConsumerGroupManageController {
     @Autowired
     private CockpitTopicMQService cockpitTopicMQService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/{groupName}", method = RequestMethod.GET)
     @ResponseBody
-    public boolean update(@ModelAttribute ConsumerGroup consumerGroup) {
+    public boolean update(@PathVariable("groupName") String groupName) {
+        ConsumerGroup consumerGroup = cockpitConsumerGroupDBService.get(0, groupName);
         return cockpitConsumerGroupMQService.update(consumerGroup);
     }
 
