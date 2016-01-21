@@ -176,7 +176,13 @@ function initTable(){
             { "data": "updateTime" },
             { "data": "topic",
                 "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                    $(nTd).html("<a href='javascript:void(0);' " + "onclick='detailTable(\"" + oData.topic + "\")'>Detail</a>&nbsp;&nbsp;");
+                    if (oData.status == "ACTIVE") {
+                        $(nTd).html("<a href='javascript:void(0);' " + "onclick='detailTable(\"" + oData.topic + "\")'>Detail</a>&nbsp;&nbsp;");
+                    }else {
+                        $(nTd).html("<a href='javascript:void(0);' " + "onclick='approveTopic(\"" + oData.id + "\")'>Approve</a>&nbsp;&nbsp;")
+                        .append("<a href='javascript:void(0);' " + "onclick='detailTable(\"" + oData.topic + "\")'>Detail</a>&nbsp;&nbsp;");
+                    }
+
                 }
             }
         ],
@@ -257,6 +263,28 @@ function detailTable(topic){
     details.style.marginleft = "0";
     document.body.appendChild(details); //添加遮罩
 
+}
+
+function approveTopic(topic){
+    showCloud();
+    $.ajax({
+        async: false,
+        url: "cockpit/manage/topic/" + topic,
+        type: 'GET',
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(backData){
+            if (backData) {
+
+            }
+
+            hideCloud();
+        },
+        error: function() {
+            alert("something wrong.");
+            hideCloud();
+        }
+    });
 }
 
 function _deleteFun(brokerId, topicId, topic, cluster_name, broker_address) {
@@ -381,6 +409,9 @@ function addDetail(){
         contentType: "application/json",
         success: function(brokers){
             var selectB = document.getElementById("brokerList");
+            if (selectB.childNodes.length > 1) {
+                selectB.length = 1;
+            }
             brokers.forEach(function(broker) {
                 var option = document.createElement("option");
                 option.value = broker.id;

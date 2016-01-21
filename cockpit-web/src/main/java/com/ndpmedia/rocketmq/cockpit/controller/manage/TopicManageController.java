@@ -55,4 +55,11 @@ public class TopicManageController {
         }
         return true;
     }
+
+    @RequestMapping(value = "/{topic}", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean approveTopic(@PathVariable("topic") long topic){
+        cockpitTopicDBService.activate(topic);
+        return true;
+    }
 }

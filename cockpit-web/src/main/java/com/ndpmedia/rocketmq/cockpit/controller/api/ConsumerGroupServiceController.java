@@ -9,11 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -73,9 +69,12 @@ public class ConsumerGroupServiceController {
         return consumerGroup.getId();
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
     @ResponseBody
-    public void update(@RequestBody ConsumerGroup consumerGroup) {
+    public void update(@PathVariable("id") long id) {
+        ConsumerGroup consumerGroup = cockpitConsumerGroupDBService.get(id, null);
+        consumerGroup.setConsumeEnable(true);
+        consumerGroup.setStatus(Status.ACTIVE);
         consumerGroup.setUpdateTime(new Date());
         cockpitConsumerGroupDBService.update(consumerGroup);
     }
