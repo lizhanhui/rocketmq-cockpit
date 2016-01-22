@@ -30,6 +30,7 @@ public class RocketMQUserLoginFailedHandler extends SimpleUrlAuthenticationFailu
             exception.addSuppressed(new Exception(" the user : [" + username + "] is locked !"));
         }
         this.setDefaultFailureUrl("/index.html");
-        super.onAuthenticationFailure(request, response, exception);
+        response.sendError(204);
+        return;
     }
 }

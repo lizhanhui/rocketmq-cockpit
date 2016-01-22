@@ -67,7 +67,7 @@ public class RocketMQLoginFilter implements Filter, LoginConstant {
         if (checkVerificationCode(request)) {
             logger.warn("[personal filter] verification code is not right !");
             session.setAttribute(LOGIN_SESSION_ERROR_KEY, LOGIN_VERIFICATION_CODE_WRONG);
-            request.getRequestDispatcher(LOGIN_PAGE_PATH).forward(request, response);
+            response.sendError(205, LOGIN_VERIFICATION_CODE_WRONG);
             return;
         }
 
