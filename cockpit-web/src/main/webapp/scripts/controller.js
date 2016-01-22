@@ -21,9 +21,15 @@
         if (UserService.isLogin) {
             $location.path('/dashboard');
         }else{
+
             $scope.kaptchaImage = function(){
+                getKaptchaImage();
+            };
+
+            function getKaptchaImage() {
                 document.getElementById("kaptchaImage").src = "cockpit/captcha-image?"  + Math.floor(Math.random() * 100);
             };
+
             $scope.message = "";
 
             $scope.submit = function() {
@@ -33,9 +39,14 @@
                 };
                 $http.post('j_spring_security_check', loginLoad, config)
                 .success(function(data, status, headers, config){
-                    UserService.isLogin = true;
-                    $cookieStore.put("isLogin", "yes");
-                    $location.path('/dashboard');
+                    if (200 == status) {
+                        UserService.isLogin = true;
+                        $location.path('/dashboard');
+                            $cookieStore.put("isLogin","yes");
+                    }else {
+                        $scope.message = "login failed!";
+                        getKaptchaImage();
+                    }
                 }).error(function(data, status, headers, config){
                     $cookieStore.remove("isLogin");
                     $scope.message = "login failed."

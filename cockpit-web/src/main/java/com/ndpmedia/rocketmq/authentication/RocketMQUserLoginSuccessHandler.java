@@ -86,6 +86,7 @@ public class RocketMQUserLoginSuccessHandler extends SavedRequestAwareAuthentica
                 response.sendRedirect(stringBuilder.toString());
                 return;
             }
+            response.addCookie(new Cookie("isLogin", "yes"));
 
             response.sendRedirect(request.getContextPath());
         } else {
