@@ -14,6 +14,10 @@
 
     LoginController.$inject = ['$scope', '$location', '$http', '$window', 'UserService', '$cookieStore'];
     function LoginController($scope, $location, $http, $window, UserService, $cookieStore) {
+        function getKaptchaImage() {
+            document.getElementById("kaptchaImage").src = "cockpit/captcha-image?"  + Math.floor(Math.random() * 100);
+        };
+
         if ("yes" == $cookieStore.get("isLogin")) {
             UserService.isLogin = true;
         }
@@ -21,13 +25,8 @@
         if (UserService.isLogin) {
             $location.path('/dashboard');
         }else{
-
             $scope.kaptchaImage = function(){
                 getKaptchaImage();
-            };
-
-            function getKaptchaImage() {
-                document.getElementById("kaptchaImage").src = "cockpit/captcha-image?"  + Math.floor(Math.random() * 100);
             };
 
             $scope.message = "";
@@ -83,6 +82,218 @@
     ProjectController.$inject = ['$scope', '$http' , '$location', 'UserService', '$cookieStore'];
 
     function ProjectController($scope, $http, $location, UserService, $cookieStore ){
+        function reDrow(){
+            initAdd();
+            clearGroups();
+            clearTopics();
+            activate();
+        };
+
+        function initAdd() {
+            $scope.visibleG = false;
+            $scope.visibleT = false;
+            $scope.groupMessage = "";
+            $scope.topicMessage = "";
+            $scope.consumerGroups = null;
+            $scope.consumerGroup = null;
+            $scope.topics = null;
+            $scope.topic = null;
+        };
+
+
+
+        function activate() {
+            $http({
+                method:'GET',
+                //headers: {'Content-type': 'application/json;charset=UTF-8'},
+                url: 'cockpit/api/project/' + $scope.project.id + "/consumer-groups",
+                responseType: 'json'
+            }).success(function(data, status, headers, config) {
+                if (data != null) {
+                    data.forEach(function(consumerGroup){
+                        var x = [];
+                        var y = [];
+                        var yin = []
+                            $http({
+                                method:'GET',
+                                //headers: {'Content-type': 'application/json;charset=UTF-8'},
+                                url: "cockpit/api/consume-progress" + "/" + consumerGroup.groupName + "/" + "-1" + "/" + "-1" + "/" + "-1",
+                                responseType: 'json'
+                            }).success(function(data, status, headers, config) {
+                                if (data != null) {
+                                    data.forEach(function (consumeProgress) {
+                                        var temp = [];
+                                        var time = consumeProgress.createTime.replace(new RegExp("-", "gm"), "/");
+                                        temp.push((new Date(time)).getTime() -  offset);
+                                        temp.push(consumeProgress.diff);
+                                        yin.push(temp);
+                                    });
+                                    if (yin.length > 0 ) {
+                                        yin.reverse();
+                                        if ("undefined" ===  typeof($scope.chartConfig) ){
+                                            activate1(consumerGroup.groupName, yin);
+                                        }else if($scope.chartConfig.series.length === 0) {
+                                            activate1(consumerGroup.groupName, yin);
+                                        }else {
+                                            addLine(consumerGroup.groupName, yin);
+                                        }
+                                    }
+                                }
+                            }).error(function(data, status, headers, config) {
+
+                            });
+
+                    });
+                }
+            }).error(function(data, status, headers, config) {
+                console.log(status);
+            });
+
+            $http({
+                url: 'cockpit/api/project/' + $scope.project.id + '/topics',
+                method: "GET",
+                responseType: 'json'
+            }).success(function(data, status, headers, config) {
+                data.forEach(function(topicMetadata) {
+                    var x = [];
+                    var y = [];
+                    var yin = []
+                        $http({
+                            method:'GET',
+                            //headers: {'Content-type': 'application/json;charset=UTF-8'},
+                            url: "cockpit/api/topic-progress" + "/" + topicMetadata.topic,
+                            responseType: 'json'
+                        }).success(function(data, status, headers, config) {
+                            data.forEach(function (topicPerSecond) {
+                                var temp = [];
+                                temp.push(topicPerSecond.timeStamp);
+                                temp.push(topicPerSecond.tps);
+                                yin.push(temp);
+                            });
+                            if (yin.length > 0 ) {
+                                yin.reverse();
+                                if ("undefined" ===  typeof($scope.chartConfig2) ){
+                                    activate2(topicMetadata.topic, yin);
+                                }else if ($scope.chartConfig2.series.length === 0) {
+                                    activate2(topicMetadata.topic, yin);
+                                }else {
+                                    addLine2(topicMetadata.topic, yin);
+                                }
+                            }
+
+                        }).error(function(data, status, headers, config) {
+
+                        });
+
+                });
+            }).error(function(data, status, headers, config) {
+
+            });
+        };
+
+        function activate1(x, y) {
+            $scope.chartConfig = {
+                options: {
+                    chart: {
+                        type: 'line'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        dateTimeLabelFormats: { // don't display the dummy year
+                            second: '%H:%M:%S',
+                            day: '%e. %b',
+                            month: '%b \'%y',
+                            year: '%Y'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'diff(times)'
+                        },
+                        min: null,
+                        startOnTick: false
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.name + '</b><br/>' +
+                            new Date(this.x) + ': ' + this.y + ' times';
+                        }
+                    }
+                },
+                series: [{
+                    name: x,
+                    data: y
+                }],
+                title: {
+                    text: $scope.project.name
+                },
+                subtitle: {
+                    text: 'diff'
+                }
+            }
+        };
+
+        function addLine(x, y){
+            $scope.chartConfig.series.push({name:x, data: y});
+        };
+
+        function clearGroups(){
+            var series = [];
+            $scope.chartConfig.series = series;
+        };
+
+        function activate2(x, y) {
+            $scope.chartConfig2 = {
+                options: {
+                    chart: {
+                        type: 'line'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        dateTimeLabelFormats: { // don't display the dummy year
+                            second: '%H:%M:%S',
+                            day: '%e. %b',
+                            month: '%b \'%y',
+                            year: '%Y'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'tps(times)'
+                        },
+                        min: null,
+                        startOnTick: false
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.name + '</b><br/>' +
+                            new Date(this.x) + ': ' + this.y + ' times';
+                        }
+                    }
+                },
+                series: [{
+                    name: x,
+                    data: y
+                }],
+                title: {
+                    text: $scope.project.name
+                },
+                subtitle: {
+                    text: 'tps'
+                }
+            }
+        };
+
+        function addLine2(x, y){
+            $scope.chartConfig2.series.push({name:x, data: y});
+        };
+
+        function clearTopics() {
+            var series = [];
+            $scope.chartConfig2.series = series;
+
+        };
+
         if (!UserService.isLogin) {
             $location.path('/login');
         }else {
@@ -96,24 +307,6 @@
     		$scope.set = function() {
                 reDrow();
     		};
-
-            function reDrow(){
-                initAdd();
-                clearGroups();
-                clearTopics();
-    			activate();
-            }
-
-            function initAdd() {
-                $scope.visibleG = false;
-                $scope.visibleT = false;
-                $scope.groupMessage = "";
-                $scope.topicMessage = "";
-                $scope.consumerGroups = null;
-                $scope.consumerGroup = null;
-                $scope.topics = null;
-                $scope.topic = null;
-            }
 
             $scope.showGroups = function(projectId) {
                 $http({
@@ -199,198 +392,6 @@
             }).error(function(data, status, headers, config) {
 
             });
-
-            function activate() {
-                $http({
-                    method:'GET',
-                    //headers: {'Content-type': 'application/json;charset=UTF-8'},
-                    url: 'cockpit/api/project/' + $scope.project.id + "/consumer-groups",
-                    responseType: 'json'
-                }).success(function(data, status, headers, config) {
-    				if (data != null) {
-    					data.forEach(function(consumerGroup){
-    			            var x = [];
-    			            var y = [];
-    			            var yin = []
-    			                $http({
-    			                    method:'GET',
-    			                    //headers: {'Content-type': 'application/json;charset=UTF-8'},
-    			                    url: "cockpit/api/consume-progress" + "/" + consumerGroup.groupName + "/" + "-1" + "/" + "-1" + "/" + "-1",
-    			                    responseType: 'json'
-    			                }).success(function(data, status, headers, config) {
-    			                    if (data != null) {
-    									data.forEach(function (consumeProgress) {
-    				                        var temp = [];
-    				                        var time = consumeProgress.createTime.replace(new RegExp("-", "gm"), "/");
-    				                        temp.push((new Date(time)).getTime() -  offset);
-    				                        temp.push(consumeProgress.diff);
-    				                        yin.push(temp);
-    				                    });
-    				                    if (yin.length > 0 ) {
-            								yin.reverse();
-    				                        if ("undefined" ===  typeof($scope.chartConfig) ){
-    				                            activate1(consumerGroup.groupName, yin);
-                                            }else if($scope.chartConfig.series.length === 0) {
-                                                activate1(consumerGroup.groupName, yin);
-    				                        }else {
-    				                            addLine(consumerGroup.groupName, yin);
-    				                        }
-    				                    }
-    			                    }
-    			                }).error(function(data, status, headers, config) {
-
-    			                });
-
-    	                });
-    				}
-                }).error(function(data, status, headers, config) {
-                    console.log(status);
-                });
-
-                $http({
-                    url: 'cockpit/api/project/' + $scope.project.id + '/topics',
-                    method: "GET",
-                    responseType: 'json'
-                }).success(function(data, status, headers, config) {
-                    data.forEach(function(topicMetadata) {
-    					var x = [];
-    					var y = [];
-    					var yin = []
-    						$http({
-    							method:'GET',
-    							//headers: {'Content-type': 'application/json;charset=UTF-8'},
-    							url: "cockpit/api/topic-progress" + "/" + topicMetadata.topic,
-    							responseType: 'json'
-    						}).success(function(data, status, headers, config) {
-    							data.forEach(function (topicPerSecond) {
-    								var temp = [];
-    								temp.push(topicPerSecond.timeStamp);
-    								temp.push(topicPerSecond.tps);
-    								yin.push(temp);
-    							});
-    							if (yin.length > 0 ) {
-    								yin.reverse();
-    								if ("undefined" ===  typeof($scope.chartConfig2) ){
-    									activate2(topicMetadata.topic, yin);
-    								}else if ($scope.chartConfig2.series.length === 0) {
-    								    activate2(topicMetadata.topic, yin);
-    								}else {
-    									addLine2(topicMetadata.topic, yin);
-    								}
-    							}
-
-    						}).error(function(data, status, headers, config) {
-
-    						});
-
-                    });
-                }).error(function(data, status, headers, config) {
-
-                });
-            };
-
-            function activate1(x, y) {
-                $scope.chartConfig = {
-                    options: {
-                        chart: {
-                            type: 'line'
-                        },
-                        xAxis: {
-                            type: 'datetime',
-                            dateTimeLabelFormats: { // don't display the dummy year
-                                second: '%H:%M:%S',
-                                day: '%e. %b',
-                                month: '%b \'%y',
-                                year: '%Y'
-                            }
-                        },
-                        yAxis: {
-                            title: {
-                                text: 'diff(times)'
-                            },
-                            min: null,
-                            startOnTick: false
-                        },
-                        tooltip: {
-                            formatter: function () {
-                                return '<b>' + this.series.name + '</b><br/>' +
-                                new Date(this.x) + ': ' + this.y + ' times';
-                            }
-                        }
-                    },
-                    series: [{
-                        name: x,
-                        data: y
-                    }],
-                    title: {
-                        text: $scope.project.name
-                    },
-                    subtitle: {
-                        text: 'diff'
-                    }
-                }
-            };
-
-            function addLine(x, y){
-                $scope.chartConfig.series.push({name:x, data: y});
-            };
-
-            function clearGroups(){
-                var series = [];
-                $scope.chartConfig.series = series;
-            }
-
-            function activate2(x, y) {
-                $scope.chartConfig2 = {
-                    options: {
-                        chart: {
-                            type: 'line'
-                        },
-                        xAxis: {
-                            type: 'datetime',
-                            dateTimeLabelFormats: { // don't display the dummy year
-                                second: '%H:%M:%S',
-                                day: '%e. %b',
-                                month: '%b \'%y',
-                                year: '%Y'
-                            }
-                        },
-                        yAxis: {
-                            title: {
-                                text: 'tps(times)'
-                            },
-                            min: null,
-                            startOnTick: false
-                        },
-                        tooltip: {
-                            formatter: function () {
-                                return '<b>' + this.series.name + '</b><br/>' +
-                                new Date(this.x) + ': ' + this.y + ' times';
-                            }
-                        }
-                    },
-                    series: [{
-                        name: x,
-                        data: y
-                    }],
-                    title: {
-                        text: $scope.project.name
-                    },
-                    subtitle: {
-                        text: 'tps'
-                    }
-                }
-            };
-
-            function addLine2(x, y){
-                $scope.chartConfig2.series.push({name:x, data: y});
-            }
-
-            function clearTopics() {
-                var series = [];
-                $scope.chartConfig2.series = series;
-
-            }
         }
     }
 
@@ -404,11 +405,35 @@
 
     MessageController.$inject = ['$scope', '$http', '$location', 'UserService', '$stateParams'];
     function MessageController($scope, $http, $location, UserService, $stateParams){
+        function searchMsg(){
+            var msgId = $scope.msgID;
+            if ("undedined" != typeof(msgId) && msgId != "" && msgId.length === 32) {
+                $http({
+                    url: 'cockpit/api/message/' + msgId,
+                    method: 'GET',
+                    responseType: 'json'
+                }).success(function(data, status, headers, config) {
+                    $scope.message = data;
+
+                    $http({
+                        url: 'cockpit/api/message/' + msgId,
+                        method: "POST",
+                        responseType: 'json'
+                    }).success(function(data, status, headers, config) {
+                        $scope.statuses = data;
+                    }).error(function(data, status, headers, config) {
+                        alert("something wrong when get message status.");
+                    });
+                }).error(function(data, status, headers, config){
+                    alert("something wrong when get message.");
+                });
+            }
+        };
 
         if (!UserService.isLogin) {
             $location.path('/login');
         }else {
-            if (null != $stateParams.msgId) {
+            if (null != $stateParams.msgId && "" != $stateParams.msgId) {
                 $scope.msgID = $stateParams.msgId;
                 searchMsg();
             }
@@ -425,31 +450,6 @@
                 searchMsg();
             };
 
-            function searchMsg(){
-                var msgId = $scope.msgID;
-                if ("undedined" != typeof(msgId) && msgId != "" && msgId.length === 32) {
-                    $http({
-                        url: 'cockpit/api/message/' + msgId,
-                        method: 'GET',
-                        responseType: 'json'
-                    }).success(function(data, status, headers, config) {
-                        $scope.message = data;
-
-                        $http({
-                            url: 'cockpit/api/message/' + msgId,
-                            method: "POST",
-                            responseType: 'json'
-                        }).success(function(data, status, headers, config) {
-                            $scope.statuses = data;
-                        }).error(function(data, status, headers, config) {
-
-                        });
-                    }).error(function(data, status, headers, config){
-
-                    });
-                }
-            };
-
             $scope.findConnectConsumer = function() {
                 if ("undefined" != typeof($scope.message) && "undedined" != typeof($scope.message.topic) && null != $scope.message.topic) {
                     $http({
@@ -460,7 +460,7 @@
                         $scope.consumerGroups = data;
                         document.getElementById("findConsumer").style.display = "block";
                     }).error(function(data, status, headers, config) {
-
+                        alert("something wrong when find consumer.");
                     });
                 }
             };
@@ -475,7 +475,7 @@
                         $scope.clients = data;
                         document.getElementById("findClient").style.display = "block";
                     }).error(function(data, status, headers, config) {
-
+                        alert("something wrong when find client.");
                     });
                 }
             };
@@ -488,7 +488,7 @@
                     }).success(function(data, status, headers, config) {
                         alert(data);
                     }).error(function(data, status, headers, config){
-
+                        alert("something wrong when check client.");
                     });
 
                 }
@@ -523,7 +523,7 @@
                     }).success(function (data, status, headers, config) {
                         $scope.messages = data;
                     }).error(function(data, status, headers, config) {
-
+                        alert("something wrong when query messages.");
                     });
 
                 }
@@ -582,8 +582,8 @@
     angular.module('cockpit')
     .controller('ProjectAddCtrl', ProjectAddController);
 
-    ProjectAddController.$inject = ['$scope', '$http', '$location', 'UserService'];
-    function ProjectAddController($scope, $http, $location, UserService) {
+    ProjectAddController.$inject = ['$scope', '$http', '$location', 'UserService', '$state'];
+    function ProjectAddController($scope, $http, $location, UserService, $state) {
         if (!UserService.isLogin) {
             $location.path('/login');
         }else{
@@ -599,9 +599,10 @@
                         $scope.message = "this project is already~~~~~exist";
                     }else{
                         $scope.message = "SUCCESS";
+                        $state.go('consumerGroupA', {'addFlow': project.name});
                     }
                 }).error(function(data, status, headers, config) {
-
+                    alert("something wrong when add project.");
                 });
             }
         }
@@ -614,16 +615,22 @@
     angular.module('cockpit')
     .controller('TopicAddCtrl', TopicAddController);
 
-    TopicAddController.$inject = ['$scope', '$http', '$location', 'UserService'];
-    function TopicAddController($scope, $http, $location, UserService) {
+    TopicAddController.$inject = ['$scope', '$http', '$location', 'UserService', '$stateParams', '$state'];
+    function TopicAddController($scope, $http, $location, UserService, $stateParams, $state) {
         if (!UserService.isLogin) {
             $location.path('/login');
         }else {
+            if (null != $stateParams.addFlow && "" != $stateParams.addFlow) {
+                $scope.welcomeMessage = " for project : " + $stateParams.addFlow;
+            }else{
+                $scope.welcomeMessage = "topic may personal";
+            }
+
             $scope.submit = function() {
                 var topicMetadata = $scope.topicMetadata;
-
+                var project = $scope.project;
                 $http({
-                    url: 'cockpit/api/topic/1',
+                    url: 'cockpit/api/topic/' + project.id,
                     method: 'PUT',
                     data: topicMetadata,
                     responseType: 'json'
@@ -632,11 +639,35 @@
                         alert("please check your topic. maybe exist.");
                     }else {
                         alert(" success ");
+                        if ("" != $stateParams.addFlow) {
+                            $state.go('projectL');
+                        }
                     }
                 }).error(function(data, status, headers, config) {
-                    alert("there is some error.");
+                    alert("something wrong when create topic.");
                 });
             }
+
+            $http({
+                url: 'cockpit/api/project',
+                method: 'GET',
+                responseType: 'json'
+            }).success(function(data, status, headers, config) {
+                if (null != data) {
+                    $scope.projects = data;
+                    if ("" != $stateParams.addFlow) {
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].name == $stateParams.addFlow) {
+                                $scope.project = data[i];
+                            }
+                        }
+                    }else {
+                        $scope.project = data[0];
+                    }
+                }
+            }).error(function(data, status, headers, config) {
+                alert("something wrong when get projects.");
+            });
         }
     }
 })();
@@ -647,16 +678,22 @@
     angular.module('cockpit')
     .controller('ConsumerGroupAddCtrl', ConsumerGroupAddController);
 
-    ConsumerGroupAddController.$inject = ['$scope', '$http', '$location', 'UserService'];
-    function ConsumerGroupAddController($scope, $http, $location, UserService){
+    ConsumerGroupAddController.$inject = ['$scope', '$http', '$location', 'UserService', '$state', '$stateParams'];
+    function ConsumerGroupAddController($scope, $http, $location, UserService, $state, $stateParams){
         if (!UserService.isLogin) {
             $location.path('/login');
         }else {
+            if (null != $stateParams.addFlow && "" != $stateParams.addFlow) {
+                $scope.welcomeMessage = " for project : " + $stateParams.addFlow;
+            }else{
+                $scope.welcomeMessage = "group may personal";
+            }
+
             $scope.submit = function() {
                 var consumerGroup = $scope.consumerGroup;
-
+                var project = $scope.project;
                 $http({
-                    url: 'cockpit/api/consumer-group/1',
+                    url: 'cockpit/api/consumer-group/' + project.id,
                     method: 'PUT',
                     data: consumerGroup,
                     responseType: 'json'
@@ -665,11 +702,35 @@
                         alert("this group maybe exist");
                     }else {
                         alert(" success ");
+                        if ("" != $stateParams.addFlow) {
+                            $state.go('topicA', {'addFlow':$stateParams.addFlow});
+                        }
                     }
                 }).error(function(data, status, headers, config) {
-                    alert("something wrong");
+                    alert("something wrong when create consumer group");
                 });
             }
+
+            $http({
+                url: 'cockpit/api/project',
+                method: 'GET',
+                responseType: 'json'
+            }).success(function(data, status, headers, config) {
+                if (null != data) {
+                    $scope.projects = data;
+                    if ("" != $stateParams.addFlow) {
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].name == $stateParams.addFlow) {
+                                $scope.project = data[i];
+                            }
+                        }
+                    }else {
+                        $scope.project = data[0];
+                    }
+                }
+            }).error(function(data, status, headers, config) {
+                alert("something wrong when get project.");
+            });
         }
     }
 })();
