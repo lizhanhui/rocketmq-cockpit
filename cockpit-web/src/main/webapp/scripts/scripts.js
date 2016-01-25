@@ -74,12 +74,14 @@ angular
             url: 'consumerGroupA',
             parent: 'dashboard',
             templateUrl: 'views/dashboard/consumerGroupA.html',
+            params: {'addFlow': ''},
             controller: 'ConsumerGroupAddCtrl'
         })
         .state('topicA', {
             url: 'topicA',
             parent: 'dashboard',
             templateUrl: 'views/dashboard/topicA.html',
+            params: {'addFlow':''},
             controller: 'TopicAddCtrl'
         });
 

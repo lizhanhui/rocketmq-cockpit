@@ -1,5 +1,5 @@
 <h3>Add Your Topic
-   <small>topic may personal</small>
+   <small><span ng-bind="welcomeMessage"></span></small>
 </h3>
 <!-- START row-->
 <div ng-controller="TopicAddCtrl" class="container-fluid">
@@ -12,6 +12,14 @@
                   <div class="panel-title">Create Topic</div>
                </div>
                <div class="panel-body">
+                  <div class="form-group">
+                      Your Projects:
+                      <select
+                           ng-model="project"
+                           ng-options="project.name for project in projects">
+                           <option value="-1">----choose--project----</option>
+                        </select>
+                  </div>
                   <div class="form-group">
                      <label class="control-label">Topic Name: * </label>
                      <input type="text" placeholder="topic name" name="topic" required="required" ng-model="topicMetadata.topic" class="form-control" ng-pattern="/^[\w]{3,128}$/" />
@@ -26,7 +34,7 @@
                   </div>
                   <div class="form-group">
                      <label class="control-label">cluster * </label>
-                     <input type="text" name="clusterName" ng-model="topicMetadata.clusterName" required="required" ng-pattern="/^[^\n]{1,255}$/" class="form-control"/>
+                     <input type="text" name="clusterName" ng-model="topicMetadata.clusterName" required="required" ng-pattern="/^[^\n]{2,255}$/" class="form-control"/>
                      <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.required" class="text-danger">this field is required</span>
                      <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.pattern" class="text-danger">DefaultCluster?</span>
                   </div>
