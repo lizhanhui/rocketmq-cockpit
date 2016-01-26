@@ -5,6 +5,7 @@ import com.ndpmedia.rocketmq.cockpit.model.Status;
 import com.ndpmedia.rocketmq.cockpit.model.Warning;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface WarningMapper {
@@ -19,4 +20,5 @@ public interface WarningMapper {
     void mark(@Param("id") long id,
               @Param("status")Status status);
 
+    int delete(@Param("date")Date date);
 }

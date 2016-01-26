@@ -46,4 +46,10 @@
             <foreach collection="levels" open="(" separator="," close=")" item="level">#{level.ordinal}</foreach>
         </if>
     </select>
+
+    <delete id="delete" parameterType="date">
+        DELETE
+        FROM warning
+        WHERE #{date} > create_time
+    </delete>
 </mapper>

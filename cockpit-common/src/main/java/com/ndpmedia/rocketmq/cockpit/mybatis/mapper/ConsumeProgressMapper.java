@@ -103,4 +103,7 @@ public interface ConsumeProgressMapper {
 
     List<ConsumeProgress> topicReady(@Param("date") Date date);
 
+    List<String> showTables();
+
+    int dropTable(@Param("name") String name);
 }

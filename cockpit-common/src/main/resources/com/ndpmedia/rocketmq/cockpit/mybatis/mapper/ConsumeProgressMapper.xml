@@ -454,4 +454,13 @@
         WHERE create_time = #{date}
         LIMIT 1
     </select>
+
+    <select id="showTables" resultType="string">
+        SHOW TABLES
+    </select>
+
+    <delete id="dropTable">
+        DROP
+        TABLE ${name}
+    </delete>
 </mapper>
