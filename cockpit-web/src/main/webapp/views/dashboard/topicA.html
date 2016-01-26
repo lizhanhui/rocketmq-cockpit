@@ -28,15 +28,15 @@
                   </div>
                   <div class="form-group">
                      <label class="control-label">Order Description * </label>
-                     <input type="text" name="order" ng-model="topicMetadata.order" required="required" ng-pattern="/^[^\n]{4,5}$/" class="form-control" />
+                     <input type="text" name="order" ng-model="topicMetadata.order" required="required" ng-pattern="/^((true)|(false))$/" class="form-control" />
                      <span ng-show="registerForm.order.$dirty &amp;&amp; registerForm.order.$error.required" class="text-danger">this field is required</span>
                      <span ng-show="registerForm.order.$dirty &amp;&amp; registerForm.order.$error.pattern" class="text-danger">true  or false ? </span>
                   </div>
                   <div class="form-group">
                      <label class="control-label">cluster * </label>
-                     <input type="text" name="clusterName" ng-model="topicMetadata.clusterName" required="required" ng-pattern="/^[^\n]{2,255}$/" class="form-control"/>
+                     <input type="text" name="clusterName" ng-model="topicMetadata.clusterName" required="required" ng-pattern="/^[^\n]{5,255}$/" class="form-control"/>
                      <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.required" class="text-danger">this field is required</span>
-                     <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.pattern" class="text-danger">DefaultCluster?</span>
+                     <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.pattern" class="text-danger">DefaultCluster ?</span>
                   </div>
                   <div class="required">* Required fields</div>
                </div>

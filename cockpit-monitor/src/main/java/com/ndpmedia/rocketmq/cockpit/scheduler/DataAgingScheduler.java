@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -38,6 +39,9 @@ public class DataAgingScheduler {
 
     @Autowired
     private TopicMapper topicMapper;
+
+    @Autowired
+    private WarningMapper warningMapper;
 
     /**
      * delete consumer group
@@ -68,6 +72,46 @@ public class DataAgingScheduler {
             deleteTopic(topicBrokerInfo);
         }
         logger.info("[MONITOR][DELETE TOPIC] clean topic data end");
+    }
+
+    /**
+     * delete already delete consumer group table
+     */
+    @Scheduled(cron = "30 10 0 * * *")
+    public void deleteDeletedTables(){
+        logger.info("[MONITOR][OLD TABLE DELETE] Start to clean table");
+        List<String> tables = consumeProgressMapper.showTables();
+        List<Integer> ids = consumeProgressMapper.groupTableIDS();
+        List<String> dropTables = new ArrayList<>();
+        for (String table:tables) {
+            if (!table.startsWith("consume_progress_"))
+                continue;
+
+            if (ids.contains(Integer.parseInt(table.split("_")[2])))
+                continue;
+
+            dropTables.add(table);
+        }
+
+        for (String table:dropTables){
+            consumeProgressMapper.dropTable(table);
+        }
+        logger.info("[MONITOR][OLD TABLE DELETE] clean table end");
+    }
+
+    /**
+     * schedule: delete old warning data
+     * period: a day
+     * span: old than 3 days
+     */
+    @Scheduled(cron = "12 3 1 * * *")
+    public void deleteWarning(){
+        logger.info("[MONITOR][OLD WARNING DELETE] Start to clean warning");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -3);
+        int numbers = warningMapper.delete(calendar.getTime());
+        logger.info("Deleted " + numbers + " warning records.");
+        logger.info("[MONITOR][OLD WARNING DELETE] clean warning end");
     }
 
     /**

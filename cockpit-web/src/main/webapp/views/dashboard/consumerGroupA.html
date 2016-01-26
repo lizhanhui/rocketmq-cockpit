@@ -28,15 +28,15 @@
                   </div>
                   <div class="form-group">
                      <label class="control-label">Consume Broadcast Enable * </label>
-                     <input type="text" name="consumeBroadcastEnable" ng-model="consumerGroup.consumeBroadcastEnable" required="required" ng-pattern="/^[^\n]{4,5}$/" class="form-control" />
+                     <input type="text" name="consumeBroadcastEnable" ng-model="consumerGroup.consumeBroadcastEnable" required="required" ng-pattern="/^((true)|(false))$/" class="form-control" />
                      <span ng-show="registerForm.consumeBroadcastEnable.$dirty &amp;&amp; registerForm.consumeBroadcastEnable.$error.required" class="text-danger">this field is required</span>
                      <span ng-show="registerForm.consumeBroadcastEnable.$dirty &amp;&amp; registerForm.consumeBroadcastEnable.$error.pattern" class="text-danger">true  or false ? </span>
                   </div>
                   <div class="form-group">
                      <label class="control-label">cluster * </label>
-                     <input type="text" name="clusterName" ng-model="consumerGroup.clusterName" required="required" ng-pattern="/^[^\n]{2,255}$/" class="form-control" value="DefaultCluster"/>
+                     <input type="text" name="clusterName" ng-model="consumerGroup.clusterName" required="required" ng-pattern="/^[^\n]{5,255}$/" class="form-control" value="DefaultCluster"/>
                      <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.required" class="text-danger">this field is required</span>
-                     <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.pattern" class="text-danger">DefaultCluster?</span>
+                     <span ng-show="registerForm.clusterName.$dirty &amp;&amp; registerForm.clusterName.$error.pattern" class="text-danger">DefaultCluster ?</span>
                   </div>
                   <div class="required">* Required fields</div>
                </div>
