@@ -79,9 +79,9 @@
 
     angular.module('cockpit')
     .controller('ProjectCtrl', ProjectController);
-    ProjectController.$inject = ['$scope', '$http' , '$location', 'UserService', '$cookieStore'];
+    ProjectController.$inject = ['$scope', '$http' , '$location', 'UserService', '$cookieStore', '$state'];
 
-    function ProjectController($scope, $http, $location, UserService, $cookieStore ){
+    function ProjectController($scope, $http, $location, UserService, $cookieStore, $state ){
         function reDrow(){
             initAdd();
             clearGroups();
@@ -103,13 +103,16 @@
 
 
         function activate() {
+            if (null == $scope.project) {
+                return;
+            }
             $http({
                 method:'GET',
                 //headers: {'Content-type': 'application/json;charset=UTF-8'},
                 url: 'cockpit/api/project/' + $scope.project.id + "/consumer-groups",
                 responseType: 'json'
             }).success(function(data, status, headers, config) {
-                if (data != null) {
+                if (data.length > 0 ) {
                     data.forEach(function(consumerGroup){
                         var x = [];
                         var y = [];
@@ -154,38 +157,39 @@
                 method: "GET",
                 responseType: 'json'
             }).success(function(data, status, headers, config) {
-                data.forEach(function(topicMetadata) {
-                    var x = [];
-                    var y = [];
-                    var yin = []
-                        $http({
-                            method:'GET',
-                            //headers: {'Content-type': 'application/json;charset=UTF-8'},
-                            url: "cockpit/api/topic-progress" + "/" + topicMetadata.topic,
-                            responseType: 'json'
-                        }).success(function(data, status, headers, config) {
-                            data.forEach(function (topicPerSecond) {
-                                var temp = [];
-                                temp.push(topicPerSecond.timeStamp);
-                                temp.push(topicPerSecond.tps);
-                                yin.push(temp);
-                            });
-                            if (yin.length > 0 ) {
-                                yin.reverse();
-                                if ("undefined" ===  typeof($scope.chartConfig2) ){
-                                    activate2(topicMetadata.topic, yin);
-                                }else if ($scope.chartConfig2.series.length === 0) {
-                                    activate2(topicMetadata.topic, yin);
-                                }else {
-                                    addLine2(topicMetadata.topic, yin);
+                if (data.length > 0) {
+                    data.forEach(function(topicMetadata) {
+                        var x = [];
+                        var y = [];
+                        var yin = []
+                            $http({
+                                method:'GET',
+                                //headers: {'Content-type': 'application/json;charset=UTF-8'},
+                                url: "cockpit/api/topic-progress" + "/" + topicMetadata.topic,
+                                responseType: 'json'
+                            }).success(function(data, status, headers, config) {
+                                data.forEach(function (topicPerSecond) {
+                                    var temp = [];
+                                    temp.push(topicPerSecond.timeStamp);
+                                    temp.push(topicPerSecond.tps);
+                                    yin.push(temp);
+                                });
+                                if (yin.length > 0 ) {
+                                    yin.reverse();
+                                    if ("undefined" ===  typeof($scope.chartConfig2) ){
+                                        activate2(topicMetadata.topic, yin);
+                                    }else if ($scope.chartConfig2.series.length === 0) {
+                                        activate2(topicMetadata.topic, yin);
+                                    }else {
+                                        addLine2(topicMetadata.topic, yin);
+                                    }
                                 }
-                            }
 
-                        }).error(function(data, status, headers, config) {
+                            }).error(function(data, status, headers, config) {
 
-                        });
-
-                });
+                            });
+                    });
+                }
             }).error(function(data, status, headers, config) {
 
             });
@@ -239,7 +243,9 @@
 
         function clearGroups(){
             var series = [];
-            $scope.chartConfig.series = series;
+            if ("undefined" !=  typeof($scope.chartConfig)) {
+                $scope.chartConfig.series = series;
+            }
         };
 
         function activate2(x, y) {
@@ -290,8 +296,9 @@
 
         function clearTopics() {
             var series = [];
-            $scope.chartConfig2.series = series;
-
+            if ("undefined" !=  typeof($scope.chartConfig2)) {
+                $scope.chartConfig2.series = series;
+            }
         };
 
         if (!UserService.isLogin) {
@@ -386,9 +393,14 @@
                 url: 'cockpit/api/project',
                 responseType: 'json'
             }).success(function(data, status, headers, config) {
-                $scope.projects=data;
+                $scope.projects = data;
                 $scope.project = $scope.projects[0];
-                activate();
+                if (data.length > 0) {
+                    activate();
+                }else {
+                    alert("FIRST: create a project .");
+                    $state.go('projectA');
+                }
             }).error(function(data, status, headers, config) {
 
             });
