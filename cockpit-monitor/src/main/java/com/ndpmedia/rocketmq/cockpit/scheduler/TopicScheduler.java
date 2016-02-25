@@ -154,6 +154,8 @@ public class TopicScheduler {
     }
 
     private void syncUpTopics(DefaultMQAdminExt defaultMQAdminExt) {
+        if (!Boolean.parseBoolean(System.getProperty("AUTOUP","false")))
+            return;
         for (String brokerAddress : brokerAddresses) {
             Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
             List<TopicBrokerInfo> list = new ArrayList<>();

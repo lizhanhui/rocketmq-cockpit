@@ -81,6 +81,8 @@ public class AutoPilot {
     }
 
     private void autoPilotConsumerGroup(MQAdminExt adminExt) {
+        if (!Boolean.parseBoolean(System.getProperty("AUTOUP","false")))
+            return;
         Map<String, Set<String>> brokerAddressConsumerGroupCache = new HashMap<>();
 
         List<TopicMetadata> topicMetadataList = cockpitTopicDBService.getTopics(Status.ACTIVE, Status.APPROVED);
@@ -141,6 +143,8 @@ public class AutoPilot {
     }
 
     private void autoPilotTopic(MQAdminExt adminExt) {
+        if (!Boolean.parseBoolean(System.getProperty("AUTOUP","false")))
+            return;
         List<TopicAvailability> topicAvailabilityList = cockpitTopicDBService.queryTopicsAvailability(Status.APPROVED, Status.ACTIVE);
 
         if (null != topicAvailabilityList && !topicAvailabilityList.isEmpty()) {

@@ -114,6 +114,8 @@ public class ConsumerGroupScheduler {
     }
 
     private void syncUpConsumerGroupsByBroker(DefaultMQAdminExt defaultMQAdminExt, String brokerAddress, Set<Long> groupIds) {
+        if (!Boolean.parseBoolean(System.getProperty("AUTOUP","false")))
+            return;
         Broker broker = cockpitBrokerDBService.get(0, brokerAddress);
         List<ConsumerGroupHosting> endangeredConsumerGroupHostingList = new ArrayList<>();
         //add last update consumer group
