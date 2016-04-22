@@ -32,7 +32,7 @@ public class TopicServiceController {
     public Map<String, Object> list(HttpServletRequest request) {
         CockpitUser cockpitUser = (CockpitUser)request.getSession().getAttribute(LoginConstant.COCKPIT_USER_KEY);
         long teamId = WebHelper.hasRole(request, CockpitRole.ROLE_ADMIN) ? 0 : cockpitUser.getTeam().getId();
-        List<TopicMetadata> topics = cockpitTopicDBService.getTopics(null);
+        List<TopicMetadata> topics = cockpitTopicDBService.getTopics((Status)null);
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("sEcho", 1);
         result.put("iTotalRecords", topics.size());
