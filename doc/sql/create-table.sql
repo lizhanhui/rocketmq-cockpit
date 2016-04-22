@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS name_server (
   ip VARCHAR(64) NOT NULL,
   port SMALLINT NOT NULL DEFAULT 9876,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time TIMESTAMP NOT NULL DEFAULT 0
+  update_time TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = INNODB;
 
 -- DEPRECATED
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS ip_mapping(
   inner_ip VARCHAR(64) NOT NULL,
   public_ip VARCHAR(64) NOT NULL,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time TIMESTAMP NOT NULL DEFAULT 0
+  update_time TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = INNODB;
 -- END OF DEPRECATED
 
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS broker (
   version VARCHAR(100) DEFAULT '3.2.2',
   dc INT NOT NULL REFERENCES data_center(id),
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time TIMESTAMP NOT NULL DEFAULT 0,
-  sync_time TIMESTAMP,
+  update_time TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP ,
+  sync_time TIMESTAMP NULL,
   CONSTRAINT uniq_cluster_name_id UNIQUE (cluster_name, broker_name, broker_id)
 ) ENGINE = INNODB;
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS topic (
   `order` BOOL DEFAULT FALSE,
   status INT NOT NULL DEFAULT 1,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time TIMESTAMP NOT NULL DEFAULT 0
+  update_time TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = INNODB;
 
 CREATE TABLE topic_broker_xref (
@@ -57,8 +57,8 @@ CREATE TABLE topic_broker_xref (
   read_queue_num INT NOT NULL DEFAULT 4,
   status_id INT NOT NULL DEFAULT 1 REFERENCES status_lu(id) ON DELETE RESTRICT ,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time TIMESTAMP NOT NULL DEFAULT 0,
-  sync_time TIMESTAMP NOT NULL DEFAULT  0,
+  update_time TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP ,
+  sync_time TIMESTAMP NULL,
   CONSTRAINT uniq_broker_topic UNIQUE (broker_id, topic_id)
 ) ENGINE = INNODB;
 
@@ -85,23 +85,23 @@ CREATE TABLE IF NOT EXISTS consumer_group (
   fatal_threshold INT NOT NULL DEFAULT 50000,
   project_id INT NOT NULL DEFAULT 1,
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time TIMESTAMP NOT NULL DEFAULT 0
+  update_time TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS topic_consumer_group_xref (
   topic_id INT NOT NULL REFERENCES topic(id),
   consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
   create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time TIMESTAMP NOT NULL DEFAULT 0,
+  update_time TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP ,
   CONSTRAINT uniq_topic_consumer_group UNIQUE (topic_id, consumer_group_id)
 ) ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS broker_consumer_group_xref (
   broker_id INT NOT NULL REFERENCES broker(id),
-  consumer_group_id INT NOT NULL REFERENCES consumer_group(id),
-  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time TIMESTAMP NOT NULL DEFAULT 0,
-  sync_time TIMESTAMP NOT NULL DEFAULT 0,
+  consumer_group_id INT NOT NULL REFERENCES consumer_group(id) ,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+  update_time TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP ,
+  sync_time TIMESTAMP NULL,
   CONSTRAINT uniq_broker_consumer_group UNIQUE (broker_id, consumer_group_id)
 );
 
@@ -291,6 +291,7 @@ ALTER TABLE consumer_group ADD CONSTRAINT  uniq_cluster_consumer_group UNIQUE (c
 ALTER TABLE broker ADD CONSTRAINT  uniq_cluster_broker_name_broker_id UNIQUE (cluster_name, broker_name, broker_id);
 
 ALTER TABLE resource_permission ADD CONSTRAINT uniq_resource_id_type_team UNIQUE (resource_id, resource_type_id, team_id);
---新库无需执行
-ALTER TABLE topic_progress ADD INDEX create_time (create_time);
-ALTER TABLE consume_progress ADD INDEX create_time (create_time);
+
+-- 新库无需执行
+-- ALTER TABLE topic_progress ADD INDEX create_time (create_time);
+-- ALTER TABLE consume_progress ADD INDEX create_time (create_time);
