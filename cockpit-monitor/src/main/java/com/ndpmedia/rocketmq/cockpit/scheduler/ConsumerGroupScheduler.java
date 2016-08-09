@@ -90,7 +90,7 @@ public class ConsumerGroupScheduler {
             return;
         }
 
-        SubscriptionGroupWrapper subscriptionGroupWrapper = defaultMQAdminExt.fetchAllSubscriptionGroups(brokerAddress, 12000L);
+        SubscriptionGroupWrapper subscriptionGroupWrapper = defaultMQAdminExt.fetchAllSubscriptionGroups(brokerAddress);
 
         for (SubscriptionGroupConfig subscriptionGroupConfig : subscriptionGroupWrapper.getSubscriptionGroupTable().values()) {
             ConsumerGroup consumerGroup = cockpitConsumerGroupDBService.get(0, subscriptionGroupConfig.getGroupName());
@@ -128,7 +128,7 @@ public class ConsumerGroupScheduler {
             try {
                 logger.debug("[MONITOR][CONSUMER-GROUP-SCHEDULER]About to create consumer group {} on broker {}",
                         subscriptionGroupConfig.getGroupName(), brokerAddress);
-                defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress, subscriptionGroupConfig, 15000L);
+                defaultMQAdminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress, subscriptionGroupConfig);
                 groupIds.add(hosting.getConsumerGroup().getId());
                 logger.info("[MONITOR][CONSUMER-GROUP-SCHEDULER]Consumer Group {} has been created on broker {}",
                         subscriptionGroupConfig.getGroupName(), brokerAddress);

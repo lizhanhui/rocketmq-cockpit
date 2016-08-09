@@ -223,7 +223,7 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
 
             TopicConfig topicConfig = TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo);
             if (-1 != topicBrokerInfo.getBroker().getId())
-                adminExt.createAndUpdateTopicConfig(topicBrokerInfo.getBroker().getAddress(), topicConfig, 20000L);
+                adminExt.createAndUpdateTopicConfig(topicBrokerInfo.getBroker().getAddress(), topicConfig);
             else{
                 Set<String> masterSet =
                         CommandUtil.fetchMasterAddrByClusterName(adminExt, topicBrokerInfo.getTopicMetadata().getClusterName());
@@ -231,7 +231,7 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
                     int retry = 0;
                     while (retry < 5) {
                         try {
-                            adminExt.createAndUpdateTopicConfig(addr, topicConfig, 15000L);
+                            adminExt.createAndUpdateTopicConfig(addr, topicConfig);
                             break;
                         } catch (Exception e) {
                             logger.warn("createAndUpdateTopicConfig faild:" + addr + e);
@@ -262,14 +262,14 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
             }
             Set<String> adders = CommandUtil.fetchMasterAddrByClusterName(adminExt, topic.getClusterName());
 
-            adminExt.deleteTopicInBroker(adders, topic.getTopic(), 15000L);
+            adminExt.deleteTopicInBroker(adders, topic.getTopic());
             // 删除 NameServer 上的 topic 信息
             Set<String> nameServerSet = null;
             if (adminExt.getNamesrvAddr() != null) {
                 String[] ns = adminExt.getNamesrvAddr().trim().split(";");
-                nameServerSet = new HashSet(Arrays.asList(ns));
+                nameServerSet = new HashSet<>(Arrays.asList(ns));
+                adminExt.deleteTopicInNameServer(nameServerSet, topic.getTopic());
             }
-            adminExt.deleteTopicInNameServer(nameServerSet, topic.getTopic(), null);
         } catch (Exception e) {
             logger.warn("[MANAGE][DELETE_TOPIC]" + e);
             return false;
@@ -291,14 +291,14 @@ public class CockpitTopicMQServiceImpl implements CockpitTopicMQService {
             }
             Set<String> addrs = new HashSet<>();
             addrs.add(topicBrokerInfo.getBroker().getAddress());
-            adminExt.deleteTopicInBroker(addrs, topicBrokerInfo.getTopicMetadata().getTopic(), 15000L);
+            adminExt.deleteTopicInBroker(addrs, topicBrokerInfo.getTopicMetadata().getTopic());
             // 删除 NameServer 上的 topic 信息
             Set<String> nameServerSet = null;
             if (adminExt.getNamesrvAddr() != null) {
                 String[] ns = adminExt.getNamesrvAddr().trim().split(";");
-                nameServerSet = new HashSet(Arrays.asList(ns));
+                nameServerSet = new HashSet<>(Arrays.asList(ns));
+                adminExt.deleteTopicInNameServer(nameServerSet, topicBrokerInfo.getTopicMetadata().getTopic());
             }
-            adminExt.deleteTopicInNameServer(nameServerSet, topicBrokerInfo.getTopicMetadata().getTopic(), topicBrokerInfo.getBroker().getAddress().trim());
         } catch (Exception e) {
             logger.warn("[MANAGE][DELETE_TOPIC_BROKER]" + e);
             return false;

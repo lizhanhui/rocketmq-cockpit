@@ -168,7 +168,7 @@ public class TopicScheduler {
                 try {
                     logger.debug("[MONITOR][TOPIC-SCHEDULER]About to create topic {} on broker {}",
                             topicConfig.getTopicName(), brokerAddress);
-                    defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddress, topicConfig, 15000L);
+                    defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddress, topicConfig);
                     cockpitTopicDBService.activate(topicBrokerInfo.getTopicMetadata().getId(), topicBrokerInfo.getBroker().getId());
                     logger.info("[MONITOR][TOPIC-SCHEDULER]Topic {} has been created on broker {}",
                             topicConfig.getTopicName(), brokerAddress);
