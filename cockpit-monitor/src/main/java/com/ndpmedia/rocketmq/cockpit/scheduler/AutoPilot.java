@@ -115,7 +115,7 @@ public class AutoPilot {
         if (!brokerAddressConsumerGroupCache.containsKey(brokerAddress.getValue())) {
             Set<String> consumerGroups = new HashSet<String>();
             try {
-                SubscriptionGroupWrapper subscriptionGroups = adminExt.fetchAllSubscriptionGroups(brokerAddress.getValue(), 3000);
+                SubscriptionGroupWrapper subscriptionGroups = adminExt.fetchAllSubscriptionGroups(brokerAddress.getValue());
                 for (SubscriptionGroupConfig subscriptionGroupConfig : subscriptionGroups.getSubscriptionGroupTable().values()) {
                     consumerGroups.add(subscriptionGroupConfig.getGroupName());
                 }
@@ -134,7 +134,7 @@ public class AutoPilot {
             if (!consumerGroupsOnBroker.contains(consumerGroup.getGroupName())) {
                 try {
                     adminExt.createAndUpdateSubscriptionGroupConfig(brokerAddress.getValue(),
-                            CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup), 15000L);
+                            CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup));
                 } catch (Exception e) {
                     LOGGER.error("[MONITOR][AUTO-PILOT]Broker {} does not have consumer group: {} and trying to creating such consumer group fails!", brokerAddress.getValue(), consumerGroup.getGroupName());
                 }
@@ -198,7 +198,7 @@ public class AutoPilot {
                     try {
                         // For each topic, create associated consumer group on the target, matched brokers.
                         adminExt.createAndUpdateSubscriptionGroupConfig(broker.getAddress(),
-                                CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup), 20000);
+                                CockpitConsumerGroupMQServiceImpl.wrap(consumerGroup));
                         brokerMapper.createConsumerGroup(brokerId, consumerGroupId);
 
                     } catch (RemotingException | MQBrokerException | InterruptedException | MQClientException e) {
@@ -221,7 +221,7 @@ public class AutoPilot {
 
                 // Create topic on matched brokers or update topic read/write queue number.
                 adminExt.createAndUpdateTopicConfig(broker.getAddress(),
-                        TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo), 15000L);
+                        TopicTranslate.wrapTopicToTopicConfig(topicBrokerInfo));
                 if (existingTopicBrokerInfo.isEmpty()) {
                     cockpitTopicDBService.insertTopicBrokerInfo(topicBrokerInfo);
                 }

@@ -74,7 +74,7 @@ public class CockpitConsumerGroupMQServiceImpl implements CockpitConsumerGroupMQ
 
                 if (null != masterSet && !masterSet.isEmpty()) {
                     for (String brokerAddress : masterSet) {
-                        defaultMQAdminExt.deleteSubscriptionGroup(brokerAddress, consumerGroup.getGroupName(), 15000L);
+                        defaultMQAdminExt.deleteSubscriptionGroup(brokerAddress, consumerGroup.getGroupName());
                     }
                 }
             }

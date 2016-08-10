@@ -31,4 +31,6 @@ public interface CockpitUserMapper {
     void activate(long id);
 
     void suspend(long id);
+    
+    void remove(@Param("userId") long id);
 }

@@ -34,7 +34,7 @@ public class CockpitConsumeProgressServiceImpl implements CockpitConsumeProgress
         try {
             defaultMQAdminExt.start();
             // 查询特定consumer
-            ConsumeStats consumeStats = defaultMQAdminExt.examineConsumeStats(groupName, 15000L);
+            ConsumeStats consumeStats = defaultMQAdminExt.examineConsumeStats(groupName);
 
             List<MessageQueue> messageQueueList = new LinkedList<MessageQueue>();
             messageQueueList.addAll(consumeStats.getOffsetTable().keySet());
@@ -72,7 +72,7 @@ public class CockpitConsumeProgressServiceImpl implements CockpitConsumeProgress
         List<ConsumeProgress> consumeProgressList = new ArrayList<ConsumeProgress>();
         try {
             // 查询特定consumer
-            ConsumeStats consumeStats = defaultMQAdminExt.examineConsumeStats(groupName, 15000L);
+            ConsumeStats consumeStats = defaultMQAdminExt.examineConsumeStats(groupName);
 
             List<MessageQueue> messageQueueList = new LinkedList<MessageQueue>();
             messageQueueList.addAll(consumeStats.getOffsetTable().keySet());
